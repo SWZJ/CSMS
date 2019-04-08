@@ -566,7 +566,7 @@ public class CDTopic {
         return count;
     }
 
-    //获取总数据条数（是否删除+是否有效+所属教师）（2表示不考虑该条件）
+    //获取总数据条数（是否删除+是否有效+所属教师ID）（boolean型的2表示不考虑该条件）
     public int Count(int cdtopic_deleted,int cdtopic_active,int teacher_id) {
     	switch(cdtopic_deleted) {
     	case 2:
@@ -646,7 +646,7 @@ public class CDTopic {
         return cdtList;
     }
     
-    //返回分页数据（是否删除+是否有效+所属教师）（2表示不考虑该条件）
+    //返回分页数据（是否删除+是否有效+所属教师ID）（boolean型的2表示不考虑该条件）
     public List<CDTopic> cutPageData(int page,int pageSize,int cdtopic_deleted,int cdtopic_active,int teacher_id){
     	switch(cdtopic_deleted) {
     	case 2:

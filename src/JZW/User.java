@@ -331,6 +331,96 @@ public class User {
 		return null;
     }
     
+	//获取数据量
+    public int CountByString(String querySql) {
+    	int count;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        Connection conn = null;
+        try{
+            conn = conn();
+            ps = conn.prepareStatement(querySql);
+            rs = ps.executeQuery();
+            rs.next();
+            count = rs.getInt(1);
+        }catch(Exception e2) {
+            e2.printStackTrace();
+            return 0;
+        }finally{
+            try {
+                rs.close();
+                ps.close();
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+        return count;
+    }
+
+    //获取总数据条数（是否删除）（boolean型的2表示不考虑该条件）
+    public int Count(int user_deleted) {
+    	switch(user_deleted) {
+    	case 2:
+    		return CountByString("select count(*) from user");
+    	default:
+    		return CountByString("select count(*) from user where user_deleted = "+user_deleted);
+    	}
+    }
+	
+    //返回分页数据
+    public List<User> cutPageDataByString(int page,int pageSize,String querySql){
+        List<User> userList = new ArrayList<User>();
+        User user = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        Connection conn = null;
+        try{
+        	conn = conn();
+            ps = conn.prepareStatement(querySql);
+            ps.setInt(1,page*pageSize-pageSize);
+            ps.setInt(2,pageSize);
+            rs = ps.executeQuery();
+            while(rs.next()) {
+            	user = new User();
+            	user.user_id = rs.getInt("user_id");
+            	user.user_account = rs.getString("user_account");
+            	user.user_password = rs.getString("user_password");
+            	user.user_name = rs.getString("user_name");
+            	user.user_root = rs.getInt("user_root");
+            	user.user_root_name = rs.getString("user_root_name");
+            	user.user_deleted = rs.getBoolean("user_deleted");
+            	user.student_id = rs.getInt("student_id");
+            	user.teacher_id = rs.getInt("teacher_id");
+            	user.created_at = rs.getTimestamp("created_at");
+            	user.updated_at = rs.getTimestamp("updated_at");
+            	user.deleted_at = rs.getTimestamp("deleted_at");
+            	userList.add(user);
+            }
+        }catch(Exception e2) {
+            e2.printStackTrace();
+            return null;
+        }finally{
+            try {
+                rs.close();
+                ps.close();
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+        return userList;
+    }
+    
+    //返回分页数据（是否删除）（boolean型的2表示不考虑该条件）
+    public List<User> cutPageData(int page,int pageSize,int user_deleted){
+    	switch(user_deleted) {
+    	case 2:
+    		return cutPageDataByString(page,pageSize,"select * from user limit ?,?");
+    	default:
+    		return cutPageDataByString(page,pageSize,"select * from user where user_deleted = "+user_deleted+" limit ?,?");
+    	}
+    }
  
     //从数据库获取所有用户信息返回用户表
     public List<User> getUserInfo() {

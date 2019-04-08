@@ -1,3 +1,4 @@
+<%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();

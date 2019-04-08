@@ -1,5 +1,5 @@
-<%@ page language="java" import="java.util.*,JZW.*,java.text.DateFormat,java.text.SimpleDateFormat" pageEncoding="utf-8"%>
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
+<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -84,7 +84,7 @@
         
     <div class="panel">
         <div class="panel-heading" >
-            <h3 class="panel-title">课题信息管理</h3>
+            <h3 class="panel-title">我拥有的所有课题信息</h3>
             <div class="right">
                 <a href="/CSMS/SWZJ/teacher/createTopic/cdtopicAdd.jsp"><span class="label label-primary"><i class="fa fa-plus-square"></i>&nbsp;新增课题</span></a>
             </div>
@@ -117,8 +117,8 @@
 					int pageCount = recordCount%pageSize==0 ? recordCount/pageSize : recordCount/pageSize+1; 				//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
 					
-					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
+					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
 					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,2,2,user.getTeacherID());
 					for(CDTopic cdtopic:cutList) {
@@ -127,15 +127,16 @@
 						out.print("<a href=\"/CSMS/SWZJ/teacher/myTopic/cdtopicDetail.jsp?id="+cdtopic.getID()+"\">详情</a>&ensp;");
 						out.print("<a href=\"/CSMS/SWZJ/teacher/myTopic/cdtopicAmend.jsp?id="+cdtopic.getID()+"\">修改</a>&ensp;");
 						out.print("<a href=\"/CSMS/SWZJ/teacher/myTopic/cdtopicDoDelete.jsp?id="+cdtopic.getID()+"\" onclick=\"if (confirm('确定要删除这个课题吗？') == false) return false;\">删除</a>");
-						out.print("<th>"+cdtopic.getNum()+"</th>");
-						out.print("<th>"+cdtopic.getName()+"</th>");
-						out.print("<th>"+cdtopic.getKeyword()+"</th>");
-						out.print("<th>"+cdtopic.getTechnology()+"</th>");
-						out.print("<th>"+cdtopic.getHeadcount()+"</th>");
-						out.print("<th>"+cdtopic.getTeacherName()+"</th>");
-						out.print("<th>"+cdtopic.getActiveStr()+"</th>");
-						/* out.print("<th>"+cdtopic.getCreated()+"</th>");
-						out.print("<th>"+cdtopic.getUpdated()+"</th>"); */
+						out.print("</td>");
+						out.print("<td>"+cdtopic.getNum()+"</td>");
+						out.print("<td>"+cdtopic.getName()+"</td>");
+						out.print("<td>"+cdtopic.getKeyword()+"</td>");
+						out.print("<td>"+cdtopic.getTechnology()+"</td>");
+						out.print("<td>"+cdtopic.getHeadcount()+"</td>");
+						out.print("<td>"+cdtopic.getTeacherName()+"</td>");
+						out.print("<td>"+cdtopic.getActiveStr()+"</td>");
+						/* out.print("<td>"+cdtopic.getCreated()+"</td>");
+						out.print("<td>"+cdtopic.getUpdated()+"</td>"); */
 					}
 				%>
 				</tbody>

@@ -521,16 +521,15 @@ public class Student {
     	else return false;
     }
 
-    //获取总数据条数
-    public int Count() {
+    //获取数据量
+    public int CountByString(String querySql) {
     	int count;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
             conn = conn();
-            String sqlQuery = "select count(*) from student";
-            ps = conn.prepareStatement(sqlQuery);
+            ps = conn.prepareStatement(querySql);
             rs = ps.executeQuery();
             rs.next();
             count = rs.getInt(1);
@@ -548,9 +547,27 @@ public class Student {
         }
         return count;
     }
+
+    //获取总数据条数（是否删除+所选课题ID）（boolean型的2表示不考虑该条件）
+    public int Count(int student_deleted,int cdtopic_id) {
+    	switch(student_deleted) {
+    	case 2:
+    		if(cdtopic_id!=0) {
+				return CountByString("select count(*) from student where cdtopic_id ="+cdtopic_id);
+			}else {
+				return CountByString("select count(*) from student");
+			}
+    	default:
+    		if(cdtopic_id!=0) {
+				return CountByString("select count(*) from student where student_deleted = "+student_deleted+" and cdtopic_id ="+cdtopic_id);
+			}else {
+				return CountByString("select count(*) from student where student_deleted = "+student_deleted);
+			}
+    	}
+    }
     
-    //返回分页数据
-    public List<Student> cutPageData(int page,int pageSize){
+  //返回分页数据
+    public List<Student> cutPageDataByString(int page,int pageSize,String querySql){
         List<Student> stuList = new ArrayList<Student>();
         Student stu = null;
         ResultSet rs = null;
@@ -558,8 +575,7 @@ public class Student {
         Connection conn = null;
         try{
         	conn = conn();
-            String sqlQuery = "select * from student limit ?,?";
-            ps = conn.prepareStatement(sqlQuery);
+            ps = conn.prepareStatement(querySql);
             ps.setInt(1,page*pageSize-pageSize);
             ps.setInt(2,pageSize);
             rs = ps.executeQuery();
@@ -593,6 +609,24 @@ public class Student {
             }
         }
         return stuList;
+    }
+    
+    //返回分页数据（是否删除+所选课题ID）（boolean型的2表示不考虑该条件）
+    public List<Student> cutPageData(int page,int pageSize,int student_deleted,int cdtopic_id){
+    	switch(student_deleted) {
+    	case 2:
+    		if(cdtopic_id!=0) {
+				return cutPageDataByString(page,pageSize,"select * from student where cdtopic_id = "+cdtopic_id+" limit ?,?");
+			}else {
+				return cutPageDataByString(page,pageSize,"select * from student limit ?,?");
+			}
+    	default:
+    		if(cdtopic_id!=0) {
+				return cutPageDataByString(page,pageSize,"select * from student where student_deleted = "+student_deleted+" and cdtopic_id ="+cdtopic_id+" limit ?,?");
+			}else {
+				return cutPageDataByString(page,pageSize,"select * from student where student_deleted = "+student_deleted+" limit ?,?");
+			}
+    	}
     }
     
     //从数据库获取所有学生信息返回学生表

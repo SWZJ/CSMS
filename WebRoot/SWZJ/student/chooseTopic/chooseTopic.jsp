@@ -1,5 +1,5 @@
-<%@ page language="java" import="java.util.*,JZW.*,java.text.DateFormat,java.text.SimpleDateFormat" pageEncoding="utf-8"%>
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
+<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -146,49 +146,42 @@
 			<table class="table table-hover">
 				<thead>
 					<tr>
-					<th>操作管理</th>
-					<th>学号</th>
-					<th>姓名</th>
-					<th>性别</th>
-					<th>年龄</th>
-					<th>班级</th>
-					<th>专业</th>
-					<th>学院</th>
-					<th>所选课题名称</th>
-					<!-- <th>添加时间</th>
-					<th>修改时间</th> -->
+					<th>操作</th>
+					<th>编号</th>
+					<th>名称</th>
+					<th>关键字</th>
+					<th>实现技术</th>
+					<th>人员数</th>
+					<th>所属教师</th>
+					<th>生效状态</th>
 					</tr>
 				</thead>
 				<tbody>
 				<%
-					Student stu=new Student();
-					int recordCount = stu.Count();   		//记录总数
+					/* CDTopic cdt=new CDTopic(); */
+					/* cdt.refreshHeadcountOfAll();//刷新所有课题的人员数 */
+					int recordCount = cdt.Count(0,2,0);   	//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
 					int pageCount = recordCount%pageSize==0 ? recordCount/pageSize : recordCount/pageSize+1; 				//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
 					
-					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
+					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<Student> cutList = stu.cutPageData(Page, pageSize);
-					for(Student student:cutList) {
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,0);
+					for(CDTopic cdtopic:cutList) {
+						if(cdtopic.getID()==cdt.getID())	continue;
 						out.print("<tr>");
-						out.print("<td>");
-						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Student/studentDetail.jsp?id="+student.getID()+"\">详情</a>&ensp;");
-						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Student/studentAmend.jsp?id="+student.getID()+"\">修改</a>&ensp;");
-						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Student/studentDoDelete.jsp?id="+student.getID()+"\" onclick=\"if (confirm('确定要删除这条学生信息吗？') == false) return false;\">删除</a>");
-						out.print("<th>"+student.getNum()+"</th>");
-						out.print("<th>"+student.getName()+"</th>");
-						out.print("<th>"+student.getSex()+"</th>");
-						out.print("<th>"+student.getAge()+"</th>");
-						out.print("<th>"+student.getClassName()+"</th>");
-						out.print("<th>"+student.getMajorName()+"</th>");
-						out.print("<th>"+student.getCollegeName()+"</th>");
-						out.print("<th>"+student.getCDTopicName()+"</th>");
-						/* out.print("<th>"+student.getCreated()+"</th>");
-						out.print("<th>"+student.getUpdated()+"</th>"); */
+						out.print("<td><a href=\"#\" onclick=\"return confirm('确定选择这个课题吗？');\"><span class=\"label label-primary\">选择课题</span></a></td>");
+						out.print("<td>"+cdtopic.getNum()+"</td>");
+						out.print("<td>"+cdtopic.getName()+"</td>");
+						out.print("<td>"+cdtopic.getKeyword()+"</td>");
+						out.print("<td>"+cdtopic.getTechnology()+"</td>");
+						out.print("<td>"+cdtopic.getHeadcount()+"</td>");
+						out.print("<td>"+cdtopic.getTeacherName()+"</td>");
+						out.print("<td>"+cdtopic.getActiveStr()+"</td>");
 					}
 				%>
 				</tbody>

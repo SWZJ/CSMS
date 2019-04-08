@@ -1,6 +1,6 @@
-<%@ page language="java" import="java.util.*,JZW.*,java.text.DateFormat,java.text.SimpleDateFormat" pageEncoding="utf-8"%>
-<%String url = request.getRequestURI() + "?" + request.getQueryString();%>
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
+<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
+<%String url = request.getRequestURI() + "?" + request.getQueryString();%>
 
 <!DOCTYPE html>
 <html>
@@ -111,33 +111,34 @@
 				<tbody>
 				<%
 					Student stu=new Student();
-					int recordCount = stu.Count();   		//记录总数
+					int recordCount = stu.Count(0,0);   		//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
 					int pageCount = recordCount%pageSize==0 ? recordCount/pageSize : recordCount/pageSize+1; 				//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
 					
-					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
+					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<Student> cutList = stu.cutPageData(Page, pageSize);
+					List<Student> cutList = stu.cutPageData(Page,pageSize,0,0);
 					for(Student student:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
 						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Student/studentDetail.jsp?id="+student.getID()+"\">详情</a>&ensp;");
 						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Student/studentAmend.jsp?id="+student.getID()+"\">修改</a>&ensp;");
 						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Student/studentDoDelete.jsp?id="+student.getID()+"\" onclick=\"if (confirm('确定要删除这条学生信息吗？') == false) return false;\">删除</a>");
-						out.print("<th>"+student.getNum()+"</th>");
-						out.print("<th>"+student.getName()+"</th>");
-						out.print("<th>"+student.getSex()+"</th>");
-						out.print("<th>"+student.getAge()+"</th>");
-						out.print("<th>"+student.getClassName()+"</th>");
-						out.print("<th>"+student.getMajorName()+"</th>");
-						out.print("<th>"+student.getCollegeName()+"</th>");
-						out.print("<th>"+student.getCDTopicName()+"</th>");
-						/* out.print("<th>"+student.getCreated()+"</th>");
-						out.print("<th>"+student.getUpdated()+"</th>"); */
+						out.print("</td>");
+						out.print("<td>"+student.getNum()+"</td>");
+						out.print("<td>"+student.getName()+"</td>");
+						out.print("<td>"+student.getSex()+"</td>");
+						out.print("<td>"+student.getAge()+"</td>");
+						out.print("<td>"+student.getClassName()+"</td>");
+						out.print("<td>"+student.getMajorName()+"</td>");
+						out.print("<td>"+student.getCollegeName()+"</td>");
+						out.print("<td>"+student.getCDTopicName()+"</td>");
+						/* out.print("<td>"+student.getCreated()+"</td>");
+						out.print("<td>"+student.getUpdated()+"</td>"); */
 					}
 				%>
 				</tbody>

@@ -1,5 +1,5 @@
-<%@ page language="java" import="java.util.*,JZW.*,java.text.DateFormat,java.text.SimpleDateFormat" pageEncoding="utf-8"%>
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
+<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -107,29 +107,30 @@
 				<%
 					Teacher tea=new Teacher();
 					/* tea.refreshCDTopicCountOfAll();//刷新所有教师的拥有课题数量 */
-					int recordCount = tea.Count();   		//记录总数
+					int recordCount = tea.Count(0);   		//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
 					int pageCount = recordCount%pageSize==0 ? recordCount/pageSize : recordCount/pageSize+1; 				//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
 					
-					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
+					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<Teacher> cutList = tea.cutPageData(Page, pageSize);
+					List<Teacher> cutList = tea.cutPageData(Page,pageSize,0);
 					for(Teacher teacher:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
 						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Teacher/teacherDetail.jsp?id="+teacher.getID()+"\">详情</a>&ensp;");
 						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Teacher/teacherAmend.jsp?id="+teacher.getID()+"\">修改</a>&ensp;");
 						out.print("<a href=\"/CSMS/SWZJ/admin/manageInfo/Teacher/teacherDoDelete.jsp?id="+teacher.getID()+"\" onclick=\"if (confirm('确定要删除这条教师信息吗？') == false) return false;\">删除</a>");
-						out.print("<th>"+teacher.getNum()+"</th>");
-						out.print("<th>"+teacher.getName()+"</th>");
-						out.print("<th>"+teacher.getPosition()+"</th>");
-						out.print("<th>"+teacher.getCDTcount()+"</th>");
-						/* out.print("<th>"+teacher.getCreated()+"</th>");
-						out.print("<th>"+teacher.getUpdated()+"</th>"); */
+						out.print("</td>");
+						out.print("<td>"+teacher.getNum()+"</td>");
+						out.print("<td>"+teacher.getName()+"</td>");
+						out.print("<td>"+teacher.getPosition()+"</td>");
+						out.print("<td>"+teacher.getCDTcount()+"</td>");
+						/* out.print("<td>"+teacher.getCreated()+"</td>");
+						out.print("<td>"+teacher.getUpdated()+"</td>"); */
 					}
 				%>
 				</tbody>

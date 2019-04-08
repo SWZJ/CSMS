@@ -1,6 +1,5 @@
-<%@page import="java.sql.*"%>
-<%@ page language="java" import="java.util.*,JZW.*,java.util.Date" pageEncoding="utf-8"%>
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
+<%@ page language="java" import="java.util.*,JZW.*,java.util.Date" pageEncoding="utf-8"%>
 
 <%
 	CDTopic cdt = new CDTopic();

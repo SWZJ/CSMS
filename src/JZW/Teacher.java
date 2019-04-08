@@ -365,17 +365,16 @@ public class Teacher {
     	if(queryTeacherByNumber(teacher_number).size() != 0)	return true;
     	else return false;
     }
-
-    //获取总数据条数
-    public int Count() {
+    
+    //获取数据量
+    public int CountByString(String querySql) {
     	int count;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
             conn = conn();
-            String sqlQuery = "select count(*) from teacher";
-            ps = conn.prepareStatement(sqlQuery);
+            ps = conn.prepareStatement(querySql);
             rs = ps.executeQuery();
             rs.next();
             count = rs.getInt(1);
@@ -393,9 +392,19 @@ public class Teacher {
         }
         return count;
     }
+
+    //获取总数据条数（是否删除）（boolean型的2表示不考虑该条件）
+    public int Count(int teacher_deleted) {
+    	switch(teacher_deleted) {
+    	case 2:
+    		return CountByString("select count(*) from teacher");
+    	default:
+    		return CountByString("select count(*) from teacher where teacher_deleted = "+teacher_deleted);
+    	}
+    }
     
     //返回分页数据
-    public List<Teacher> cutPageData(int page,int pageSize){
+    public List<Teacher> cutPageDataByString(int page,int pageSize,String querySql){
         List<Teacher> teaList = new ArrayList<Teacher>();
         Teacher tea = null;
         ResultSet rs = null;
@@ -403,8 +412,7 @@ public class Teacher {
         Connection conn = null;
         try{
         	conn = conn();
-            String sqlQuery = "select * from teacher limit ?,?";
-            ps = conn.prepareStatement(sqlQuery);
+            ps = conn.prepareStatement(querySql);
             ps.setInt(1,page*pageSize-pageSize);
             ps.setInt(2,pageSize);
             rs = ps.executeQuery();
@@ -434,6 +442,16 @@ public class Teacher {
             }
         }
         return teaList;
+    }
+    
+    //返回分页数据（是否删除）（boolean型的2表示不考虑该条件）
+    public List<Teacher> cutPageData(int page,int pageSize,int teacher_deleted){
+    	switch(teacher_deleted) {
+    	case 2:
+    		return cutPageDataByString(page,pageSize,"select * from teacher limit ?,?");
+    	default:
+    		return cutPageDataByString(page,pageSize,"select * from teacher where teacher_deleted = "+teacher_deleted+" limit ?,?");
+    	}
     }
     
     //从数据库获取所有教师信息返回教师表

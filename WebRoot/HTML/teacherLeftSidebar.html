@@ -12,10 +12,10 @@
                     <i class="lnr lnr-code"></i><span>我的课题</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
                     <div id="myTopic" class="collapse">
                         <ul class="nav">
+                        	<li><a href="/CSMS/SWZJ/teacher/myTopic/allTopic.jsp" id="allTopic" class="">我拥有的课题</a></li>
                         	<li><a href="/CSMS/SWZJ/teacher/myTopic/activeTopic.jsp" id="activeTopic" class="">已生效课题</a></li>
-                            <li><a href="/CSMS/SWZJ/teacher/myTopic/failedTopic.jsp" id="failedTopic" class="">已失效课题</a></li>
+                            <li><a href="/CSMS/SWZJ/teacher/myTopic/failedTopic.jsp" id="failedTopic" class="">未生效课题</a></li>
                             <li><a href="/CSMS/SWZJ/teacher/myTopic/studentOfTopic.jsp" id="studentOfTopic" class="">选题学生</a></li>
-                            <li><a href="/CSMS/SWZJ/teacher/myTopic/allTopic.jsp" id="allTopic" class="">所有课题</a></li>
                         </ul>
                     </div>
                 </li>
@@ -27,7 +27,7 @@
                         <ul class="nav">
                         	<li><a href="/CSMS/SWZJ/teacher/createTopic/cdtopicAdd.jsp" id="cdtopicAdd" class="">新增课题</a></li>
 							<li><a href="${pageContext.request.contextPath}/servlet/ListFileServlet?location=reportOfStudent&branch=student&id=${ user.getTeacherID() }" 
-								id="reportOfStudent" class="">学生的开题报告</a></li>
+								id="reportOfStudent" class="">学生的课题报告</a></li>
                         </ul>
                     </div>
                 </li>

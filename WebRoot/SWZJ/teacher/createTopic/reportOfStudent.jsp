@@ -1,5 +1,5 @@
-<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
+<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -120,7 +120,7 @@
 			<table class="table table-hover">
 				<thead>
 					<tr>
-					<th>操作管理</th>
+					<th>操作</th>
 					<th>课题报告名称</th>
 					<!-- <th></th> -->
 					</tr>
@@ -139,7 +139,8 @@
 					<%}else{%>
 						<a href="${downurl}&location=reportOfStudent&branch=student&id=${user.getTeacherID()}&queryStr=<%=queryStr%>">下载</a>
 					<%}%>
-					<th>${me.value}</th>
+					</td>
+					<td>${me.value}</td>
 				</c:forEach>
 				</tbody>
 			</table>

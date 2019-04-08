@@ -1,4 +1,4 @@
-<%@page import="java.sql.*"%>
+<%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
 <%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
 
 <%
