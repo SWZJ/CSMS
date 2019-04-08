@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <display-name>CSMS</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  
+  <jsp-config>
+    <jsp-property-group>
+      <description>html encoding</description>
+      <display-name>JSPConfiguration</display-name>
+      <url-pattern>*.html</url-pattern>
+      <el-ignored>true</el-ignored>
+      <page-encoding>UTF-8</page-encoding>
+      <scripting-invalid>false</scripting-invalid>
+      <include-prelude></include-prelude>
+      <include-coda></include-coda>
+    </jsp-property-group>
+  </jsp-config>
+  
+  
+	<session-config>
+		<session-timeout>120</session-timeout>
+	</session-config>
+  
+  
+  
+	<servlet>
+		<servlet-name>UploadHandleServlet</servlet-name>
+		<servlet-class>me.gacl.web.controller.UploadHandleServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>UploadHandleServlet</servlet-name>
+		<url-pattern>/servlet/UploadHandleServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>DownLoadServlet</servlet-name>
+		<servlet-class>me.gacl.web.controller.DownLoadServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>DownLoadServlet</servlet-name>
+		<url-pattern>/servlet/DownLoadServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ListFileServlet</servlet-name>
+		<servlet-class>me.gacl.web.controller.ListFileServlet</servlet-class>
+	</servlet>
+	 
+	<servlet-mapping>
+		<servlet-name>ListFileServlet</servlet-name>
+		<url-pattern>/servlet/ListFileServlet</url-pattern>
+	</servlet-mapping>
+	
+	
+</web-app>
+
