@@ -12,7 +12,7 @@
   	<script>
   		/* alert('${message}'); */
   		<% session.setAttribute("message",request.getAttribute("message")); %>
-  		window.location = "${pageContext.request.contextPath}/servlet/ListFileServlet?location=myReport&branch=student&id=${user.getTeacherID()}&queryStr=${user.getName()}";
+  		window.location.href = "${pageContext.request.contextPath}/servlet/ListFileServlet?location=studentMyReport&branch=student&id=${user.getTeacherID()}&queryStr=${user.getName()}";
   	</script>
   </body>
 </html>

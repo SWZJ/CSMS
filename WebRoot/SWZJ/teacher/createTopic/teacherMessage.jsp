@@ -11,7 +11,7 @@
   	<script>
   		alert('${message}');
   		<% session.setAttribute("message",request.getAttribute("message")); %>
-  		window.location = "/CSMS/SWZJ/teacher/createTopic/reportOfStudent.jsp";
+  		window.location.href = "/CSMS/SWZJ/teacher/createTopic/teacherReportOfStudent.jsp";
   	</script>
   </body>
 </html>

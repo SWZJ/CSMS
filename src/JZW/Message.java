@@ -496,16 +496,15 @@ public class Message {
     	else return false;
     }
 
-    //获取总数据条数
-    public int Count() {
+    //获取所有数据量（无条件）
+    public int CountOfAll() {
     	int count;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
             conn = conn();
-            String sqlQuery = "select count(*) from message";
-            ps = conn.prepareStatement(sqlQuery);
+            ps = conn.prepareStatement("select count(*) from message");
             rs = ps.executeQuery();
             rs.next();
             count = rs.getInt(1);
@@ -524,22 +523,19 @@ public class Message {
         return count;
     }
     
-    //返回分页数据
-    public List<Message> cutPageData(int page,int pageSize){
-        List<Message> mesList = new ArrayList<Message>();
+    //按条件获取消息数据
+    public List<Message> queryByConditionByString(String querySql,String queryStr) {
+    	List<Message> mesList = new ArrayList<Message>();
         Message mes = null;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
         	conn = conn();
-            String sqlQuery = "select * from message limit ?,?";
-            ps = conn.prepareStatement(sqlQuery);
-            ps.setInt(1,page*pageSize-pageSize);
-            ps.setInt(2,pageSize);
+            ps = conn.prepareStatement(querySql);
             rs = ps.executeQuery();
             while(rs.next()) {
-                mes = new Message();
+            	mes = new Message();
                 mes.message_id = rs.getInt("message_id");
                 mes.message_identifier = rs.getString("message_identifier");
                 mes.message_type = rs.getString("message_type");
@@ -552,11 +548,17 @@ public class Message {
                 mes.created_at = rs.getTimestamp("created_at");
                 mes.updated_at = rs.getTimestamp("updated_at");
                 mes.deleted_at = rs.getTimestamp("deleted_at");
-                mesList.add(mes);
+            	if(queryStr.length()==0) {
+            		mesList.add(mes);
+            	}
+            	else if(mes.message_summary.indexOf(queryStr)!=-1||
+            			mes.message_content.indexOf(queryStr)!=-1) {
+            		mesList.add(mes);
+            	}
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            return mesList;
         }finally{
             try {
                 rs.close();
@@ -567,6 +569,105 @@ public class Message {
             }
         }
         return mesList;
+    }
+    
+    //按条件获取消息数据（是否删除+是否阅读+发送者ID+接收者ID）（boolean型的2表示不考虑该条件）
+    public List<Message> queryByCondition(int message_deleted,int message_readed,int sender_id,int receiver_id,String queryStr) {
+    	if(message_deleted==2&&message_readed==2&&sender_id==0&&receiver_id==0&&queryStr.length()==0) {
+    		return queryByConditionByString("select * from message",queryStr);
+    	}else {
+    		String querySql = "select * from message where";
+    		if(message_deleted!=2)	querySql += " message_deleted = "+message_deleted+" and";
+    		if(message_readed!=2)	querySql += " message_readed = "+message_readed+" and";
+    		if(sender_id!=0)		querySql += " sender_id = "+sender_id+" and";
+    		if(receiver_id!=0)		querySql += " receiver_id = "+receiver_id+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		return queryByConditionByString(querySql,queryStr);
+    	}
+    }
+
+    //返回分页数据
+    public List<Message> cutPageDataByString(int page,int pageSize,String querySql,String queryStr){
+    	List<Message> mesList = new ArrayList<Message>();
+        Message mes = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        Connection conn = null;
+        try{
+        	conn = conn();
+        	if(queryStr.length()==0) {
+        		ps = conn.prepareStatement(querySql);
+                ps.setInt(1,page*pageSize-pageSize);
+        		ps.setInt(2,pageSize);
+            }else {
+            	querySql = querySql.substring(0, querySql.length()-10);
+            	ps = conn.prepareStatement(querySql);
+            }
+            rs = ps.executeQuery();
+            while(rs.next()) {
+            	mes = new Message();
+                mes.message_id = rs.getInt("message_id");
+                mes.message_identifier = rs.getString("message_identifier");
+                mes.message_type = rs.getString("message_type");
+                mes.message_summary = rs.getString("message_summary");
+                mes.message_content = rs.getString("message_content");
+                mes.message_readed = rs.getBoolean("message_readed");
+                mes.message_deleted = rs.getBoolean("message_deleted");
+                mes.sender_id = rs.getInt("sender_id");
+                mes.receiver_id = rs.getInt("receiver_id");
+                mes.created_at = rs.getTimestamp("created_at");
+                mes.updated_at = rs.getTimestamp("updated_at");
+                mes.deleted_at = rs.getTimestamp("deleted_at");
+                if(queryStr.length()==0) {
+            		mesList.add(mes);
+            	}
+            	else if(mes.message_summary.indexOf(queryStr)!=-1||
+            			mes.message_content.indexOf(queryStr)!=-1) {
+            		mesList.add(mes);
+            	}
+            }
+        }catch(Exception e2) {
+            e2.printStackTrace();
+            return mesList;
+        }finally{
+            try {
+                rs.close();
+                ps.close();
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if(queryStr.length()==0) {
+        	return mesList;
+        }else {
+        	int count = queryByConditionByString(querySql,queryStr).size();
+        	int start = page*pageSize-pageSize;
+        	int end;
+        	if(start == (count/pageSize)*pageSize) {
+        		end = start+count%pageSize;
+        		return mesList.subList(start, end);
+        	}else {
+        		end = start+pageSize;
+        		return mesList.subList(start, end);
+        	}
+        }
+    }
+    
+    //返回分页数据（是否删除+是否阅读+发送者ID+接收者ID）（boolean型的2表示不考虑该条件）
+    public List<Message> cutPageData(int page,int pageSize,int message_deleted,int message_readed,int sender_id,int receiver_id,String queryStr){
+    	if(message_deleted==2&&message_readed==2&&sender_id==0&&receiver_id==0&&queryStr.length()==0) {
+    		return cutPageDataByString(page,pageSize,"select * from message limit ?,?",queryStr);
+    	}else {
+    		String querySql = "select * from message where";
+    		if(message_deleted!=2)	querySql += " message_deleted = "+message_deleted+" and";
+    		if(message_readed!=2)	querySql += " message_readed = "+message_readed+" and";
+    		if(sender_id!=0)		querySql += " sender_id = "+sender_id+" and";
+    		if(receiver_id!=0)		querySql += " receiver_id = "+receiver_id+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		querySql += "limit ?,?";
+    		return cutPageDataByString(page,pageSize,querySql,queryStr);
+    	}
     }
     
     //从数据库获取所有消息信息返回消息表

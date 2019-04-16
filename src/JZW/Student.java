@@ -493,18 +493,94 @@ public class Student {
     }
  
     //删除课题信息时，先将学生表中对应的课题信息置空
-    public boolean refreshCDTopicID(int cdtopic_id) {
+    public boolean emptyCDTopicByCDTopicID(int cdtopic_id) {
     	 Connection conn = conn();
-         String deleteSQL = "update student set cdtopic_id=null where cdtopic_id="+"'"+cdtopic_id+"'";
+         String updateSQL = "update student set cdtopic_id=null where cdtopic_id="+"'"+cdtopic_id+"'";
          PreparedStatement ps = null;
          try {
-             ps = conn.prepareStatement(deleteSQL);
+             ps = conn.prepareStatement(updateSQL);
              ps.executeUpdate();
          } catch (Exception e) {
              e.printStackTrace();
              System.out.println("数据库语句检查或执行出错");
              return false;
          } finally {
+        	 String updateSql = "update student set updated_at = ? where cdtopic_id="+ cdtopic_id;
+             try {
+                 ps = conn.prepareStatement(updateSql);
+                 ps.setTimestamp(1, new Timestamp(new Date().getTime()));
+                 ps.executeUpdate();
+                 ps.close();
+             } catch (SQLException e1) {
+                 e1.printStackTrace();
+                 return false;
+             }
+             try {
+                 ps.close();
+                 conn.close();
+             } catch (SQLException e1) {
+                 e1.printStackTrace();
+             }
+         }
+         return true;
+    }
+    
+    //退选课题（设置学生所选课题为空）
+    public boolean emptyCDTopicByStudentID(int student_id) {
+    	 Connection conn = conn();
+         String updateSQL = "update student set cdtopic_id=null where student_id="+student_id;
+         PreparedStatement ps = null;
+         try {
+             ps = conn.prepareStatement(updateSQL);
+             ps.executeUpdate();
+         } catch (Exception e) {
+             e.printStackTrace();
+             System.out.println("数据库语句检查或执行出错");
+             return false;
+         } finally {
+        	 String updateSql = "update student set updated_at = ? where student_id="+ student_id;
+             try {
+                 ps = conn.prepareStatement(updateSql);
+                 ps.setTimestamp(1, new Timestamp(new Date().getTime()));
+                 ps.executeUpdate();
+                 ps.close();
+             } catch (SQLException e1) {
+                 e1.printStackTrace();
+                 return false;
+             }
+             try {
+                 ps.close();
+                 conn.close();
+             } catch (SQLException e1) {
+                 e1.printStackTrace();
+             }
+         }
+         return true;
+    }
+    
+    //选择课题
+    public boolean selectCDTopicByStudentID(int student_id,int cdtopic_id) {
+    	 Connection conn = conn();
+         String updateSQL = "update student set cdtopic_id="+cdtopic_id+" where student_id="+student_id;
+         PreparedStatement ps = null;
+         try {
+             ps = conn.prepareStatement(updateSQL);
+             ps.executeUpdate();
+         } catch (Exception e) {
+             e.printStackTrace();
+             System.out.println("数据库语句检查或执行出错");
+             return false;
+         } finally {
+        	 String updateSql = "update student set updated_at = ? where student_id="+ student_id;
+             try {
+                 ps = conn.prepareStatement(updateSql);
+                 ps.setTimestamp(1, new Timestamp(new Date().getTime()));
+                 ps.executeUpdate();
+                 ps.close();
+             } catch (SQLException e1) {
+                 e1.printStackTrace();
+                 return false;
+             }
              try {
                  ps.close();
                  conn.close();
@@ -521,15 +597,15 @@ public class Student {
     	else return false;
     }
 
-    //获取数据量
-    public int CountByString(String querySql) {
+    //获取所有数据量（无条件）
+    public int CountOfAll() {
     	int count;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
             conn = conn();
-            ps = conn.prepareStatement(querySql);
+            ps = conn.prepareStatement("select count(*) from student");
             rs = ps.executeQuery();
             rs.next();
             count = rs.getInt(1);
@@ -547,40 +623,20 @@ public class Student {
         }
         return count;
     }
-
-    //获取总数据条数（是否删除+所选课题ID）（boolean型的2表示不考虑该条件）
-    public int Count(int student_deleted,int cdtopic_id) {
-    	switch(student_deleted) {
-    	case 2:
-    		if(cdtopic_id!=0) {
-				return CountByString("select count(*) from student where cdtopic_id ="+cdtopic_id);
-			}else {
-				return CountByString("select count(*) from student");
-			}
-    	default:
-    		if(cdtopic_id!=0) {
-				return CountByString("select count(*) from student where student_deleted = "+student_deleted+" and cdtopic_id ="+cdtopic_id);
-			}else {
-				return CountByString("select count(*) from student where student_deleted = "+student_deleted);
-			}
-    	}
-    }
     
-  //返回分页数据
-    public List<Student> cutPageDataByString(int page,int pageSize,String querySql){
-        List<Student> stuList = new ArrayList<Student>();
-        Student stu = null;
+    //按条件获取学生数据
+    public List<Student> queryByConditionByString(String querySql,String queryStr) {
+    	List<Student> stuList = new ArrayList<Student>();
+    	Student stu = null;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
         	conn = conn();
             ps = conn.prepareStatement(querySql);
-            ps.setInt(1,page*pageSize-pageSize);
-            ps.setInt(2,pageSize);
             rs = ps.executeQuery();
             while(rs.next()) {
-                stu = new Student();
+            	stu = new Student();
                 stu.student_id = rs.getInt("student_id");
                 stu.student_number = rs.getString("student_number");
                 stu.student_name = rs.getString("student_name");
@@ -594,11 +650,17 @@ public class Student {
                 stu.created_at = rs.getTimestamp("created_at");
                 stu.updated_at = rs.getTimestamp("updated_at");
                 stu.deleted_at = rs.getTimestamp("deleted_at");
-                stuList.add(stu);
+            	if(queryStr.length()==0) {
+            		stuList.add(stu);
+            	}
+            	else if(stu.student_number.indexOf(queryStr)!=-1||
+            			stu.student_name.indexOf(queryStr)!=-1) {
+            		stuList.add(stu);
+            	}
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            return stuList;
         }finally{
             try {
                 rs.close();
@@ -611,21 +673,105 @@ public class Student {
         return stuList;
     }
     
-    //返回分页数据（是否删除+所选课题ID）（boolean型的2表示不考虑该条件）
-    public List<Student> cutPageData(int page,int pageSize,int student_deleted,int cdtopic_id){
-    	switch(student_deleted) {
-    	case 2:
-    		if(cdtopic_id!=0) {
-				return cutPageDataByString(page,pageSize,"select * from student where cdtopic_id = "+cdtopic_id+" limit ?,?");
-			}else {
-				return cutPageDataByString(page,pageSize,"select * from student limit ?,?");
-			}
-    	default:
-    		if(cdtopic_id!=0) {
-				return cutPageDataByString(page,pageSize,"select * from student where student_deleted = "+student_deleted+" and cdtopic_id ="+cdtopic_id+" limit ?,?");
-			}else {
-				return cutPageDataByString(page,pageSize,"select * from student where student_deleted = "+student_deleted+" limit ?,?");
-			}
+    //按条件获取学生数据（是否删除+所选课题ID+所属班级ID+所属专业ID+所属学院ID）（boolean型的2表示不考虑该条件）
+    public List<Student> queryByCondition(int student_deleted,int cdtopic_id,int class_id,int major_id,int college_id,String queryStr) {
+    	if(student_deleted==2&&cdtopic_id==0&&class_id==0&&major_id==0&&college_id==0&&queryStr.length()==0) {
+    		return queryByConditionByString("select * from student",queryStr);
+    	}else {
+    		String querySql = "select * from student where";
+    		if(student_deleted!=2)	querySql += " student_deleted = "+student_deleted+" and";
+    		if(cdtopic_id!=0)		querySql += " cdtopic_id = "+cdtopic_id+" and";
+    		if(class_id!=0)			querySql += " class_id = "+class_id+" and";
+    		if(major_id!=0)			querySql += " major_id = "+major_id+" and";
+    		if(college_id!=0)		querySql += " college_id = "+college_id+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		return queryByConditionByString(querySql,queryStr);
+    	}
+    }
+
+    //返回分页数据
+    public List<Student> cutPageDataByString(int page,int pageSize,String querySql,String queryStr){
+        List<Student> stuList = new ArrayList<Student>();
+        Student stu = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        Connection conn = null;
+        try{
+        	conn = conn();
+        	if(queryStr.length()==0) {
+        		ps = conn.prepareStatement(querySql);
+                ps.setInt(1,page*pageSize-pageSize);
+        		ps.setInt(2,pageSize);
+            }else {
+            	querySql = querySql.substring(0, querySql.length()-10);
+            	ps = conn.prepareStatement(querySql);
+            }
+            rs = ps.executeQuery();
+            while(rs.next()) {
+            	stu = new Student();
+                stu.student_id = rs.getInt("student_id");
+                stu.student_number = rs.getString("student_number");
+                stu.student_name = rs.getString("student_name");
+                stu.student_sex = rs.getString("student_sex");
+                stu.student_age = rs.getInt("student_age");
+                stu.student_deleted = rs.getBoolean("student_deleted");
+                stu.class_id = rs.getInt("class_id");
+                stu.major_id = rs.getInt("major_id");
+                stu.college_id = rs.getInt("college_id");
+                stu.cdtopic_id = rs.getInt("cdtopic_id");
+                stu.created_at = rs.getTimestamp("created_at");
+                stu.updated_at = rs.getTimestamp("updated_at");
+                stu.deleted_at = rs.getTimestamp("deleted_at");
+            	if(queryStr.length()==0) {
+            		stuList.add(stu);
+            	}
+            	else if(stu.student_number.indexOf(queryStr)!=-1||
+            			stu.student_name.indexOf(queryStr)!=-1) {
+            		stuList.add(stu);
+            	}
+            }
+        }catch(Exception e2) {
+            e2.printStackTrace();
+            return stuList;
+        }finally{
+            try {
+                rs.close();
+                ps.close();
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if(queryStr.length()==0) {
+        	return stuList;
+        }else {
+        	int count = queryByConditionByString(querySql,queryStr).size();
+        	int start = page*pageSize-pageSize;
+        	int end;
+        	if(start == (count/pageSize)*pageSize) {
+        		end = start+count%pageSize;
+        		return stuList.subList(start, end);
+        	}else {
+        		end = start+pageSize;
+        		return stuList.subList(start, end);
+        	}
+        }
+    }
+    
+    //返回分页数据（是否删除+所选课题ID+所属班级ID+所属专业ID+所属学院ID）（boolean型的2表示不考虑该条件）
+    public List<Student> cutPageData(int page,int pageSize,int student_deleted,int cdtopic_id,int class_id,int major_id,int college_id,String queryStr){
+    	if(student_deleted==2&&cdtopic_id==0&&class_id==0&&major_id==0&&college_id==0&&queryStr.length()==0) {
+    		return cutPageDataByString(page,pageSize,"select * from student limit ?,?",queryStr);
+    	}else {
+    		String querySql = "select * from student where";
+    		if(student_deleted!=2)	querySql += " student_deleted = "+student_deleted+" and";
+    		if(cdtopic_id!=0)		querySql += " cdtopic_id = "+cdtopic_id+" and";
+    		if(class_id!=0)			querySql += " class_id = "+class_id+" and";
+    		if(major_id!=0)			querySql += " major_id = "+major_id+" and";
+    		if(college_id!=0)		querySql += " college_id = "+college_id+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		querySql += "limit ?,?";
+    		return cutPageDataByString(page,pageSize,querySql,queryStr);
     	}
     }
     

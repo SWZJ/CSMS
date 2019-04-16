@@ -32,7 +32,12 @@ public class UploadHandleServlet extends HttpServlet {
 		String id = request.getParameter("id");
         //得到上传文件的保存目录，将上传的文件存放于WEB-INF目录下，不允许外界直接访问，保证上传文件的安全
         String savePath = this.getServletContext().getRealPath("/WEB-INF/upload/"+branch+"/"+id);
-        
+        File file = new File(savePath);
+        //如果目录不存在
+        if(!file.exists()){
+            //创建目录
+            file.mkdirs();
+        }
         //消息提示
         String message = "";
         try{
@@ -113,19 +118,19 @@ public class UploadHandleServlet extends HttpServlet {
         }catch (FileUploadBase.FileSizeLimitExceededException e) {
             e.printStackTrace();
             request.setAttribute("message", "报告上传失败：单个文件超出最大值！！！");
-            request.getRequestDispatcher("/SWZJ/student/uploadReport/message.jsp").forward(request, response);
+            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentMessage.jsp").forward(request, response);
             return;
         }catch (FileUploadBase.SizeLimitExceededException e) {
             e.printStackTrace();
             request.setAttribute("message", "报告上传失败：上传文件的总的大小超出限制的最大值！！！");
-            request.getRequestDispatcher("/SWZJ/student/uploadReport/message.jsp").forward(request, response);
+            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentMessage.jsp").forward(request, response);
             return;
         }catch (Exception e) {
             message= "报告上传失败：遇到未知错误！！！";
             e.printStackTrace();
         }
         request.setAttribute("message",message);
-        request.getRequestDispatcher("/SWZJ/student/uploadReport/message.jsp").forward(request, response);
+        request.getRequestDispatcher("/SWZJ/student/uploadReport/studentMessage.jsp").forward(request, response);
     }
     
     /**

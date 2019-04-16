@@ -89,29 +89,20 @@
 <div class="main">
 <!-- MAIN CONTENT -->
 <div class="main-content">
-
-<!-- ERROR TIP -->
-<!-- END ERROR TIP -->
         
-    <%
-		int cdtopic_id = Integer.valueOf(request.getParameter("id"));
-		CDTopic cdtOld = new CDTopic();
-		cdtOld = cdtOld.queryCDTopicByID(cdtopic_id);
-		session.setAttribute("cdtopicOld", cdtOld);
-	 %>
     <div class="panel">
         <div class="panel-heading">
-            <h3 class="panel-title">修改课题信息</h3>
+            <h3 class="panel-title">新增课题信息填写</h3>
         </div>
         <div class="panel-body">
-            <form name="CDTopicForm" class="form-horizontal" role="form" method="post" action="/CSMS/SWZJ/admin/manageInfo/CDTopic/cdtopicDoAmend.jsp" onsubmit="return checkAll()" >
-                <input type="hidden" name="_token" value="lyGZwiU0GA6BPKKRIX9f8DSzkNptSO17ftcyrUlV">
+            <form name="CDTopicForm" class="form-horizontal" role="form" method="post" 
+            action="/CSMS/SWZJ/teacher/createTopic/teacherCdtopicDoAdd.jsp" onsubmit="return checkAll()" >
                 
                 <div class="form-group" id="cdtopic_number_class">
                     <label for="cdtopic_number" class="col-sm-2 control-label"><a class="text-danger">*</a>编号</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="cdtopic_number" name="cdtopic_number" 
-                        placeholder="请输入课题编号" value="<%= cdtOld.getNum() %>" onblur="checkCDTopic_number()">
+                        placeholder="请输入课题编号（长度为10—12，例如：2019JZW12137）" value="" onblur="checkCDTopic_number()">
                         <span id="cdtopic_number_span"></span>
                     </div>
                 </div>
@@ -120,7 +111,7 @@
                     <label for="cdtopic_name" class="col-sm-2 control-label"><a class="text-danger">*</a>名称</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="cdtopic_name" name="cdtopic_name" 
-                        placeholder="请输入课题名称" value="<%= cdtOld.getName() %>" onblur="checkCDTopic_name()">
+                        placeholder="请输入课题名称" value="" onblur="checkCDTopic_name()">
                         <span id="cdtopic_name_span"></span>
                     </div>
                 </div>
@@ -129,16 +120,16 @@
                     <label for="cdtopic_keyword" class="col-sm-2 control-label"><a class="text-danger"></a>关键字</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="cdtopic_keyword" name="cdtopic_keyword" 
-                        placeholder="请输入课题关键字" value="<%= cdtOld.getKeyword() %>" onblur="checkCDTopic_keyword()">
+                        placeholder="请输入课题关键字" value="" onblur="checkCDTopic_keyword()">
                         <span id="cdtopic_keyword_span"></span>
                     </div>
                 </div>
 	
                 <div class="form-group" id="cdtopic_technology_class">
-                    <label for="cdtopic_technology" class="col-sm-2 control-label"><a class="text-danger"></a>实现技术</label>
+                    <label for="cdtopic_实现技术" class="col-sm-2 control-label"><a class="text-danger"></a>实现技术</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="cdtopic_technology" name="cdtopic_technology" 
-                        placeholder="请输入课题实现技术" value="<%= cdtOld.getTechnology() %>" onblur="checkCDTopic_实现技术()">
+                        placeholder="请输入课题实现技术" value="" onblur="checkCDTopic_technology()">
                         <span id="cdtopic_technology_span"></span>
                     </div>
                 </div>
@@ -146,9 +137,9 @@
                 <div class="form-group" id="teacher_id_class">
                     <label for="teacher_id" class="col-sm-2 control-label"><a class="text-danger"></a>所属教师</label>
                     <div class="col-sm-8">
-                        <select class="form-control" id="teacher_id" name="teacher_id">
+                        <select class="form-control" id="teacher_id" name="teacher_id" disabled="disabled">
 	                        <option value = 0>--请选择所属教师--</option>
-	                        <%
+	                       	<%
 	                        	Teacher tea = new Teacher();
 	                        	List<Teacher> teaList = tea.getTeacherInfo();
 	                        	for(Teacher teacher:teaList){
@@ -184,7 +175,7 @@
 <!-- 获取所属教师 -->
 <script>
 	$("#teacher_id option").each(function() {
-        if($(this).val()=='<%= cdtOld.getTeacherID() %>'){
+        if($(this).val()==${user.getTeacherID()}){
         	$(this).prop('selected',true);
        	}
     });

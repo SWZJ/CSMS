@@ -1,5 +1,5 @@
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
-<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*,JZW.*,java.net.URLDecoder" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -89,6 +89,56 @@
                 <a href="/CSMS/SWZJ/teacher/myTopic/studentAdd.jsp"><span class="label label-primary"><i class="fa fa-plus-square"></i>&nbsp;新增学生</span></a>
             </div>
         </div>
+        <div class="panel-heading">
+			<div class="container-fluid">
+				<div class="row">
+					<% int cdtopic_id = request.getParameter("cdtopic_id")== null ? 0 : Integer.parseInt(request.getParameter("cdtopic_id")); //课题ID %>
+					<div class="col-md-8 col-sm-8 col-lg-8">
+				        <form class="form-inline" id="searchForm" role="form" method="get" action="">
+				            <div class="form-group">
+				            	<span class="panel-title">信息查询&emsp;&emsp;&emsp;&emsp;</span>
+				            	<span>课题查询:</span>
+				                <select title="选择课题" id="cdtopic_id" name="cdtopic_id" class="form-control field">
+				                    <option value = 0>不限课题</option>
+				                    <%
+			                        	List<CDTopic> cdtList = new CDTopic().queryByCondition(0, 2, user.getTeacherID(), "");
+			                        	for(CDTopic cdtopic:cdtList){
+			                        		out.print("<option value=\""+cdtopic.getID()+"\">"+cdtopic.getName()+"</option>");
+			                        	}
+			                         %>
+				                </select>
+				                <span class="form-group-btn"><a onclick="searchCDT()" class="btn btn-primary">查询</a></span>
+				            </div>
+				            <script type="text/javascript">
+								function searchCDT() {
+									document.getElementById("searchForm").submit();
+								}
+							</script>
+				        </form>
+				    </div>
+				    <% String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr"); //搜索字段 %>
+			        <div class="col-md-4 col-sm-4 col-lg-4">
+						<form role="form" class="form-horizontal" method="get" id="searchCDTopic" action="">
+							<div class="input-group">
+								<input class="form-control" name="queryStr" type="text" id="queryStr" value="<%=queryStr%>" placeholder="课题编号、名称、关键字或实现技术">
+								<input type="hidden" name="selectPages" value="<%=request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages"))%>">
+								<span class="input-group-btn"><a onclick="return searchCDTopic()" class="btn btn-primary">搜索</a></span>
+							</div>
+							<script type="text/javascript">
+								function searchCDTopic() {
+									if(document.getElementById("queryStr").value.length != 0){
+										document.getElementById("searchCDTopic").submit();
+										return true;
+									}else{
+										return false;
+									}
+								}
+							</script>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
         
 		<div class="panel-body">
 			<table class="table table-hover">
@@ -109,29 +159,44 @@
 				<%
 					Student stu=new Student();
 					CDTopic cdt = new CDTopic();
-					List<CDTopic> cdtList = cdt.queryCDTopicByTeacherID(user.getTeacherID());
+					cdtList = cdt.queryCDTopicByTeacherID(user.getTeacherID());
 					int recordCount = 0;   		//记录总数
-					for(CDTopic cdtopic:cdtList) {
-						recordCount += stu.Count(0, cdtopic.getID());
+					if(cdtopic_id==0){
+						for(CDTopic cdtopic:cdtList) {
+							recordCount += stu.queryByCondition(0,cdtopic.getID(),0,0,0,queryStr).size();
+						}
+					}else{
+						recordCount += stu.queryByCondition(0,cdtopic_id,0,0,0,queryStr).size();
 					}
 					
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
-					int pageCount = recordCount%pageSize==0 ? recordCount/pageSize : recordCount/pageSize+1; 				//计算总页数
+					int pageCount = recordCount%pageSize==0 ? (recordCount/pageSize==0?1:recordCount/pageSize) : recordCount/pageSize+1;	//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
 					
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
-					
-					for(CDTopic cdtopic:cdtList) {
-						recordCount += stu.Count(0, cdtopic.getID());
-					}
 
 					List<Student> cutList = new ArrayList<Student>();
-					for(CDTopic cdtopic:cdtList) {
-						cutList.addAll(stu.cutPageData(Page, pageSize, 0, cdtopic.getID()));
+					if(cdtopic_id==0){
+						for(CDTopic cdtopic:cdtList) {
+							cutList.addAll(stu.queryByCondition(0,cdtopic.getID(),0,0,0,queryStr));
+						}
+					}else{
+						cutList.addAll(stu.queryByCondition(0,cdtopic_id,0,0,0,queryStr));
 					}
+
+					int count = recordCount;
+		        	int head = Page*pageSize-pageSize;
+		        	int foot;
+		        	if(head == (count/pageSize)*pageSize) {
+		        		foot = head+count%pageSize;
+		        		cutList =  cutList.subList(head, foot);
+		        	}else {
+		        		foot = head+pageSize;
+		        		cutList =  cutList.subList(head, foot);
+		        	}
 					for(Student student:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -152,7 +217,9 @@
 		</div>
 		
 		<!-- 选择页码 -->
+		<%session.setAttribute("queryStr", queryStr);%>
 		<%@include file="/HTML/selectPages.html" %>
+		<%session.removeAttribute("queryStr");%>
 
 	</div>
 	
@@ -160,22 +227,30 @@
 		<div class="pull-left">
 			<ul class="pagination">
 				<% 
+					String url = request.getRequestURI() + "?";
+					if(request.getQueryString()!=null){
+						url = request.getRequestURI() + "?" + URLDecoder.decode(request.getQueryString(),"utf-8") +"&";
+					}
+					if(url.indexOf("page")!=-1){
+						int pageLen = 6+(Page+"").length();
+						url = url.substring(0, url.length()-pageLen);
+					}
 					if(pageCount<=end){
 						if(Page == 1){
 							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">首页</a></li>",pageSize,1));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">首页</a></li>",1));
 						}
 						
 						end = pageCount;
 						
 						if(Page>1){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&laquo;</a></li>",pageSize,Page-1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&laquo;</a></li>",Page-1));
 						}
 						
 						for(int i=start;i<=end;i++){
 						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\"?selectPages=%d&page=%d\">%d</a></li>",pageSize,i,i);
+						  String pageinfo=String.format("<li><a href=\""+url+"page=%d\">%d</a></li>",i,i);
 						  if(i==Page){
 						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
 						  }
@@ -183,20 +258,20 @@
 						}
 						
 						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&raquo;</a></li>",pageSize,Page+1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&raquo;</a></li>",Page+1));
 						}
 						
 						if(Page == pageCount){
 							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">尾页</a></li>",pageSize,pageCount));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">尾页</a></li>",pageCount));
 						}
 						
 					}else{
 						if(Page == 1){
 							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">首页</a></li>",pageSize,1));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">首页</a></li>",1));
 						}
 						if(Page>=7){
 						  start=Page-5;
@@ -206,12 +281,12 @@
 						  start=pageCount-9;
 						}
 						if(Page>1){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&laquo;</a></li>",pageSize,Page-1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&laquo;</a></li>",Page-1));
 						}
 						
 						for(int i=start;i<=end;i++){
 						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\"?selectPages=%d&page=%d\">%d</a></li>",pageSize,i,i);
+						  String pageinfo=String.format("<li><a href=\""+url+"page=%d\">%d</a></li>",i,i);
 						  if(i==Page){
 						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
 						  }
@@ -219,13 +294,13 @@
 						}
 						
 						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&raquo;</a></li>",pageSize,Page+1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&raquo;</a></li>",Page+1));
 						}
 						
 						if(Page == pageCount){
 							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">尾页</a></li>",pageSize,pageCount));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">尾页</a></li>",pageCount));
 						}
 					}
 			     %>
@@ -243,6 +318,34 @@
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
 <%@include file="/HTML/javaScript.html" %>
+<!-- SELECT  -->
+<script>
+   $(document).ready(function(){
+       //页面行数改变，刷新页面
+       $("#selectPages").change(function(){
+           $("#pageNumForm").submit();
+       });
+   });
+</script>
+<!-- END SELECT  -->
+<!-- GET SELECT PAGES FROM INPUT -->
+<script>
+	$("#selectPages option").each(function() {
+        if($(this).val()=='<%= pageSize %>'){
+        	$(this).prop('selected',true);
+       	}
+    });
+</script>
+<!-- END GET SELECT PAGES FROM INPUT -->
+<!-- 选中课题 -->
+<script>
+	$("#cdtopic_id option").each(function() {
+        if($(this).val()=='<%= cdtopic_id %>'){
+        	$(this).prop('selected',true);
+       	}
+    });
+</script>
+<!-- END 选中课题 -->
 
 </body>
 </html>

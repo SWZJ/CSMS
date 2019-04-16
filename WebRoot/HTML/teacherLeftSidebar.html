@@ -12,10 +12,10 @@
                     <i class="lnr lnr-code"></i><span>我的课题</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
                     <div id="myTopic" class="collapse">
                         <ul class="nav">
-                        	<li><a href="/CSMS/SWZJ/teacher/myTopic/allTopic.jsp" id="allTopic" class="">我拥有的课题</a></li>
-                        	<li><a href="/CSMS/SWZJ/teacher/myTopic/activeTopic.jsp" id="activeTopic" class="">已生效课题</a></li>
-                            <li><a href="/CSMS/SWZJ/teacher/myTopic/failedTopic.jsp" id="failedTopic" class="">未生效课题</a></li>
-                            <li><a href="/CSMS/SWZJ/teacher/myTopic/studentOfTopic.jsp" id="studentOfTopic" class="">选题学生</a></li>
+                        	<li><a href="/CSMS/SWZJ/teacher/myTopic/teacherAllTopic.jsp" id="teacherAllTopic" class="">我拥有的课题</a></li>
+                        	<li><a href="/CSMS/SWZJ/teacher/myTopic/teacherActiveTopic.jsp" id="teacherActiveTopic" class="">已生效课题</a></li>
+                            <li><a href="/CSMS/SWZJ/teacher/myTopic/teacherFailedTopic.jsp" id="teacherFailedTopic" class="">未生效课题</a></li>
+                            <li><a href="/CSMS/SWZJ/teacher/myTopic/teacherStudentOfTopic.jsp" id="teacherStudentOfTopic" class="">选题学生</a></li>
                         </ul>
                     </div>
                 </li>
@@ -25,9 +25,9 @@
                     <i class="lnr lnr-file-empty"></i><span>出题、选题阶段</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
                     <div id="createTopic" class="collapse">
                         <ul class="nav">
-                        	<li><a href="/CSMS/SWZJ/teacher/createTopic/cdtopicAdd.jsp" id="cdtopicAdd" class="">新增课题</a></li>
-							<li><a href="${pageContext.request.contextPath}/servlet/ListFileServlet?location=reportOfStudent&branch=student&id=${ user.getTeacherID() }" 
-								id="reportOfStudent" class="">学生的课题报告</a></li>
+                        	<li><a href="/CSMS/SWZJ/teacher/createTopic/teacherCdtopicAdd.jsp" id="teacherCdtopicAdd" class="">新增课题</a></li>
+							<li><a href="${pageContext.request.contextPath}/servlet/ListFileServlet?location=teacherReportOfStudent&branch=student&id=${ user.getTeacherID() }" 
+								id="teacherReportOfStudent" class="">学生的课题报告</a></li>
                         </ul>
                     </div>
                 </li>
@@ -61,14 +61,14 @@
 	if(pathname.indexOf("myTopic") != -1){
 		document.getElementById("#myTopic").className = "active";
 		document.getElementById("myTopic").className = "collapse in";
-		if(pathname.indexOf("activeTopic") != -1){
-			document.getElementById("activeTopic").className = "active";
-		}else if(pathname.indexOf("failedTopic") != -1){
-			document.getElementById("failedTopic").className = "active";
-		}else if(pathname.indexOf("studentOfTopic") != -1){
-			document.getElementById("studentOfTopic").className = "active";
-		}else if(pathname.indexOf("allTopic") != -1){
-			document.getElementById("allTopic").className = "active";
+		if(pathname.indexOf("teacherActiveTopic") != -1){
+			document.getElementById("teacherActiveTopic").className = "active";
+		}else if(pathname.indexOf("teacherFailedTopic") != -1){
+			document.getElementById("teacherFailedTopic").className = "active";
+		}else if(pathname.indexOf("teacherStudentOfTopic") != -1){
+			document.getElementById("teacherStudentOfTopic").className = "active";
+		}else if(pathname.indexOf("teacherAllTopic") != -1){
+			document.getElementById("teacherAllTopic").className = "active";
 		}
 	}
 	
@@ -76,15 +76,15 @@
 	if(pathname.indexOf("createTopic") != -1){
 		document.getElementById("#createTopic").className = "active";
 		document.getElementById("createTopic").className = "collapse in";
-		if(pathname.indexOf("cdtopicAdd") != -1){
-			document.getElementById("cdtopicAdd").className = "active";
+		if(pathname.indexOf("teacherCdtopicAdd") != -1){
+			document.getElementById("teacherCdtopicAdd").className = "active";
 		}else if(pathname.indexOf("reportOfStudent") != -1){
 			document.getElementById("reportOfStudent").className = "active";
 		}
 	}else if(pathname.indexOf("ListFileServlet") != -1){
 		document.getElementById("#createTopic").className = "active";
 		document.getElementById("createTopic").className = "collapse in";
-		document.getElementById("reportOfStudent").className = "active";
+		document.getElementById("teacherReportOfStudent").className = "active";
 	}
 	
 	

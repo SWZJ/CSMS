@@ -59,7 +59,7 @@
     </div>
 </nav>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/studentLeftSidebar.html" %>
+<%@include file="/HTML/teacherLeftSidebar.html" %>
 
 <!-- 内容区域 -->
 <div class="main">
@@ -88,15 +88,15 @@
             <div class="container-fluid">
 				<div class="row">
 					<div class="col-md-8 col-sm-8 col-lg-8">
-						<h3 class="panel-title">您提交过的课题报告</h3>
+						<h3 class="panel-title">选择了您的课题的学生的课题报告</h3>
 					</div>
 					<div class="col-md-4 col-sm-4 col-lg-4">
 						<form role="form" class="form-horizontal" method="get" id="searchFile" action="">
 							<div class="input-group">
-								<input type="hidden" name="location" value="myReport">
+								<input type="hidden" name="location" value="reportOfStudent">
 								<input type="hidden" name="branch" value="student">
 								<input type="hidden" name="id" value="${user.getTeacherID()}">
-								<input class="form-control" name="queryStr" type="text" id="queryStr" disabled="disabled"
+								<input class="form-control" name="queryStr" type="text" id="queryStr"
 								value="<%=queryStr%>" placeholder="学生姓名、学号、班级或课题关键字">
 								<span class="input-group-btn"><a onclick="return searchFile()" class="btn btn-primary">搜索</a></span>
 							</div>
@@ -135,9 +135,9 @@
 					<tr>
 					<td>
 					<%if(queryStr.equals("")==true){%>
-						<a href="${downurl}&location=myReport&branch=student&id=${user.getTeacherID()}">下载</a>
+						<a href="${downurl}&location=teacherReportOfStudent&branch=student&id=${user.getTeacherID()}">下载</a>
 					<%}else{%>
-						<a href="${downurl}&location=myReport&branch=student&id=${user.getTeacherID()}&queryStr=<%=queryStr%>">下载</a>
+						<a href="${downurl}&location=teacherReportOfStudent&branch=student&id=${user.getTeacherID()}&queryStr=<%=queryStr%>">下载</a>
 					<%}%>
 					</td>
 					<td>${me.value}</td>

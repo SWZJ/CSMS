@@ -1,5 +1,5 @@
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
-<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*,JZW.*,java.net.URLDecoder" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -89,6 +89,45 @@
                 <a href="/CSMS/SWZJ/admin/manageInfo/Teacher/teacherAdd.jsp"><span class="label label-primary"><i class="fa fa-plus-square"></i>&nbsp;新增教师</span></a>
             </div>
         </div>
+		<div class="panel-heading">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-8 col-sm-8 col-lg-8">
+				        <form class="form-inline" id="searchForm" role="form" method="get" action="">
+				            <div class="form-group">
+				            	<span class="panel-title">信息查询&emsp;&emsp;&emsp;&emsp;</span>
+				            	
+				            </div>
+				            <script type="text/javascript">
+								function searchTEA() {
+									document.getElementById("searchForm").submit();
+								}
+							</script>
+				        </form>
+				    </div>
+				    <% String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr"); //搜索字段 %>
+			        <div class="col-md-4 col-sm-4 col-lg-4">
+						<form role="form" class="form-horizontal" method="get" id="searchTeacher" action="">
+							<div class="input-group">
+								<input class="form-control" name="queryStr" type="text" id="queryStr" value="<%=queryStr%>" placeholder="教师编号、姓名、职位或关键字">
+								<input type="hidden" name="selectPages" value="<%=request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages"))%>">
+								<span class="input-group-btn"><a onclick="return searchTeacher()" class="btn btn-primary">搜索</a></span>
+							</div>
+							<script type="text/javascript">
+								function searchTeacher() {
+									if(document.getElementById("queryStr").value.length != 0){
+										document.getElementById("searchTeacher").submit();
+										return true;
+									}else{
+										return false;
+									}
+								}
+							</script>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
         
 		<div class="panel-body">
 			<table class="table table-hover">
@@ -107,17 +146,17 @@
 				<%
 					Teacher tea=new Teacher();
 					/* tea.refreshCDTopicCountOfAll();//刷新所有教师的拥有课题数量 */
-					int recordCount = tea.Count(0);   		//记录总数
+					int recordCount = tea.queryByCondition(0,queryStr).size();   		//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
-					int pageCount = recordCount%pageSize==0 ? recordCount/pageSize : recordCount/pageSize+1; 				//计算总页数
+					int pageCount = recordCount%pageSize==0 ? (recordCount/pageSize==0?1:recordCount/pageSize) : recordCount/pageSize+1;	//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
 					
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<Teacher> cutList = tea.cutPageData(Page,pageSize,0);
+					List<Teacher> cutList = tea.cutPageData(Page,pageSize,0,queryStr);
 					for(Teacher teacher:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -146,22 +185,30 @@
 		<div class="pull-left">
 			<ul class="pagination">
 				<% 
+					String url = request.getRequestURI() + "?";
+					if(request.getQueryString()!=null){
+						url = request.getRequestURI() + "?" + URLDecoder.decode(request.getQueryString(),"utf-8") +"&";
+					}
+					if(url.indexOf("page")!=-1){
+						int pageLen = 6+(Page+"").length();
+						url = url.substring(0, url.length()-pageLen);
+					}
 					if(pageCount<=end){
 						if(Page == 1){
 							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">首页</a></li>",pageSize,1));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">首页</a></li>",1));
 						}
 						
 						end = pageCount;
 						
 						if(Page>1){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&laquo;</a></li>",pageSize,Page-1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&laquo;</a></li>",Page-1));
 						}
 						
 						for(int i=start;i<=end;i++){
 						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\"?selectPages=%d&page=%d\">%d</a></li>",pageSize,i,i);
+						  String pageinfo=String.format("<li><a href=\""+url+"page=%d\">%d</a></li>",i,i);
 						  if(i==Page){
 						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
 						  }
@@ -169,20 +216,20 @@
 						}
 						
 						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&raquo;</a></li>",pageSize,Page+1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&raquo;</a></li>",Page+1));
 						}
 						
 						if(Page == pageCount){
 							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">尾页</a></li>",pageSize,pageCount));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">尾页</a></li>",pageCount));
 						}
 						
 					}else{
 						if(Page == 1){
 							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">首页</a></li>",pageSize,1));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">首页</a></li>",1));
 						}
 						if(Page>=7){
 						  start=Page-5;
@@ -192,12 +239,12 @@
 						  start=pageCount-9;
 						}
 						if(Page>1){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&laquo;</a></li>",pageSize,Page-1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&laquo;</a></li>",Page-1));
 						}
 						
 						for(int i=start;i<=end;i++){
 						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\"?selectPages=%d&page=%d\">%d</a></li>",pageSize,i,i);
+						  String pageinfo=String.format("<li><a href=\""+url+"page=%d\">%d</a></li>",i,i);
 						  if(i==Page){
 						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
 						  }
@@ -205,13 +252,13 @@
 						}
 						
 						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&raquo;</a></li>",pageSize,Page+1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&raquo;</a></li>",Page+1));
 						}
 						
 						if(Page == pageCount){
 							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">尾页</a></li>",pageSize,pageCount));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">尾页</a></li>",pageCount));
 						}
 					}
 			     %>

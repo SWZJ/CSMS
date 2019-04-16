@@ -31,7 +31,7 @@ public class DownLoadServlet extends HttpServlet {
         //如果文件不存在
         if(!file.exists()){
             request.setAttribute("message", "您要下载的资源已被删除！！");
-            request.getRequestDispatcher("/SWZJ/teacher/createTopic/reportOfStudent.jsp").forward(request, response);
+            request.getRequestDispatcher("/SWZJ/teacher/createTopic/teacherReportOfStudent.jsp").forward(request, response);
             return;
         }
         //处理文件名

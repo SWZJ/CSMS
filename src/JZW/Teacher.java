@@ -366,15 +366,15 @@ public class Teacher {
     	else return false;
     }
     
-    //获取数据量
-    public int CountByString(String querySql) {
+    //获取所有数据量（无条件）
+    public int CountOfAll() {
     	int count;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
             conn = conn();
-            ps = conn.prepareStatement(querySql);
+            ps = conn.prepareStatement("select count(*) from teacher");
             rs = ps.executeQuery();
             rs.next();
             count = rs.getInt(1);
@@ -392,20 +392,10 @@ public class Teacher {
         }
         return count;
     }
-
-    //获取总数据条数（是否删除）（boolean型的2表示不考虑该条件）
-    public int Count(int teacher_deleted) {
-    	switch(teacher_deleted) {
-    	case 2:
-    		return CountByString("select count(*) from teacher");
-    	default:
-    		return CountByString("select count(*) from teacher where teacher_deleted = "+teacher_deleted);
-    	}
-    }
     
-    //返回分页数据
-    public List<Teacher> cutPageDataByString(int page,int pageSize,String querySql){
-        List<Teacher> teaList = new ArrayList<Teacher>();
+    //按条件获取教师数据
+    public List<Teacher> queryByConditionByString(String querySql,String queryStr) {
+    	List<Teacher> teaList = new ArrayList<Teacher>();
         Teacher tea = null;
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -413,8 +403,6 @@ public class Teacher {
         try{
         	conn = conn();
             ps = conn.prepareStatement(querySql);
-            ps.setInt(1,page*pageSize-pageSize);
-            ps.setInt(2,pageSize);
             rs = ps.executeQuery();
             while(rs.next()) {
                 tea = new Teacher();
@@ -427,11 +415,18 @@ public class Teacher {
                 tea.created_at = rs.getTimestamp("created_at");
                 tea.updated_at = rs.getTimestamp("updated_at");
                 tea.deleted_at = rs.getTimestamp("deleted_at");
-                teaList.add(tea);
+            	if(queryStr.length()==0) {
+            		teaList.add(tea);
+            	}
+            	else if(tea.teacher_number.indexOf(queryStr)!=-1||
+            			tea.teacher_name.indexOf(queryStr)!=-1||
+            			tea.teacher_position.indexOf(queryStr)!=-1) {
+            		teaList.add(tea);
+            	}
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            return teaList;
         }finally{
             try {
                 rs.close();
@@ -444,13 +439,94 @@ public class Teacher {
         return teaList;
     }
     
+    //按条件获取教师数据（是否删除）（boolean型的2表示不考虑该条件）
+    public List<Teacher> queryByCondition(int teacher_deleted,String queryStr) {
+    	if(teacher_deleted==2&&queryStr.length()==0) {
+    		return queryByConditionByString("select * from teacher",queryStr);
+    	}else {
+    		String querySql = "select * from teacher where";
+    		if(teacher_deleted!=2)	querySql += " teacher_deleted = "+teacher_deleted+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		return queryByConditionByString(querySql,queryStr);
+    	}
+    }
+
+    //返回分页数据
+    public List<Teacher> cutPageDataByString(int page,int pageSize,String querySql,String queryStr){
+    	List<Teacher> teaList = new ArrayList<Teacher>();
+        Teacher tea = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        Connection conn = null;
+        try{
+        	conn = conn();
+        	if(queryStr.length()==0) {
+        		ps = conn.prepareStatement(querySql);
+                ps.setInt(1,page*pageSize-pageSize);
+        		ps.setInt(2,pageSize);
+            }else {
+            	querySql = querySql.substring(0, querySql.length()-10);
+            	ps = conn.prepareStatement(querySql);
+            }
+            rs = ps.executeQuery();
+            while(rs.next()) {
+                tea = new Teacher();
+                tea.teacher_id = rs.getInt("teacher_id");
+                tea.teacher_number = rs.getString("teacher_number");
+                tea.teacher_name = rs.getString("teacher_name");
+                tea.teacher_position = rs.getString("teacher_position");
+                tea.teacher_cdtcount = rs.getInt("teacher_cdtcount");
+                tea.teacher_deleted = rs.getBoolean("teacher_deleted");
+                tea.created_at = rs.getTimestamp("created_at");
+                tea.updated_at = rs.getTimestamp("updated_at");
+                tea.deleted_at = rs.getTimestamp("deleted_at");
+                if(queryStr.length()==0) {
+            		teaList.add(tea);
+            	}
+            	else if(tea.teacher_number.indexOf(queryStr)!=-1||
+            			tea.teacher_name.indexOf(queryStr)!=-1||
+            			tea.teacher_position.indexOf(queryStr)!=-1) {
+            		teaList.add(tea);
+            	}
+            }
+        }catch(Exception e2) {
+            e2.printStackTrace();
+            return teaList;
+        }finally{
+            try {
+                rs.close();
+                ps.close();
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if(queryStr.length()==0) {
+        	return teaList;
+        }else {
+        	int count = queryByConditionByString(querySql,queryStr).size();
+        	int start = page*pageSize-pageSize;
+        	int end;
+        	if(start == (count/pageSize)*pageSize) {
+        		end = start+count%pageSize;
+        		return teaList.subList(start, end);
+        	}else {
+        		end = start+pageSize;
+        		return teaList.subList(start, end);
+        	}
+        }
+    }
+    
     //返回分页数据（是否删除）（boolean型的2表示不考虑该条件）
-    public List<Teacher> cutPageData(int page,int pageSize,int teacher_deleted){
-    	switch(teacher_deleted) {
-    	case 2:
-    		return cutPageDataByString(page,pageSize,"select * from teacher limit ?,?");
-    	default:
-    		return cutPageDataByString(page,pageSize,"select * from teacher where teacher_deleted = "+teacher_deleted+" limit ?,?");
+    public List<Teacher> cutPageData(int page,int pageSize,int teacher_deleted,String queryStr){
+    	if(teacher_deleted==2&&queryStr.length()==0) {
+    		return cutPageDataByString(page,pageSize,"select * from teacher limit ?,?",queryStr);
+    	}else {
+    		String querySql = "select * from teacher where";
+    		if(teacher_deleted!=2)	querySql += " teacher_deleted = "+teacher_deleted+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		querySql += "limit ?,?";
+    		return cutPageDataByString(page,pageSize,querySql,queryStr);
     	}
     }
     

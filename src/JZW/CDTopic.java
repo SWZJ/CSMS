@@ -538,16 +538,16 @@ public class CDTopic {
     	if(queryCDTopicByNumber(cdtopic_number).size() != 0)	return true;
     	else return false;
     }
-
-    //获取数据量
-    public int CountByString(String querySql) {
+    
+    //获取所有数据量（无条件）
+    public int CountOfAll() {
     	int count;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
             conn = conn();
-            ps = conn.prepareStatement(querySql);
+            ps = conn.prepareStatement("select count(*) from cdtopic");
             rs = ps.executeQuery();
             rs.next();
             count = rs.getInt(1);
@@ -565,63 +565,25 @@ public class CDTopic {
         }
         return count;
     }
-
-    //获取总数据条数（是否删除+是否有效+所属教师ID）（boolean型的2表示不考虑该条件）
-    public int Count(int cdtopic_deleted,int cdtopic_active,int teacher_id) {
-    	switch(cdtopic_deleted) {
-    	case 2:
-    		switch(cdtopic_active) {
-    		case 2:
-    			if(teacher_id!=0) {
-    				return CountByString("select count(*) from cdtopic where teacher_id ="+teacher_id);
-    			}else {
-    				return CountByString("select count(*) from cdtopic");
-    			}
-			default:
-				if(teacher_id!=0) {
-    				return CountByString("select count(*) from cdtopic where cdtopic_active = "+cdtopic_active+" and teacher_id ="+teacher_id);
-    			}else {
-    				return CountByString("select count(*) from cdtopic where cdtopic_active = "+cdtopic_active);
-    			}
-    		}
-    	default:
-    		switch(cdtopic_active) {
-    		case 2:
-    			if(teacher_id!=0) {
-    				return CountByString("select count(*) from cdtopic where cdtopic_deleted = "+cdtopic_deleted+" and teacher_id ="+teacher_id);
-    			}else {
-    				return CountByString("select count(*) from cdtopic where cdtopic_deleted = "+cdtopic_deleted);
-    			}
-			default:
-				if(teacher_id!=0) {
-    				return CountByString("select count(*) from cdtopic where cdtopic_deleted = "+cdtopic_deleted+" and cdtopic_active = "+cdtopic_active+" and teacher_id ="+teacher_id);
-    			}else {
-    				return CountByString("select count(*) from cdtopic where cdtopic_deleted = "+cdtopic_deleted+" and cdtopic_active = "+cdtopic_active);
-    			}
-    		}
-    	}
-    }
-
-    //返回分页数据
-    public List<CDTopic> cutPageDataByString(int page,int pageSize,String querySql){
-        List<CDTopic> cdtList = new ArrayList<CDTopic>();
-        CDTopic cdt = null;
+    
+    //按条件获取课题数据
+    public List<CDTopic> queryByConditionByString(String querySql,String queryStr) {
+    	List<CDTopic> cdtList = new ArrayList<CDTopic>();
+    	CDTopic cdt = null;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
         	conn = conn();
             ps = conn.prepareStatement(querySql);
-            ps.setInt(1,page*pageSize-pageSize);
-    		ps.setInt(2,pageSize);
             rs = ps.executeQuery();
             while(rs.next()) {
             	cdt = new CDTopic();
             	cdt.cdtopic_id = rs.getInt("cdtopic_id");
             	cdt.cdtopic_number = rs.getString("cdtopic_number");
             	cdt.cdtopic_name = rs.getString("cdtopic_name");
-            	cdt.cdtopic_keyword = rs.getString("cdtopic_keyword");
-            	cdt.cdtopic_technology = rs.getString("cdtopic_technology");
+            	cdt.cdtopic_keyword = rs.getString("cdtopic_keyword")==null?"":rs.getString("cdtopic_keyword");
+            	cdt.cdtopic_technology = rs.getString("cdtopic_technology")==null?"":rs.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = rs.getInt("cdtopic_headcount");
             	cdt.cdtopic_active = rs.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = rs.getBoolean("cdtopic_deleted");
@@ -629,11 +591,19 @@ public class CDTopic {
             	cdt.created_at = rs.getTimestamp("created_at");
             	cdt.updated_at = rs.getTimestamp("updated_at");
             	cdt.deleted_at = rs.getTimestamp("deleted_at");
-                cdtList.add(cdt);
+            	if(queryStr.length()==0) {
+            		cdtList.add(cdt);
+            	}
+            	else if(cdt.cdtopic_number.indexOf(queryStr)!=-1||
+            			cdt.cdtopic_name.indexOf(queryStr)!=-1||
+    					cdt.cdtopic_keyword.indexOf(queryStr)!=-1||
+    					cdt.cdtopic_technology.indexOf(queryStr)!=-1) {
+            		cdtList.add(cdt);
+            	}
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            return cdtList;
         }finally{
             try {
                 rs.close();
@@ -646,39 +616,102 @@ public class CDTopic {
         return cdtList;
     }
     
-    //返回分页数据（是否删除+是否有效+所属教师ID）（boolean型的2表示不考虑该条件）
-    public List<CDTopic> cutPageData(int page,int pageSize,int cdtopic_deleted,int cdtopic_active,int teacher_id){
-    	switch(cdtopic_deleted) {
-    	case 2:
-    		switch(cdtopic_active) {
-    		case 2:
-    			if(teacher_id!=0) {
-    				return cutPageDataByString(page,pageSize,"select * from cdtopic where teacher_id = "+teacher_id+" limit ?,?");
-    			}else {
-    				return cutPageDataByString(page,pageSize,"select * from cdtopic limit ?,?");
-    			}
-			default:
-				if(teacher_id!=0) {
-    				return cutPageDataByString(page,pageSize,"select * from cdtopic where cdtopic_active = "+cdtopic_active+" and teacher_id ="+teacher_id+" limit ?,?");
-    			}else {
-    				return cutPageDataByString(page,pageSize,"select * from cdtopic where cdtopic_active = "+cdtopic_active+" limit ?,?");
-    			}
-    		}
-    	default:
-    		switch(cdtopic_active) {
-    		case 2:
-    			if(teacher_id!=0) {
-    				return cutPageDataByString(page,pageSize,"select * from cdtopic where cdtopic_deleted = "+cdtopic_deleted+" and teacher_id ="+teacher_id+" limit ?,?");
-    			}else {
-    				return cutPageDataByString(page,pageSize,"select * from cdtopic where cdtopic_deleted = "+cdtopic_deleted+" limit ?,?");
-    			}
-			default:
-				if(teacher_id!=0) {
-    				return cutPageDataByString(page,pageSize,"select * from cdtopic where cdtopic_deleted = "+cdtopic_deleted+" and cdtopic_active = "+cdtopic_active+" and teacher_id ="+teacher_id+" limit ?,?");
-    			}else {
-    				return cutPageDataByString(page,pageSize,"select * from cdtopic where cdtopic_deleted = "+cdtopic_deleted+" and cdtopic_active = "+cdtopic_active+" limit ?,?");
-    			}
-    		}
+    //按条件获取课题数据（是否删除+是否有效+所属教师ID+搜索字段）（boolean型的2表示不考虑该条件）
+    public List<CDTopic> queryByCondition(int cdtopic_deleted,int cdtopic_active,int teacher_id,String queryStr) {
+    	if(cdtopic_deleted==2&&cdtopic_active==2&&teacher_id==0&&queryStr.length()==0) {
+    		return queryByConditionByString("select * from cdtopic",queryStr);
+    	}else {
+    		String querySql = "select * from cdtopic where";
+    		if(cdtopic_deleted!=2)	querySql += " cdtopic_deleted = "+cdtopic_deleted+" and";
+    		if(cdtopic_active!=2)	querySql += " cdtopic_active = "+cdtopic_active+" and";
+    		if(teacher_id!=0)		querySql += " teacher_id = "+teacher_id+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		return queryByConditionByString(querySql,queryStr);
+    	}
+    }
+
+    //返回分页数据
+    public List<CDTopic> cutPageDataByString(int page,int pageSize,String querySql,String queryStr){
+        List<CDTopic> cdtList = new ArrayList<CDTopic>();
+        CDTopic cdt = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        Connection conn = null;
+        try{
+        	conn = conn();
+        	if(queryStr.length()==0) {
+        		ps = conn.prepareStatement(querySql);
+                ps.setInt(1,page*pageSize-pageSize);
+        		ps.setInt(2,pageSize);
+            }else {
+            	querySql = querySql.substring(0, querySql.length()-10);
+            	ps = conn.prepareStatement(querySql);
+            }
+            rs = ps.executeQuery();
+            while(rs.next()) {
+            	cdt = new CDTopic();
+            	cdt.cdtopic_id = rs.getInt("cdtopic_id");
+            	cdt.cdtopic_number = rs.getString("cdtopic_number");
+            	cdt.cdtopic_name = rs.getString("cdtopic_name");
+            	cdt.cdtopic_keyword = rs.getString("cdtopic_keyword")==null?"":rs.getString("cdtopic_keyword");
+            	cdt.cdtopic_technology = rs.getString("cdtopic_technology")==null?"":rs.getString("cdtopic_technology");
+            	cdt.cdtopic_headcount = rs.getInt("cdtopic_headcount");
+            	cdt.cdtopic_active = rs.getBoolean("cdtopic_active");
+            	cdt.cdtopic_deleted = rs.getBoolean("cdtopic_deleted");
+            	cdt.teacher_id = rs.getInt("teacher_id");
+            	cdt.created_at = rs.getTimestamp("created_at");
+            	cdt.updated_at = rs.getTimestamp("updated_at");
+            	cdt.deleted_at = rs.getTimestamp("deleted_at");
+            	if(queryStr.length()==0) {
+            		cdtList.add(cdt);
+            	}
+            	else if(cdt.cdtopic_number.indexOf(queryStr)!=-1||
+            			cdt.cdtopic_name.indexOf(queryStr)!=-1||
+    					cdt.cdtopic_keyword.indexOf(queryStr)!=-1||
+    					cdt.cdtopic_technology.indexOf(queryStr)!=-1) {
+            		cdtList.add(cdt);
+            	}
+            }
+        }catch(Exception e2) {
+            e2.printStackTrace();
+            return cdtList;
+        }finally{
+            try {
+                rs.close();
+                ps.close();
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if(queryStr.length()==0) {
+        	return cdtList;
+        }else {
+        	int count = queryByConditionByString(querySql,queryStr).size();
+        	int start = page*pageSize-pageSize;
+        	int end;
+        	if(start == (count/pageSize)*pageSize) {
+        		end = start+count%pageSize;
+        		return cdtList.subList(start, end);
+        	}else {
+        		end = start+pageSize;
+        		return cdtList.subList(start, end);
+        	}
+        }
+    }
+    
+    //返回分页数据（是否删除+是否有效+所属教师ID+搜索字段）（boolean型的2表示不考虑该条件）
+    public List<CDTopic> cutPageData(int page,int pageSize,int cdtopic_deleted,int cdtopic_active,int teacher_id,String queryStr){
+    	if(cdtopic_deleted==2&&cdtopic_active==2&&teacher_id==0&&queryStr.length()==0) {
+    		return cutPageDataByString(page,pageSize,"select * from cdtopic limit ?,?",queryStr);
+    	}else {
+    		String querySql = "select * from cdtopic where";
+    		if(cdtopic_deleted!=2)	querySql += " cdtopic_deleted = "+cdtopic_deleted+" and";
+    		if(cdtopic_active!=2)	querySql += " cdtopic_active = "+cdtopic_active+" and";
+    		if(teacher_id!=0)		querySql += " teacher_id = "+teacher_id+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		querySql += "limit ?,?";
+    		return cutPageDataByString(page,pageSize,querySql,queryStr);
     	}
     }
     

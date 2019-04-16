@@ -12,7 +12,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 public class User {
@@ -28,8 +27,17 @@ public class User {
     private Date created_at;		//新增时间
     private Date updated_at;		//修改时间
     private Date deleted_at;		//删除时间
+    private boolean remember;		//登录记住账号密码
 
     public User() {}
+    
+    public boolean getRemember() {
+    	return remember;
+    }
+    
+    public void setRemember(boolean remember) {
+    	this.remember=remember;
+    }
     
     public int getID() {
     	return user_id;
@@ -155,7 +163,7 @@ public class User {
     }
     
     //添加用户
-    public boolean creatUser(String user_account,String user_password,String user_name,int user_root,String user_root_name,int student_at,int teacher_id,Date created_at) {
+    public boolean creatUser(String user_account,String user_password,String user_name,int user_root,String user_root_name,int student_id,int teacher_id,Date created_at) {
     	String insertSql =
         		"insert into user("
         			+ "user_account,"
@@ -258,6 +266,16 @@ public class User {
         }
     }
     
+    //账号密码查找用户
+    public User queryUserByAccountPassword(String account,String password) {
+    	String querySql = "select * from user where user_account="+"'"+account+"'"+" and user_password="+"'"+password+"'";
+    	if(queryUser(querySql).size()!=0) {
+        	return queryUser(querySql).get(0);
+        }else {
+        	return new User();
+        }
+    }
+    
     //权限查找用户
     public List<User> queryUserByRoot(int user_root) {
         String querySql = "select * from user where user_root="+"'"+user_root+"'";
@@ -310,18 +328,12 @@ public class User {
     }
     
 
-    //判断账号密码是否正确
+    //验证账号密码是否正确
 	public User validateAccountPassword(String account,String password) {
-    	User user = new User();
+    	User user = queryUserByAccountPassword(account, password);
     	Student stu = new Student();
-		Iterator<User> users = user.getUserInfo().iterator();
-		while(users.hasNext()) {
-			user = users.next();
-			if(account.equals(user.getAccount()) && password.equals(user.getPassword())) {
-				return user;
-			}
-		}
-		
+		if(user.getID()!=0)	return user;
+		//判断是否为新学生登录
 		if(user.queryUserByAccount(account).getID() == 0 && stu.queryStudentByNumber(account).size() != 0 && password.equals("123456")) {	
 			stu = stu.queryStudentByNumber(account).get(0);
 			Date created_at = new Date();
@@ -331,15 +343,15 @@ public class User {
 		return null;
     }
     
-	//获取数据量
-    public int CountByString(String querySql) {
+	//获取所有数据量（无条件）
+    public int CountOfAll() {
     	int count;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
         try{
             conn = conn();
-            ps = conn.prepareStatement(querySql);
+            ps = conn.prepareStatement("select count(*) from user");
             rs = ps.executeQuery();
             rs.next();
             count = rs.getInt(1);
@@ -357,20 +369,10 @@ public class User {
         }
         return count;
     }
-
-    //获取总数据条数（是否删除）（boolean型的2表示不考虑该条件）
-    public int Count(int user_deleted) {
-    	switch(user_deleted) {
-    	case 2:
-    		return CountByString("select count(*) from user");
-    	default:
-    		return CountByString("select count(*) from user where user_deleted = "+user_deleted);
-    	}
-    }
-	
-    //返回分页数据
-    public List<User> cutPageDataByString(int page,int pageSize,String querySql){
-        List<User> userList = new ArrayList<User>();
+    
+    //按条件获取用户数据
+    public List<User> queryByConditionByString(String querySql,String queryStr) {
+    	List<User> userList = new ArrayList<User>();
         User user = null;
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -378,8 +380,6 @@ public class User {
         try{
         	conn = conn();
             ps = conn.prepareStatement(querySql);
-            ps.setInt(1,page*pageSize-pageSize);
-            ps.setInt(2,pageSize);
             rs = ps.executeQuery();
             while(rs.next()) {
             	user = new User();
@@ -395,11 +395,17 @@ public class User {
             	user.created_at = rs.getTimestamp("created_at");
             	user.updated_at = rs.getTimestamp("updated_at");
             	user.deleted_at = rs.getTimestamp("deleted_at");
-            	userList.add(user);
+            	if(queryStr.length()==0) {
+            		userList.add(user);
+            	}
+            	else if(user.user_name.indexOf(queryStr)!=-1||
+            			user.user_root_name.indexOf(queryStr)!=-1) {
+            		userList.add(user);
+            	}
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            return userList;
         }finally{
             try {
                 rs.close();
@@ -412,13 +418,96 @@ public class User {
         return userList;
     }
     
+    //按条件获取用户数据（是否删除）（boolean型的2表示不考虑该条件）
+    public List<User> queryByCondition(int user_deleted,String queryStr) {
+    	if(user_deleted==2&&queryStr.length()==0) {
+    		return queryByConditionByString("select * from user",queryStr);
+    	}else {
+    		String querySql = "select * from user where";
+    		if(user_deleted!=2)	querySql += " user_deleted = "+user_deleted+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		return queryByConditionByString(querySql,queryStr);
+    	}
+    }
+
+    //返回分页数据
+    public List<User> cutPageDataByString(int page,int pageSize,String querySql,String queryStr){
+    	List<User> userList = new ArrayList<User>();
+        User user = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        Connection conn = null;
+        try{
+        	conn = conn();
+        	if(queryStr.length()==0) {
+        		ps = conn.prepareStatement(querySql);
+                ps.setInt(1,page*pageSize-pageSize);
+        		ps.setInt(2,pageSize);
+            }else {
+            	querySql = querySql.substring(0, querySql.length()-10);
+            	ps = conn.prepareStatement(querySql);
+            }
+            rs = ps.executeQuery();
+            while(rs.next()) {
+            	user = new User();
+            	user.user_id = rs.getInt("user_id");
+            	user.user_account = rs.getString("user_account");
+            	user.user_password = rs.getString("user_password");
+            	user.user_name = rs.getString("user_name");
+            	user.user_root = rs.getInt("user_root");
+            	user.user_root_name = rs.getString("user_root_name");
+            	user.user_deleted = rs.getBoolean("user_deleted");
+            	user.student_id = rs.getInt("student_id");
+            	user.teacher_id = rs.getInt("teacher_id");
+            	user.created_at = rs.getTimestamp("created_at");
+            	user.updated_at = rs.getTimestamp("updated_at");
+            	user.deleted_at = rs.getTimestamp("deleted_at");
+            	if(queryStr.length()==0) {
+            		userList.add(user);
+            	}
+            	else if(user.user_name.indexOf(queryStr)!=-1||
+            			user.user_root_name.indexOf(queryStr)!=-1) {
+            		userList.add(user);
+            	}
+            }
+        }catch(Exception e2) {
+            e2.printStackTrace();
+            return userList;
+        }finally{
+            try {
+                rs.close();
+                ps.close();
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if(queryStr.length()==0) {
+        	return userList;
+        }else {
+        	int count = queryByConditionByString(querySql,queryStr).size();
+        	int start = page*pageSize-pageSize;
+        	int end;
+        	if(start == (count/pageSize)*pageSize) {
+        		end = start+count%pageSize;
+        		return userList.subList(start, end);
+        	}else {
+        		end = start+pageSize;
+        		return userList.subList(start, end);
+        	}
+        }
+    }
+    
     //返回分页数据（是否删除）（boolean型的2表示不考虑该条件）
-    public List<User> cutPageData(int page,int pageSize,int user_deleted){
-    	switch(user_deleted) {
-    	case 2:
-    		return cutPageDataByString(page,pageSize,"select * from user limit ?,?");
-    	default:
-    		return cutPageDataByString(page,pageSize,"select * from user where user_deleted = "+user_deleted+" limit ?,?");
+    public List<User> cutPageData(int page,int pageSize,int user_deleted,String queryStr){
+    	if(user_deleted==2&&queryStr.length()==0) {
+    		return cutPageDataByString(page,pageSize,"select * from user limit ?,?",queryStr);
+    	}else {
+    		String querySql = "select * from user where";
+    		if(user_deleted!=2)	querySql += " user_deleted = "+user_deleted+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		querySql += "limit ?,?";
+    		return cutPageDataByString(page,pageSize,querySql,queryStr);
     	}
     }
  

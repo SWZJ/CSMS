@@ -22,7 +22,7 @@
 		}else{
 			session.setAttribute("message", "遇到未知错误！可能是服务器正在维护或者其他未知原因！ "+cdtopic_name+" 的信息修改失败！");
 		}
-		out.print("<script>window.location = \"/CSMS/SWZJ/admin/manageInfo/CDTopic/cdtopicInfo.jsp\";</script>");
+		out.print("<script>window.location.href = \"/CSMS/SWZJ/admin/manageInfo/CDTopic/cdtopicInfo.jsp\";</script>");
 		session.removeAttribute("cdtopicOld");
     }
 %>

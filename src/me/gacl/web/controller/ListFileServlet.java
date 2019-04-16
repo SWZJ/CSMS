@@ -24,21 +24,28 @@ public class ListFileServlet extends HttpServlet {
 		//获取文件夹分支索引
 		String branch = request.getParameter("branch");
 		//获取索引ID
-		String id = request.getParameter("id");
+		int id=Integer.parseInt(request.getParameter("id"));
 		//获取搜索字段
 		String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr");
         //获取上传文件的目录
-        String uploadFilePath = this.getServletContext().getRealPath("/WEB-INF/upload/"+branch+"/"+id);
+        String uploadFilePath = this.getServletContext().getRealPath("/WEB-INF/upload/"+branch);
+        if(id != 0)	uploadFilePath+="/"+id;
+        File file = new File(uploadFilePath);
+        //如果目录不存在
+        if(!file.exists()){
+            //创建目录
+            file.mkdirs();
+        }
         //存储要下载的文件名
         Map<String,String> fileNameMap = new HashMap<String,String>();
         //递归遍历filepath目录下的所有文件和目录，将文件的文件名存储到map集合中
         listfile(new File(uploadFilePath),fileNameMap,queryStr);//File既可以代表一个文件也可以代表一个目录
         //将Map集合发送到listfile.jsp页面进行显示
         request.setAttribute("fileNameMap", fileNameMap);
-        if(location.equals("reportOfStudent")==true) {
-        	request.getRequestDispatcher("/SWZJ/teacher/createTopic/reportOfStudent.jsp").forward(request, response);
-        }else if(location.equals("myReport")==true) {
-        	request.getRequestDispatcher("/SWZJ/student/designStep/myReport.jsp").forward(request, response);
+        if(location.equals("teacherReportOfStudent")==true) {
+        	request.getRequestDispatcher("/SWZJ/teacher/createTopic/teacherReportOfStudent.jsp").forward(request, response);
+        }else if(location.equals("studentMyReport")==true) {
+        	request.getRequestDispatcher("/SWZJ/student/designStep/studentMyReport.jsp").forward(request, response);
         }
     }
     

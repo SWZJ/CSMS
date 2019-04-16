@@ -122,7 +122,7 @@
 
             <div class="form-group">
                 <div class="col-sm-offset-5 col-sm-6">
-                    <a  class="btn btn-primary" href="/CSMS/SWZJ/admin/manageInfo/CDTopic/cdtopicAmend.jsp?id=<%= cdtopic_id %>">修改</a>
+                    <a  class="btn btn-primary" href="/CSMS/SWZJ/teacher/myTopic/teacherCdtopicAmend.jsp?id=<%= cdtopic_id %>">修改</a>
                     <a class="btn btn-primary" href="#" onClick="history.back(-1)">返回</a>
                 </div>
             </div>

@@ -25,7 +25,7 @@
 		}else{
 			session.setAttribute("message", "遇到未知错误！可能是服务器正在维护或者其他未知原因！ "+student_name+" 的信息修改失败！");
 		}
-		out.print("<script>window.location = \"/CSMS/SWZJ/admin/manageInfo/Student/studentInfo.jsp\";</script>");
+		out.print("<script>window.location.href = \"/CSMS/SWZJ/admin/manageInfo/Student/studentInfo.jsp\";</script>");
 		session.removeAttribute("studentOld");
     }
 %>

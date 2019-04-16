@@ -1,6 +1,5 @@
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
-<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
-<%String url = request.getRequestURI() + "?" + request.getQueryString();%>
+<%@ page language="java" import="java.util.*,JZW.*,java.net.URLDecoder" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -82,14 +81,70 @@
 }%>
 <% session.removeAttribute("message"); %>
 <!-- END ERROR TIP -->
- 
+
     <div class="panel">
+    
         <div class="panel-heading" >
             <h3 class="panel-title">学生信息管理</h3>
             <div class="right">
                 <a href="/CSMS/SWZJ/admin/manageInfo/Student/studentAdd.jsp"><span class="label label-primary"><i class="fa fa-plus-square"></i>&nbsp;新增学生</span></a>
             </div>
         </div>
+		<div class="panel-heading">
+			<div class="container-fluid">
+				<div class="row">
+					<% int coolege_id = request.getParameter("coolege_id")== null ? 0 : Integer.parseInt(request.getParameter("coolege_id")); //学院ID %>
+					<% int major_id = request.getParameter("major_id")== null ? 0 : Integer.parseInt(request.getParameter("major_id")); //专业ID %>
+					<% int class_id = request.getParameter("class_id")== null ? 0 : Integer.parseInt(request.getParameter("class_id")); //班级ID %>
+					<div class="col-md-8 col-sm-8 col-lg-8">
+				        <form class="form-inline" id="searchForm" role="form" method="post" action="">
+				            <div class="form-group">
+				            	<span class="panel-title">信息查询&emsp;&emsp;</span>
+				            	<span>学院:</span>
+				                <select title="检索学院" id="college_id" name="college_id" class="form-control field">
+				                    <option value="">信息学院</option>
+				                </select>
+				                <span>专业:</span>
+				                <select title="检索专业" id="major_id" name="major_id" class="form-control field">
+				                    <option value="">计算机科学与技术</option>
+				                </select>
+				                <span>班级:</span>
+				                <select title="检索班级" id="class_id" name="class_id" class="form-control field">
+				                    <option value="">计科17-3BJ</option>
+				                </select>
+				                <span class="form-group-btn"><a onclick="return search()" class="btn btn-primary">查询</a></span>
+				            </div>
+				        </form>
+				    </div>
+				    <% String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr"); //搜索字段 %>
+				    <%-- <% if(new College().queryCollegeByName(queryStr).size()!=0){college_id = new College().queryCollegeByName(queryStr).get(0).getID();} %>
+				    <% if(new Major().queryMajorByName(queryStr).size()!=0){major_id = new Major().queryMajorByName(queryStr).get(0).getID();} %>
+				    <% if(new CLass().queryCLassByName(queryStr).size()!=0){class_id = new CLass().queryCLassByName(queryStr).get(0).getID();queryStr="";} %> --%>
+			        <div class="col-md-4 col-sm-4 col-lg-4">
+						<form role="form" class="form-horizontal" method="get" id="searchStudent" action="">
+							<div class="input-group">
+								<input class="form-control" name="queryStr" type="text" id="queryStr" value="<%=queryStr%>" placeholder="学生学号、姓名或关键字">
+								<input type="hidden" name="college_id" value="<%=request.getParameter("college_id")== null ? 0 : Integer.parseInt(request.getParameter("college_id"))%>">
+								<input type="hidden" name="major_id" value="<%=request.getParameter("major_id")== null ? 0 : Integer.parseInt(request.getParameter("major_id"))%>">
+								<input type="hidden" name="class_id" value="<%=request.getParameter("class_id")== null ? 0 : Integer.parseInt(request.getParameter("class_id"))%>">
+								<input type="hidden" name="selectPages" value="<%=request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages"))%>">
+								<span class="input-group-btn"><a onclick="return searchStudent()" class="btn btn-primary">搜索</a></span>
+							</div>
+							<script type="text/javascript">
+								function searchStudent() {
+									if(document.getElementById("queryStr").value.length != 0){
+										document.getElementById("searchStudent").submit();
+										return true;
+									}else{
+										return false;
+									}
+								}
+							</script>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
         
 		<div class="panel-body">
 			<table class="table table-hover">
@@ -111,17 +166,17 @@
 				<tbody>
 				<%
 					Student stu=new Student();
-					int recordCount = stu.Count(0,0);   		//记录总数
+					int recordCount = stu.queryByCondition(0,0,0,0,0,queryStr).size();   		//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
-					int pageCount = recordCount%pageSize==0 ? recordCount/pageSize : recordCount/pageSize+1; 				//计算总页数
+					int pageCount = recordCount%pageSize==0 ? (recordCount/pageSize==0?1:recordCount/pageSize) : recordCount/pageSize+1;	//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
 					
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<Student> cutList = stu.cutPageData(Page,pageSize,0,0);
+					List<Student> cutList = stu.cutPageData(Page, pageSize,0,0,0,0,0,queryStr);
 					for(Student student:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -146,7 +201,9 @@
 		</div>
 		
 		<!-- 选择页码 -->
+		<%session.setAttribute("queryStr", queryStr);%>
 		<%@include file="/HTML/selectPages.html" %>
+		<%session.removeAttribute("queryStr");%>
 
 	</div>
 	
@@ -154,22 +211,30 @@
 		<div class="pull-left">
 			<ul class="pagination">
 				<% 
+					String url = request.getRequestURI() + "?";
+					if(request.getQueryString()!=null){
+						url = request.getRequestURI() + "?" + URLDecoder.decode(request.getQueryString(),"utf-8") +"&";
+					}
+					if(url.indexOf("page")!=-1){
+						int pageLen = 6+(Page+"").length();
+						url = url.substring(0, url.length()-pageLen);
+					}
 					if(pageCount<=end){
 						if(Page == 1){
 							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">首页</a></li>",pageSize,1));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">首页</a></li>",1));
 						}
 						
 						end = pageCount;
 						
 						if(Page>1){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&laquo;</a></li>",pageSize,Page-1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&laquo;</a></li>",Page-1));
 						}
 						
 						for(int i=start;i<=end;i++){
 						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\"?selectPages=%d&page=%d\">%d</a></li>",pageSize,i,i);
+						  String pageinfo=String.format("<li><a href=\""+url+"page=%d\">%d</a></li>",i,i);
 						  if(i==Page){
 						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
 						  }
@@ -177,20 +242,20 @@
 						}
 						
 						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&raquo;</a></li>",pageSize,Page+1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&raquo;</a></li>",Page+1));
 						}
 						
 						if(Page == pageCount){
 							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">尾页</a></li>",pageSize,pageCount));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">尾页</a></li>",pageCount));
 						}
 						
 					}else{
 						if(Page == 1){
 							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">首页</a></li>",pageSize,1));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">首页</a></li>",1));
 						}
 						if(Page>=7){
 						  start=Page-5;
@@ -200,12 +265,12 @@
 						  start=pageCount-9;
 						}
 						if(Page>1){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&laquo;</a></li>",pageSize,Page-1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&laquo;</a></li>",Page-1));
 						}
 						
 						for(int i=start;i<=end;i++){
 						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\"?selectPages=%d&page=%d\">%d</a></li>",pageSize,i,i);
+						  String pageinfo=String.format("<li><a href=\""+url+"page=%d\">%d</a></li>",i,i);
 						  if(i==Page){
 						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
 						  }
@@ -213,13 +278,13 @@
 						}
 						
 						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&raquo;</a></li>",pageSize,Page+1));
+						  out.print(String.format("<li><a href=\""+url+"page=%d\">&raquo;</a></li>",Page+1));
 						}
 						
 						if(Page == pageCount){
 							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
 						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">尾页</a></li>",pageSize,pageCount));
+							out.print(String.format("<li><a href=\""+url+"page=%d\">尾页</a></li>",pageCount));
 						}
 					}
 			     %>
@@ -256,6 +321,33 @@
     });
 </script>
 <!-- END GET SELECT PAGES FROM INPUT -->
+<%-- <!-- 选中学院 -->
+<script>
+	$("#cdtopic_id option").each(function() {
+        if($(this).val()=='<%= college_id %>'){
+        	$(this).prop('selected',true);
+       	}
+    });
+</script>
+<!-- END 选中学院 -->
+<!-- 选中专业 -->
+<script>
+	$("#cdtopic_id option").each(function() {
+        if($(this).val()=='<%= major_id %>'){
+        	$(this).prop('selected',true);
+       	}
+    });
+</script>
+<!-- END 选中专业 -->
+<!-- 选中班级 -->
+<script>
+	$("#cdtopic_id option").each(function() {
+        if($(this).val()=='<%= class_id %>'){
+        	$(this).prop('selected',true);
+       	}
+    });
+</script>
+<!-- END 选中班级 --> --%>
 
 
 </body>

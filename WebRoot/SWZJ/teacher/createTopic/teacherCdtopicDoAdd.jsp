@@ -21,6 +21,6 @@
 		}else{
 			session.setAttribute("message", "遇到未知错误！可能是服务器正在维护或者其他未知原因！新增课题 "+cdtopic_name+" 失败！");
 		}
-		out.print("<script>window.location = \"/CSMS/SWZJ/teacher/myTopic/allTopic.jsp\";</script>");
+		out.print("<script>window.location.href = \"/CSMS/SWZJ/teacher/myTopic/teacherAllTopic.jsp\";</script>");
     }
 %>
