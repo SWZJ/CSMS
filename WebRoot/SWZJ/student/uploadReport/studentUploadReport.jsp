@@ -1,5 +1,5 @@
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
-<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*,JZW.*,fileController.FileManage" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -51,7 +51,7 @@
 	                <li><a href="#"><i class="lnr lnr-user"></i> <span>我的信息</span></a></li>
 	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
 	                <li><a href="#"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
+	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
 	            </ul>
 	        </li>
         </ul>
@@ -68,14 +68,18 @@
 
 <!-- ERROR TIP -->
 <!-- END ERROR TIP -->
-        
-     <div style="padding: 100px 0px;text-align: center">
-        <h2>上传我的课题报告</h2>
+     
+     <%Student student = new Student().queryStudentByID(user.getStudentID()); %>
+     <%int reportCount = new FileManage().fileCount("student", 0, user.getName()); %>
+     <div style="padding: 80px 0px;text-align: center">
+        <h2>上传我的课题报告</h2><hr>
+        <h4><span style="color:red">上传要求：</span>文件名中必须含课题名称、班级、姓名和学号。（例：神葳计划 计科17-3BJ 李浩葳 14172401437）</h4>
+        <p><span  style="color:#DA26C9">最多上传10篇报告</span>&ensp;&ensp;&ensp;已上传报告数：<%=reportCount %></p>
         <form method="post" action="${pageContext.request.contextPath}/servlet/UploadHandleServlet?branch=student&id=${user.getTeacherID()}" onsubmit="return checkFile()?checkID():false" target="_self" enctype="multipart/form-data">
         	<input type="hidden" name="username" value="${user.getName()}">
             <button type="button" class="btn btn-default" onclick="transferclick()" style="margin: 40px">
-                <span class="glyphicon glyphicon-inbox" style="font-size: 100px"></span>
-            </button><br>
+                <span class="glyphicon glyphicon-inbox" style="font-size: 100px" title="选择课题报告文件"></span>
+            </button>
             <p id="nametarget">请选择上传文件</p>
             <input type="file" name="thesis" id="thesis" accept="application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="showfilename()" style="padding: 10px;display:none">
             <button type="submit" class="btn btn-primary" title="上传课题报告">上传</button>
@@ -100,7 +104,18 @@
 		function checkFile(){
 			var file=document.getElementById("thesis");
             if(file.files[0] != undefined){
-                return true;
+            	var filename=file.files[0].name;
+            	var reportCount = '<%=reportCount%>';
+            	if(	filename.indexOf('<%=student.getCDTopicName()%>')!=-1&&
+            		filename.indexOf('<%=student.getClassName()%>')!=-1&&
+            		filename.indexOf('<%=student.getName()%>')!=-1&&
+            		filename.indexOf('<%=student.getNum()%>')!=-1&&
+            		reportCount<=10){
+            		return true;
+            	}else{
+            		alert("上传文件失败！原因可能有：\n1、文件名不符合要求；\n2、文件名中的课题名称、班级、姓名或学号有误；\n3、上传报告数量已超限。");
+            		return false;
+            	}  
             }else{
             	alert("上传文件不能为空！");
             	return false;

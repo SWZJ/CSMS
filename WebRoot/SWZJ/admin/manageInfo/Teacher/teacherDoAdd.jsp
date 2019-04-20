@@ -14,7 +14,6 @@
 	    Date created_at = new Date();
 		
 		if(tea.CreateTeacher(teacher_number, teacher_name,teacher_position, created_at)){
-			tea.refreshCDTopicCountByID(tea.getID());
 			session.setAttribute("message", teacher_name+" 的信息添加成功！");
 		}else{
 			session.setAttribute("message", "遇到未知错误！可能是服务器正在维护或者其他未知原因！ "+teacher_name+" 的信息添加失败！");

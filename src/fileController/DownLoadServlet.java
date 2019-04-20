@@ -1,4 +1,4 @@
-package me.gacl.web.controller;
+package fileController;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,12 +9,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
+
 
 public class DownLoadServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -5603244993971514130L;
+	private static Logger logger = Logger.getLogger(DownLoadServlet.class);	//输出日志
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//获取当前url位置
+		String location = request.getParameter("location");
 		//获取文件夹分支索引
 		String branch = request.getParameter("branch");
 		//获取索引ID
@@ -28,14 +33,20 @@ public class DownLoadServlet extends HttpServlet {
         String path = findFileSavePathByFileName(fileName,fileSaveRootPath);
         //得到要下载的文件
         File file = new File(path + "\\" + fileName);
-        //如果文件不存在
-        if(!file.exists()){
-            request.setAttribute("message", "您要下载的资源已被删除！！");
-            request.getRequestDispatcher("/SWZJ/teacher/createTopic/teacherReportOfStudent.jsp").forward(request, response);
-            return;
-        }
         //处理文件名
         String realname = fileName.substring(fileName.indexOf("_")+1);
+        //如果文件不存在
+        if(!file.exists()){
+        	logger.warn("文件 "+realname+" 下载失败，资源未找到或已被删除。");
+            request.setAttribute("message", "文件 "+realname+" 下载失败，您要下载的文件资源未找到或已被删除！！");
+            if(location.equals("teacherReportOfStudent")==true) {
+            	request.getRequestDispatcher("/SWZJ/teacher/createTopic/teacherDownloadReportMessage.jsp").forward(request, response);
+            }else if(location.equals("studentMyReport")==true) {
+            	request.getRequestDispatcher("/SWZJ/student/designStep/studentDownloadReportMessage.jsp").forward(request, response);
+            }
+            /*response.getWriter().write("<script> history.go(-1) </script>");*/
+            return;
+        }
         //设置响应头，控制浏览器下载该文件
         response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(realname, "UTF-8"));
         //读取要下载的文件，保存到文件输入流
@@ -54,6 +65,7 @@ public class DownLoadServlet extends HttpServlet {
         in.close();
         //关闭输出流
         out.close();
+        logger.info("文件 "+realname+" 下载成功！");
     }
     
     /**

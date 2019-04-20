@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 public class User {
 	private int user_id;			//用户主键
@@ -28,8 +29,13 @@ public class User {
     private Date updated_at;		//修改时间
     private Date deleted_at;		//删除时间
     private boolean remember;		//登录记住账号密码
+    private static Logger logger = Logger.getLogger(User.class);	//输出日志
 
     public User() {}
+    
+    public Logger getLogger() {
+    	return logger;
+    }
     
     public boolean getRemember() {
     	return remember;
@@ -188,10 +194,9 @@ public class User {
         	if(teacher_id != 0)	ps.setInt(7, teacher_id);	else	ps.setNull(7, Types.INTEGER);
         	ps.setTimestamp(8, new Timestamp(created_at.getTime()));
             ps.executeUpdate();
-            return true;
         } catch (Exception e1) {
             e1.printStackTrace();
-            System.out.println("添加用户信息失败！");
+            logger.error("数据库语句检查或执行出错！添加用户信息失败："+user_account+" "+user_password+" "+user_name+" "+user_root+" "+user_root_name+" "+student_id+" "+teacher_id);
             return false;
         } finally {
             try {
@@ -199,8 +204,11 @@ public class User {
                 conn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("添加用户信息"+user_account+" "+user_password+" "+user_name+" "+user_root+" "+user_root_name+" "+student_id+" "+teacher_id+"后数据库关闭出错！");
             }
         }
+        logger.info("添加用户信息成功："+user_account+" "+user_password+" "+user_name+" "+user_root+" "+user_root_name+" "+student_id+" "+teacher_id);
+        return true;
     }
     
     
@@ -233,6 +241,7 @@ public class User {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
+            logger.error("数据库语句检查或执行出错！用户信息查询失败。");
             return null;
         }finally{
             try {
@@ -241,6 +250,7 @@ public class User {
                 queryConn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("查询用户信息后数据库关闭出错！");
             }
         }
         return userList;
@@ -291,6 +301,7 @@ public class User {
     
     //修改用户密码
     public boolean updateUserPassword(User user,String user_password) {
+    	String updateStr = "";
     	int count = 0;//记录是否有修改
     	Date nowTime = new Date();
     	Connection conn = conn();
@@ -302,7 +313,9 @@ public class User {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 密码:"+user.user_password+"->"+user_password;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 密码"+user.user_password+"为"+user_password+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -314,7 +327,9 @@ public class User {
                 ps.setTimestamp(1, new Timestamp(nowTime.getTime()));
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 修改时间:"+user.updated_at+"->"+updated_at;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 修改时间"+user.updated_at+"为"+updated_at+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -323,6 +338,10 @@ public class User {
             conn.close();
         } catch (SQLException e1) {
             e1.printStackTrace();
+            logger.error("修改用户 "+user.user_id+" 信息"+updateStr+"后数据库关闭失败！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改用户 "+user.user_id+" 信息成功！"+updateStr);
         }
         return true;
     }
@@ -332,12 +351,16 @@ public class User {
 	public User validateAccountPassword(String account,String password) {
     	User user = queryUserByAccountPassword(account, password);
     	Student stu = new Student();
-		if(user.getID()!=0)	return user;
+		if(user.getID()!=0)	{
+	        logger.info(user.getRootName()+" "+user.getName()+" 成功登录系统。");  
+			return user;
+		}
 		//判断是否为新学生登录
 		if(user.queryUserByAccount(account).getID() == 0 && stu.queryStudentByNumber(account).size() != 0 && password.equals("123456")) {	
 			stu = stu.queryStudentByNumber(account).get(0);
 			Date created_at = new Date();
 			user.creatUser(account, password, stu.getName(), 0, "学生", stu.getID() , 0 , created_at);
+			logger.info("学生 "+stu.getName()+" 成功注册。"); 
 			return user.queryUserByAccount(account);
 		}
 		return null;
@@ -345,7 +368,7 @@ public class User {
     
 	//获取所有数据量（无条件）
     public int CountOfAll() {
-    	int count;
+    	int count = 0;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
@@ -357,13 +380,14 @@ public class User {
             count = rs.getInt(1);
         }catch(Exception e2) {
             e2.printStackTrace();
-            return 0;
+            logger.error("数据库语句检查或执行出错！无条件获取用户数据量失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("无条件获取用户数据量后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -405,13 +429,14 @@ public class User {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return userList;
+            logger.error("数据库语句检查或执行出错！按条件获取用户信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("按条件获取用户信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -472,13 +497,14 @@ public class User {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return userList;
+            logger.error("数据库语句检查或执行出错！获取用户分页信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("获取用户分页信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -538,35 +564,37 @@ public class User {
             	user.updated_at = queryRS.getTimestamp("updated_at");
             	user.deleted_at = queryRS.getTimestamp("deleted_at");
             	userList.add(user);
-            }
-            return userList;
+            } 
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            logger.error("数据库语句检查或执行出错！获取用户信息失败！");
         }finally{
             try {
                 queryRS.close();
                 queryStatement.close();
                 queryConn.close();
             } catch (SQLException e1) {
+            	logger.error("获取用户信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
+        return userList;
     }
     
     //连接数据库
     public Connection conn() {
+    	Connection connection = null;
         try {
             String driver = "com.mysql.cj.jdbc.Driver";
             String url = "jdbc:mysql://localhost/csms?useSSL=true&serverTimezone=Asia/Shanghai&user=root&password=root";
             Class.forName(driver);
-            Connection connection = DriverManager.getConnection(url);
-            return connection;
+            connection = DriverManager.getConnection(url);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("数据库连接出错");
+            logger.error("数据库连接出错！");
+            return null;
         }
-        return null;
+        return connection;
     }
 
 }

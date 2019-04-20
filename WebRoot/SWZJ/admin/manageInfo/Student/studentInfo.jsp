@@ -51,7 +51,7 @@
 	                <li><a href="#"><i class="lnr lnr-user"></i> <span>我的信息</span></a></li>
 	                <li><a href="#"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
 	                <li><a href="#"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
+	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
 	            </ul>
 	        </li>
         </ul>
@@ -101,15 +101,15 @@
 				            <div class="form-group">
 				            	<span class="panel-title">信息查询&emsp;&emsp;</span>
 				            	<span>学院:</span>
-				                <select title="检索学院" id="college_id" name="college_id" class="form-control field">
+				                <select title="选择学院" id="college_id" name="college_id" class="form-control field">
 				                    <option value="">信息学院</option>
 				                </select>
 				                <span>专业:</span>
-				                <select title="检索专业" id="major_id" name="major_id" class="form-control field">
+				                <select title="选择专业" id="major_id" name="major_id" class="form-control field">
 				                    <option value="">计算机科学与技术</option>
 				                </select>
 				                <span>班级:</span>
-				                <select title="检索班级" id="class_id" name="class_id" class="form-control field">
+				                <select title="选择班级" id="class_id" name="class_id" class="form-control field">
 				                    <option value="">计科17-3BJ</option>
 				                </select>
 				                <span class="form-group-btn"><a onclick="return search()" class="btn btn-primary">查询</a></span>

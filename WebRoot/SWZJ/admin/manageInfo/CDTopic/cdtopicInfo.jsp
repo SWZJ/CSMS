@@ -51,7 +51,7 @@
 	                <li><a href="#"><i class="lnr lnr-user"></i> <span>我的信息</span></a></li>
 	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
 	                <li><a href="#"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
+	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
 	            </ul>
 	        </li>
         </ul>
@@ -89,38 +89,43 @@
                 <a href="/CSMS/SWZJ/admin/manageInfo/CDTopic/cdtopicAdd.jsp"><span class="label label-primary"><i class="fa fa-plus-square"></i>&nbsp;新增课题</span></a>
             </div>
         </div>
-		<div class="panel-heading">
+        <div class="panel-heading">
 			<div class="container-fluid">
 				<div class="row">
-					<div class="col-md-8 col-sm-8 col-lg-8">
-						<% int cdtopic_id = request.getParameter("cdtopic_id")== null ? 0 : Integer.parseInt(request.getParameter("cdtopic_id")); //课题ID %>
+					<div class="col-md-2 col-sm-2 col-lg-2">
+						<h3 class="panel-title">信息查询</h3>
+					</div>
+					<% int teacher_id = request.getParameter("teacher_id")== null ? 0 : Integer.parseInt(request.getParameter("teacher_id")); //教师ID %>
+					<div class="col-md-5 col-sm-5 col-lg-5">
 				        <form class="form-inline" id="searchForm" role="form" method="get" action="">
-				            <div class="form-group">
-				            	<span class="panel-title">信息查询&emsp;&emsp;&emsp;&emsp;</span>
-				            	<span>课题查询:</span>
-				                <select title="选择课题" id="cdtopic_id" name="cdtopic_id" class="form-control field">
-				                    <option value = 0>不限课题</option>
-				                    <%
-			                        	List<CDTopic> cdtList = new CDTopic().queryByCondition(0, 2, 0, "");
-			                        	for(CDTopic cdtopic:cdtList){
-			                        		out.print("<option value=\""+cdtopic.getID()+"\">"+cdtopic.getName()+"</option>");
+				            <div class="form-group right">
+				            	<span>教师查询:</span>
+				                <select title="选择教师" id="teacher_id" name="teacher_id" class="form-control field">
+				                	<option value = 0>不限教师</option>
+			                       	<%
+			                        	Teacher tea = new Teacher();
+			                        	List<Teacher> teaList = tea.getTeacherInfo();
+			                        	for(Teacher teacher:teaList){
+			                        		out.print("<option value=\""+teacher.getID()+"\">"+teacher.getName()+"</option>");
 			                        	}
 			                         %>
 				                </select>
-				                <span class="form-group-btn"><a onclick="searchCDT()" class="btn btn-primary">查询</a></span>
+				                <span class="form-group-btn"><a onclick="searchTeacher()" class="btn btn-primary">查询</a></span>
 				            </div>
 				            <script type="text/javascript">
-								function searchCDT() {
+								function searchTeacher() {
 									document.getElementById("searchForm").submit();
 								}
 							</script>
 				        </form>
 				    </div>
 				    <% String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr"); //搜索字段 %>
-			        <div class="col-md-4 col-sm-4 col-lg-4">
+				    <% if(new Teacher().queryTeacherByName(queryStr).size()!=0){teacher_id = new Teacher().queryTeacherByName(queryStr).get(0).getID();queryStr="";} %>
+			        <div class="col-md-5 col-sm-5 col-lg-5">
 						<form role="form" class="form-horizontal" method="get" id="searchCDTopic" action="">
 							<div class="input-group">
-								<input class="form-control" name="queryStr" type="text" id="queryStr" value="<%=queryStr%>" placeholder="课题编号、名称、关键字或实现技术">
+								<input class="form-control" name="queryStr" type="text" id="queryStr" value="<%=queryStr%>" placeholder="课题编号、名称、关键字、实现技术或教师姓名">
+								<input type="hidden" name="teacher_id" value="<%=request.getParameter("teacher_id")== null ? 0 : Integer.parseInt(request.getParameter("teacher_id"))%>">
 								<input type="hidden" name="selectPages" value="<%=request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages"))%>">
 								<span class="input-group-btn"><a onclick="return searchCDTopic()" class="btn btn-primary">搜索</a></span>
 							</div>
@@ -139,7 +144,7 @@
 				</div>
 			</div>
 		</div>
-        
+
 		<div class="panel-body">
 			<table class="table table-hover">
 				<thead>
@@ -160,7 +165,7 @@
 				<%
 					CDTopic cdt=new CDTopic();
 					/* cdt.refreshHeadcountOfAll();//刷新所有课题的人员数 */
-					int recordCount = cdt.queryByCondition(0,2,0,queryStr).size();   	//记录总数
+					int recordCount = cdt.queryByCondition(0,2,teacher_id,queryStr).size();   	//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
@@ -170,7 +175,7 @@
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,0,queryStr);
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,teacher_id,queryStr);
 					for(CDTopic cdtopic:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -314,15 +319,15 @@
     });
 </script>
 <!-- END GET SELECT PAGES FROM INPUT -->
-<!-- 选中课题 -->
+<!-- 选中教师 -->
 <script>
-	$("#cdtopic_id option").each(function() {
-        if($(this).val()=='<%= cdtopic_id %>'){
+	$("#teacher_id option").each(function() {
+        if($(this).val()=='<%= teacher_id %>'){
         	$(this).prop('selected',true);
        	}
     });
 </script>
-<!-- END 选中课题 -->
+<!-- END 选中教师 -->
 
 
 </body>

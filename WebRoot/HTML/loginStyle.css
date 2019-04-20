@@ -68,10 +68,10 @@ body:-ms-input-placeholder {
     margin: 0 auto;
     padding: 80px 0;
     text-align: center;
-    width: 600px;
+    width: 660px;
 	position: absolute;
-	margin-left: -300px;
-	margin-top: -295px;
+	margin-left: -330px;
+	margin-top: -320px;
 	top: 50%;
 	left: 50%;
 	display: block;
@@ -116,8 +116,11 @@ form input:focus {
     color: #2B3743;
 }
 form input[type="checkbox"] {
-    	width: 20px;
-    }
+   	width: 20px;
+}
+a {
+	color: white;
+}
 form button {
     appearance: none;
     outline: 0;

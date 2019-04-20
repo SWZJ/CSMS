@@ -10,7 +10,7 @@
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
   
-  
+  <!-- 中文解码设置 -->
   <jsp-config>
     <jsp-property-group>
       <description>html encoding</description>
@@ -25,37 +25,35 @@
   </jsp-config>
   
   
+  	<!-- session存活时间配置 -->
 	<session-config>
 		<session-timeout>120</session-timeout>
 	</session-config>
   
   
-  
+  	<!-- 文件上传配置 -->
 	<servlet>
 		<servlet-name>UploadHandleServlet</servlet-name>
-		<servlet-class>me.gacl.web.controller.UploadHandleServlet</servlet-class>
+		<servlet-class>fileController.UploadHandleServlet</servlet-class>
 	</servlet>
-	
 	<servlet-mapping>
 		<servlet-name>UploadHandleServlet</servlet-name>
 		<url-pattern>/servlet/UploadHandleServlet</url-pattern>
 	</servlet-mapping>
-	
+	<!-- 文件下载配置 -->
 	<servlet>
 		<servlet-name>DownLoadServlet</servlet-name>
-		<servlet-class>me.gacl.web.controller.DownLoadServlet</servlet-class>
+		<servlet-class>fileController.DownLoadServlet</servlet-class>
 	</servlet>
-	
 	<servlet-mapping>
 		<servlet-name>DownLoadServlet</servlet-name>
 		<url-pattern>/servlet/DownLoadServlet</url-pattern>
 	</servlet-mapping>
-	
+	<!-- 文件输出配置 -->
 	<servlet>
 		<servlet-name>ListFileServlet</servlet-name>
-		<servlet-class>me.gacl.web.controller.ListFileServlet</servlet-class>
+		<servlet-class>fileController.ListFileServlet</servlet-class>
 	</servlet>
-	 
 	<servlet-mapping>
 		<servlet-name>ListFileServlet</servlet-name>
 		<url-pattern>/servlet/ListFileServlet</url-pattern>

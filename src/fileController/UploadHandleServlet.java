@@ -1,4 +1,4 @@
-package me.gacl.web.controller;
+package fileController;
  
 import java.io.File;
 import java.io.FileOutputStream;
@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
- 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +15,7 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.log4j.Logger;
  
 /**
 * @ClassName: UploadHandleServlet
@@ -24,6 +24,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 public class UploadHandleServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 2390128404412934362L;
+	private static Logger logger = Logger.getLogger(UploadHandleServlet.class);	//输出日志
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//获取文件夹分支索引
@@ -38,8 +39,9 @@ public class UploadHandleServlet extends HttpServlet {
             //创建目录
             file.mkdirs();
         }
-        //消息提示
-        String message = "";
+        /*//消息提示
+        String message = "";*/
+        String filename = "";
         try{
             //使用Apache文件上传组件处理文件上传步骤：
             //1、创建一个DiskFileItemFactory工厂
@@ -77,7 +79,7 @@ public class UploadHandleServlet extends HttpServlet {
                     System.out.println(name + " = " + value);
                 }else{//如果fileitem中封装的是上传文件
                     //得到上传的文件名称，
-                    String filename = item.getName();
+                    filename = item.getName();
                     System.out.println(filename);
                     if(filename==null || filename.trim().equals("")){
                         continue;
@@ -112,25 +114,30 @@ public class UploadHandleServlet extends HttpServlet {
                     out.close();
                     //删除处理文件上传时生成的临时文件
                     //item.delete();
-                    message = "报告上传成功！！！";
                 }
             }
         }catch (FileUploadBase.FileSizeLimitExceededException e) {
             e.printStackTrace();
-            request.setAttribute("message", "报告上传失败：单个文件超出最大值！！！");
-            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentMessage.jsp").forward(request, response);
+            request.setAttribute("message", "报告 "+filename+" 上传失败：单个文件超出最大值！！！");
+            logger.warn("报告 "+filename+" 上传失败：单个文件超出最大值！");
+            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentUploadReportMessage.jsp").forward(request, response);
             return;
         }catch (FileUploadBase.SizeLimitExceededException e) {
             e.printStackTrace();
-            request.setAttribute("message", "报告上传失败：上传文件的总的大小超出限制的最大值！！！");
-            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentMessage.jsp").forward(request, response);
+            request.setAttribute("message", "报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！！！");
+            logger.warn("报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！");
+            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentUploadReportMessage.jsp").forward(request, response);
             return;
         }catch (Exception e) {
-            message= "报告上传失败：遇到未知错误！！！";
             e.printStackTrace();
+            request.setAttribute("message","报告 "+filename+" 上传失败：遇到未知错误！！！");
+            logger.error("报告 "+filename+" 上传失败：遇到未知错误！");
+            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentUploadReportMessage.jsp").forward(request, response);
+            return;
         }
-        request.setAttribute("message",message);
-        request.getRequestDispatcher("/SWZJ/student/uploadReport/studentMessage.jsp").forward(request, response);
+        logger.info("报告 "+filename+" 上传成功！");
+        request.setAttribute("message","报告 "+filename+" 上传成功！！！");
+        request.getRequestDispatcher("/SWZJ/student/uploadReport/studentUploadReportMessage.jsp").forward(request, response);
     }
     
     /**

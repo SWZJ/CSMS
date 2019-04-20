@@ -51,7 +51,7 @@
 	                <li><a href="#"><i class="lnr lnr-user"></i> <span>我的信息</span></a></li>
 	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
 	                <li><a href="#"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
+	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
 	            </ul>
 	        </li>
         </ul>
@@ -93,7 +93,7 @@
 					<div class="col-md-4 col-sm-4 col-lg-4">
 						<form role="form" class="form-horizontal" method="get" id="searchFile" action="">
 							<div class="input-group">
-								<input type="hidden" name="location" value="myReport">
+								<input type="hidden" name="location" value="studentMyReport">
 								<input type="hidden" name="branch" value="student">
 								<input type="hidden" name="id" value="${user.getTeacherID()}">
 								<input class="form-control" name="queryStr" type="text" id="queryStr" disabled="disabled"

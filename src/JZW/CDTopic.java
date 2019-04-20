@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class CDTopic {
 	private int cdtopic_id;				//主键
 	private String cdtopic_number;		//编号
@@ -27,6 +29,7 @@ public class CDTopic {
 	private Date created_at;			//新增时间
     private Date updated_at;			//修改时间
     private Date deleted_at;			//删除时间
+    private static Logger logger = Logger.getLogger(User.class);	//输出日志
     
     public CDTopic() {}
     
@@ -192,10 +195,9 @@ public class CDTopic {
       		if(teacher_id != 0)	ps.setInt(5, teacher_id);	else	ps.setNull(5, Types.INTEGER);
       		ps.setTimestamp(6, new Timestamp(created_at.getTime()));
       		ps.executeUpdate();
-      		return true;
       	} catch (Exception e1) {
       		e1.printStackTrace();
-      		System.out.println("添加课题信息失败！");
+      		logger.error("数据库语句检查或执行出错！添加课题信息失败："+cdtopic_number+" "+cdtopic_name+" "+cdtopic_keyword+" "+cdtopic_technology+" "+teacher_id);
       		return false;
       	} finally {
       		try {
@@ -203,9 +205,12 @@ public class CDTopic {
       			conn.close();
       		} catch (SQLException e1) {
       			e1.printStackTrace();
+      			logger.error("添加课题信息"+cdtopic_number+" "+cdtopic_name+" "+cdtopic_keyword+" "+cdtopic_technology+" "+teacher_id+"后数据库关闭出错！");
       		}
       	}
-      }
+      	logger.info("添加课题信息成功："+cdtopic_number+" "+cdtopic_name+" "+cdtopic_keyword+" "+cdtopic_technology+" "+teacher_id);
+      	return true;
+  	}
     
   	//删除课题信息
     public boolean deleteCDTopic(int cdtopic_id) {
@@ -215,10 +220,9 @@ public class CDTopic {
         try {
             ps = conn.prepareStatement(deleteSQL);
             ps.executeUpdate();
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("数据库语句检查或执行出错");
+            logger.error("数据库语句检查或执行出错！删除课题 "+cdtopic_id+" 失败。");
             return false;
         } finally {
             try {
@@ -226,8 +230,11 @@ public class CDTopic {
                 conn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("删除课题 "+cdtopic_id+" 后数据库关闭出错！");
             }
         }
+        logger.info("删除课题 "+cdtopic_id+" 成功。");
+        return true;
     }
  
     //查询课题信息
@@ -259,6 +266,7 @@ public class CDTopic {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
+            logger.error("数据库语句检查或执行出错！课题信息查询失败。");
             return null;
         }finally{
             try {
@@ -267,6 +275,7 @@ public class CDTopic {
                 queryConn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("查询课题信息后数据库关闭出错！");
             }
         }
         return cdtList;
@@ -362,6 +371,7 @@ public class CDTopic {
     //修改课题信息
     public boolean updateCDTopic(CDTopic cdt,String cdtopic_number,String cdtopic_name,String cdtopic_keyword,String cdtopic_technology,int teacher_id,Date updated_at) {
  
+    	String updateStr = "";
     	int count = 0;//记录是否有修改
         Connection conn = conn();
         //信息有改动才提交
@@ -372,7 +382,9 @@ public class CDTopic {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 编号:"+cdt.cdtopic_number+"->"+cdtopic_number;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 编号"+cdt.cdtopic_number+"为"+cdtopic_number+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -385,7 +397,9 @@ public class CDTopic {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 名称:"+cdt.cdtopic_name+"->"+cdtopic_name;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 名称"+cdt.cdtopic_name+"为"+cdtopic_name+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -402,7 +416,9 @@ public class CDTopic {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 关键字:"+cdt.cdtopic_keyword+"->"+cdtopic_keyword;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 关键字"+cdt.cdtopic_keyword+"为"+cdtopic_keyword+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -419,7 +435,9 @@ public class CDTopic {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 实现技术:"+cdt.cdtopic_technology+"->"+cdtopic_technology;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 实现技术"+cdt.cdtopic_technology+"为"+cdtopic_technology+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -436,7 +454,9 @@ public class CDTopic {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 教师ID:"+cdt.teacher_id+"->"+teacher_id;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 教师ID"+cdt.teacher_id+"为"+teacher_id+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -449,7 +469,9 @@ public class CDTopic {
                 ps.setTimestamp(1, new Timestamp(updated_at.getTime()));
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 修改时间:"+cdt.updated_at+"->"+updated_at;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 修改时间"+cdt.updated_at+"为"+updated_at+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -459,8 +481,48 @@ public class CDTopic {
             conn.close();
         } catch (SQLException e1) {
             e1.printStackTrace();
+            logger.error("修改课题 "+cdt.cdtopic_id+" 信息"+updateStr+"后数据库关闭失败！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改课题 "+cdt.cdtopic_id+" 信息成功！"+updateStr);
         }
         return true;
+    }
+    
+    //删除教师信息时，先将课题表中对应的教师信息置空
+    public boolean emptyTeacherByTeacherID(int teacher_id) {
+    	 Connection conn = conn();
+         String updateSQL = "update cdtopic set teacher_id=null where teacher_id="+"'"+teacher_id+"'";
+         PreparedStatement ps = null;
+         try {
+             ps = conn.prepareStatement(updateSQL);
+             ps.executeUpdate();
+         } catch (Exception e) {
+             e.printStackTrace();
+             logger.error("数据库语句检查或执行出错！置空所有所属教师为 "+teacher_id+" 的课题的所属教师信息失败。");
+             return false;
+         } finally {
+        	 String updateSql = "update cdtopic set updated_at = ? where teacher_id="+ teacher_id;
+             try {
+                 ps = conn.prepareStatement(updateSql);
+                 ps.setTimestamp(1, new Timestamp(new Date().getTime()));
+                 ps.executeUpdate();
+                 ps.close();
+             } catch (SQLException e1) {
+                 e1.printStackTrace();
+                 logger.error("数据库语句检查或执行出错！置空所有所属教师为 "+teacher_id+" 的课题的所属教师信息后更改课题信息修改时间失败。");
+                 return false;
+             }
+             try {
+                 ps.close();
+                 conn.close();
+             } catch (SQLException e1) {
+                 e1.printStackTrace();
+                 logger.error("置空所有所属教师为 "+teacher_id+" 的课题的所属教师信息后数据库关闭出错！");
+             }
+         }
+         logger.info("置空所有所属教师为 "+teacher_id+" 的课题的所属教师信息成功。");
+         return true;
     }
     
     //学生表所选课题信息改变时改变课题表中的选题人数
@@ -481,12 +543,17 @@ public class CDTopic {
                 ps.executeUpdate();
                 ps.close();
                 conn.close();
+                logger.info("修改课题 "+cdtopic_id+ "的选题人数成功！");
                 return true;
                 } catch (SQLException e1) {
-                e1.printStackTrace();
-                return false;
+	                e1.printStackTrace();
+	                logger.error("数据库语句检查或执行出错！修改课题 "+cdtopic_id+ "的选题人数失败！");
+	                return false;
                 }
-            }else	return false;
+            }else {
+            	logger.warn("课题ID必须为正整数！");
+            	return false;
+            }
     	}
 
     //刷新课题信息人员数为实际选题人数
@@ -503,34 +570,30 @@ public class CDTopic {
                 return true;
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("数据库语句检查或执行出错！刷新课题 "+cdtopic_id+ "的人员数为实际选题人数失败！");
                 return false;
             } 
-    	}else	return false;
+    	}else{
+    		logger.warn("课题ID必须为正整数！");
+    		return false;
+    	}
     }
     
     //刷新所有课题信息人员数为实际选题人数
     public boolean refreshHeadcountOfAll() {
     	Connection conn = conn();
-    	Student stu = new Student();
     	List<CDTopic> cdtList = getCDTopicInfo();
 		for(CDTopic cdtopic:cdtList) {
-			String updateSql = "update cdtopic set cdtopic_headcount='"+stu.queryStudentByCDTopic(cdtopic.getID()).size()+"' where cdtopic_id=" + cdtopic.getID();
-			try {
-                PreparedStatement ps = conn.prepareStatement(updateSql);
-                ps.executeUpdate();
-                ps.close();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-                return false;
-            } 
+			cdtopic.refreshHeadcountByID(cdtopic.getID());
 		}
 		try {
 			conn.close();
-			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return false;
+			logger.error("刷新所有课题的人员数为实际选题人数后数据库关闭出错！");
 		}
+		logger.info("刷新所有课题的人员数为实际选题人数成功！");
+		return true;
     }
     
     //判断编号是否存在
@@ -541,7 +604,7 @@ public class CDTopic {
     
     //获取所有数据量（无条件）
     public int CountOfAll() {
-    	int count;
+    	int count = 0;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
@@ -553,13 +616,14 @@ public class CDTopic {
             count = rs.getInt(1);
         }catch(Exception e2) {
             e2.printStackTrace();
-            return 0;
+            logger.error("数据库语句检查或执行出错！无条件获取课题数据量失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("无条件获取课题数据量后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -603,13 +667,14 @@ public class CDTopic {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return cdtList;
+            logger.error("数据库语句检查或执行出错！按条件获取课题信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("按条件获取课题信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -674,13 +739,14 @@ public class CDTopic {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return cdtList;
+            logger.error("数据库语句检查或执行出错！获取课题分页信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("获取课题分页信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -743,34 +809,36 @@ public class CDTopic {
             	cdt.deleted_at = queryRS.getTimestamp("deleted_at");
             	CDTList.add(cdt);
             }
-            return CDTList;
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            logger.error("数据库语句检查或执行出错！获取课题信息失败！");
         }finally{
             try {
                 queryRS.close();
                 queryStatement.close();
                 queryConn.close();
             } catch (SQLException e1) {
+            	logger.error("获取课题信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
+        return CDTList;
     }
     
     //连接数据库
     public Connection conn() {
+    	Connection connection = null;
         try {
             String driver = "com.mysql.cj.jdbc.Driver";
             String url = "jdbc:mysql://localhost/csms?useSSL=true&serverTimezone=Asia/Shanghai&user=root&password=root";
             Class.forName(driver);
-            Connection connection = DriverManager.getConnection(url);
-            return connection;
+            connection = DriverManager.getConnection(url);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("数据库连接出错");
+            logger.error("数据库连接出错！");
+            return null;
         }
-        return null;
+        return connection;
     }
     
 }

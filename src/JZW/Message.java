@@ -5,6 +5,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import java.util.Date;
  
 public class Message {
@@ -20,6 +23,7 @@ public class Message {
     private Date created_at;			//新增时间
     private Date updated_at;			//修改时间
     private Date deleted_at;			//删除时间
+    private static Logger logger = Logger.getLogger(User.class);	//输出日志
  
     public Message() {}
  
@@ -195,7 +199,7 @@ public class Message {
             ps.executeUpdate();
         } catch (Exception e1) {
             e1.printStackTrace();
-            System.out.println("添加消息失败！");
+            logger.error("数据库语句检查或执行出错！添加消息失败："+message_identifier+" "+message_type+" "+message_summary+" "+message_content+" "+sender_id+" "+receiver_id);
             return false;
         } finally {
             try {
@@ -203,9 +207,10 @@ public class Message {
                 conn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-                return false;
+                logger.error("添加消息"+message_identifier+" "+message_type+" "+message_summary+" "+message_content+" "+sender_id+" "+receiver_id+"后数据库关闭出错！");
             }
         }
+        logger.error("添加消息成功："+message_identifier+" "+message_type+" "+message_summary+" "+message_content+" "+sender_id+" "+receiver_id);
         return true;
     }
  
@@ -219,7 +224,7 @@ public class Message {
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("数据库语句检查或执行出错");
+            logger.error("数据库语句检查或执行出错！删除消息 "+message_id+" 失败。");
             return false;
         } finally {
             try {
@@ -227,8 +232,10 @@ public class Message {
                 conn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("删除消息 "+message_id+" 后数据库关闭出错！");
             }
         }
+        logger.info("删除消息 "+message_id+" 成功。");
         return true;
     }
  
@@ -261,6 +268,7 @@ public class Message {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
+            logger.error("数据库语句检查或执行出错！消息查询失败。");
             return null;
         }finally{
             try {
@@ -269,6 +277,7 @@ public class Message {
                 queryConn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("查询消息后数据库关闭出错！");
             }
         }
         return mesList;
@@ -332,7 +341,8 @@ public class Message {
     
     //修改消息信息
     public boolean updateMessage(Message mes,String message_identifier,String message_type,String message_summary,String message_content,int sender_id,int receiver_id,Date updated_at) {
- 
+    	
+    	String updateStr = "";
     	int count = 0;//记录是否有修改
         Connection conn = conn();
         //信息有改动时才修改
@@ -343,7 +353,9 @@ public class Message {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 编号:"+mes.message_identifier+"->"+message_identifier;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改消息 "+mes.message_id+" 编号"+mes.message_identifier+"为"+message_identifier+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -356,7 +368,9 @@ public class Message {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 类型:"+mes.message_type+"->"+message_type;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改消息 "+mes.message_id+" 类型"+mes.message_type+"为"+message_type+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -369,7 +383,9 @@ public class Message {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 概述:"+mes.message_summary+"->"+message_summary;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改消息 "+mes.message_id+" 概述"+mes.message_summary+"为"+message_summary+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -382,7 +398,9 @@ public class Message {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 内容:"+mes.message_content+"->"+message_content;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改消息 "+mes.message_id+" 内容"+mes.message_content+"为"+message_content+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -395,7 +413,9 @@ public class Message {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 发送者ID:"+mes.sender_id+"->"+sender_id;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改消息 "+mes.message_id+" 发送者ID"+mes.sender_id+"为"+sender_id+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -408,7 +428,9 @@ public class Message {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 接收者ID:"+mes.receiver_id+"->"+receiver_id;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改消息 "+mes.message_id+" 接收者ID"+mes.receiver_id+"为"+receiver_id+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -421,7 +443,9 @@ public class Message {
                 ps.setTimestamp(1, new Timestamp(updated_at.getTime()));
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 修改时间:"+mes.updated_at+"->"+updated_at;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改消息 "+mes.message_id+" 修改时间"+mes.updated_at+"为"+updated_at+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -431,6 +455,10 @@ public class Message {
             conn.close();
         } catch (SQLException e1) {
             e1.printStackTrace();
+            logger.error("修改消息 "+mes.message_id+" 信息"+updateStr+"后数据库关闭出错！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改消息 "+mes.message_id+" 信息成功！"+updateStr);
         }
         return true;
     }
@@ -451,6 +479,7 @@ public class Message {
                 ps.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("数据库语句检查或执行出错！标记消息 "+this.message_id+" 阅读状态为"+message_readed+"失败！");
                 return false;
             }
         }
@@ -463,14 +492,17 @@ public class Message {
                 ps.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("数据库语句检查或执行出错！标记消息 "+this.message_id+" 阅读状态为"+message_readed+"后更改修改时间失败！");
                 return false;
             }
         }
         try {
             conn.close();
         } catch (SQLException e1) {
+        	logger.error("标记消息 "+this.message_id+" 阅读状态为"+message_readed+"后数据库关闭出错！");
             e1.printStackTrace();
         }
+        logger.info("标记消息 "+this.message_id+" 阅读状态为"+message_readed+"成功！");
         return true;
     }
     
@@ -483,9 +515,11 @@ public class Message {
 		}
 		try {
 			conn.close();
+			logger.info("标记接收者 "+receiver_id+" 所有消息为已阅读成功！");
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			logger.error("数据库关闭出错！标记接收者 "+receiver_id+" 所有消息为已阅读失败！");
 			return false;
 		}
     }
@@ -498,7 +532,7 @@ public class Message {
 
     //获取所有数据量（无条件）
     public int CountOfAll() {
-    	int count;
+    	int count = 0;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
@@ -510,13 +544,14 @@ public class Message {
             count = rs.getInt(1);
         }catch(Exception e2) {
             e2.printStackTrace();
-            return 0;
+            logger.error("数据库语句检查或执行出错！无条件获取消息数据量失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("无条件获取消息数据量后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -558,13 +593,14 @@ public class Message {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return mesList;
+            logger.error("数据库语句检查或执行出错！按条件获取消息信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("按条件获取消息信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -628,13 +664,14 @@ public class Message {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return mesList;
+            logger.error("数据库语句检查或执行出错！获取消息分页信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("获取消息分页信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -700,13 +737,14 @@ public class Message {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            logger.error("数据库语句检查或执行出错！获取消息信息失败！");
         }finally{
             try {
                 queryRS.close();
                 queryStatement.close();
                 queryConn.close();
             } catch (SQLException e1) {
+            	logger.error("获取消息信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -723,7 +761,7 @@ public class Message {
             connection = DriverManager.getConnection(url);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("数据库连接出错");
+            logger.error("数据库连接出错！");
             return null;
         }
         return connection;

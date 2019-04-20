@@ -51,7 +51,7 @@
 	                <li><a href="#"><i class="lnr lnr-user"></i> <span>我的信息</span></a></li>
 	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
 	                <li><a href="#"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
+	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
 	            </ul>
 	        </li>
         </ul>
@@ -92,24 +92,37 @@
 		<div class="panel-heading">
 			<div class="container-fluid">
 				<div class="row">
-					<div class="col-md-8 col-sm-8 col-lg-8">
-				        <form class="form-inline" id="searchForm" role="form" method="get" action="">
-				            <div class="form-group">
-				            	<span class="panel-title">信息查询&emsp;&emsp;&emsp;&emsp;</span>
-				            	
+					<div class="col-md-2 col-sm-2 col-lg-2">
+						<h3 class="panel-title">信息查询</h3>
+					</div>
+					<% String teacher_position = request.getParameter("teacher_position")== null ? "" : request.getParameter("teacher_position"); //教师职称 %>
+					<div class="col-md-5 col-sm-5 col-lg-5">
+				        <form class="form-inline" id="searchPosition" role="form" method="get" action="">
+				            <div class="form-group right">
+				            	<span>职称查询:</span>
+				                <select title="选择职称" id="teacher_position" name="teacher_position" class="form-control field">
+				                	<option value = "">不限职称</option>
+			                        <option value = "助教">助教</option>
+			                        <option value = "讲师">讲师</option>
+			                        <option value = "副教授">副教授</option>
+			                        <option value = "教授">教授</option>
+			                        <option value = "博士生导师">博士生导师</option>
+				                </select>
+				                <span class="form-group-btn"><a onclick="searchPosition()" class="btn btn-primary">查询</a></span>
 				            </div>
 				            <script type="text/javascript">
-								function searchTEA() {
-									document.getElementById("searchForm").submit();
+								function searchPosition() {
+									document.getElementById("searchPosition").submit();
 								}
 							</script>
 				        </form>
 				    </div>
 				    <% String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr"); //搜索字段 %>
-			        <div class="col-md-4 col-sm-4 col-lg-4">
+			        <div class="col-md-5 col-sm-5 col-lg-5">
 						<form role="form" class="form-horizontal" method="get" id="searchTeacher" action="">
 							<div class="input-group">
-								<input class="form-control" name="queryStr" type="text" id="queryStr" value="<%=queryStr%>" placeholder="教师编号、姓名、职位或关键字">
+								<input class="form-control" name="queryStr" type="text" id="queryStr" value="<%=queryStr%>" placeholder="教师编号、姓名或关键字">
+								<input type="hidden" name="teacher_position" value="<%=request.getParameter("teacher_position")== null ? "" : request.getParameter("teacher_position")%>">
 								<input type="hidden" name="selectPages" value="<%=request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages"))%>">
 								<span class="input-group-btn"><a onclick="return searchTeacher()" class="btn btn-primary">搜索</a></span>
 							</div>
@@ -145,8 +158,18 @@
 				<tbody>
 				<%
 					Teacher tea=new Teacher();
+					List<Teacher> cutList = tea.queryByCondition(0,queryStr);
+					Iterator<Teacher> teaList = cutList.iterator();
+					if(teacher_position.length()!=0){
+						while(teaList.hasNext()){
+							Teacher t = teaList.next();
+							if(!teacher_position.equals(t.getPosition()))	teaList.remove();
+						}
+					}
+					int recordCount = cutList.size();
+					
 					/* tea.refreshCDTopicCountOfAll();//刷新所有教师的拥有课题数量 */
-					int recordCount = tea.queryByCondition(0,queryStr).size();   		//记录总数
+					/* int recordCount = tea.queryByCondition(0,queryStr).size();   		//记录总数 */
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
@@ -156,7 +179,18 @@
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<Teacher> cutList = tea.cutPageData(Page,pageSize,0,queryStr);
+					/* List<Teacher> cutList = tea.cutPageData(Page,pageSize,0,queryStr); */
+					
+					int count = recordCount;
+		        	int head = Page*pageSize-pageSize;
+		        	int foot;
+		        	if(head == (count/pageSize)*pageSize) {
+		        		foot = head+count%pageSize;
+		        		cutList =  cutList.subList(head, foot);
+		        	}else {
+		        		foot = head+pageSize;
+		        		cutList =  cutList.subList(head, foot);
+		        	}
 					for(Teacher teacher:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -295,6 +329,15 @@
     });
 </script>
 <!-- END GET SELECT PAGES FROM INPUT -->
+<!-- 选中职称 -->
+<script>
+	$("#teacher_position option").each(function() {
+        if($(this).val()=='<%= teacher_position %>'){
+        	$(this).prop('selected',true);
+       	}
+    });
+</script>
+<!-- END 选中职称 -->
 
 
 </body>

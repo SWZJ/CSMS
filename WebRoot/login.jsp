@@ -39,6 +39,10 @@
                 </div>
 	            <button type="submit" id="login-button">Login</button>
 	        </form>
+           	<a href="logon.jsp">用户注册</a>
+           	&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
+           	<a href="forgotPassword.jsp">忘记密码?</a>
+
 	    </div>
 	
 	    <ul class="bg-bubbles">

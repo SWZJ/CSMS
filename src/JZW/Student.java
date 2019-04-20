@@ -5,6 +5,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import java.util.Date;
  
 public class Student {
@@ -21,6 +24,7 @@ public class Student {
     private Date created_at;		//新增时间
     private Date updated_at;		//修改时间
     private Date deleted_at;		//删除时间
+    private static Logger logger = Logger.getLogger(User.class);	//输出日志
  
     public Student() {}
  
@@ -219,7 +223,7 @@ public class Student {
             ps.executeUpdate();
         } catch (Exception e1) {
             e1.printStackTrace();
-            System.out.println("添加学生信息失败！");
+            logger.error("数据库语句检查或执行出错！添加学生信息失败："+student_number+" "+student_name+" "+student_sex+" "+student_age+" "+class_id+" "+major_id+" "+college_id+" "+cdtopic_id);
             return false;
         } finally {
             try {
@@ -227,9 +231,10 @@ public class Student {
                 conn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-                return false;
+                logger.error("添加学生信息"+student_number+" "+student_name+" "+student_sex+" "+student_age+" "+class_id+" "+major_id+" "+college_id+" "+cdtopic_id+"后数据库关闭出错！");
             }
         }
+        logger.info("添加学生信息成功："+student_number+" "+student_name+" "+student_sex+" "+student_age+" "+class_id+" "+major_id+" "+college_id+" "+cdtopic_id);
         return true;
     }
  
@@ -243,7 +248,7 @@ public class Student {
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("数据库语句检查或执行出错");
+            logger.error("数据库语句检查或执行出错！删除学生 "+student_id+" 失败。");
             return false;
         } finally {
             try {
@@ -251,8 +256,10 @@ public class Student {
                 conn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("删除学生 "+student_id+" 后数据库关闭出错！");
             }
         }
+        logger.info("删除学生 "+student_id+" 成功。");
         return true;
     }
  
@@ -286,6 +293,7 @@ public class Student {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
+            logger.error("数据库语句检查或执行出错！学生信息查询失败。");
             return null;
         }finally{
             try {
@@ -294,6 +302,7 @@ public class Student {
                 queryConn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("查询学生信息后数据库关闭出错！");
             }
         }
         return stuList;
@@ -356,6 +365,7 @@ public class Student {
     //修改学生信息
     public boolean updateStudent(Student stu,String student_number,String student_name,String student_sex,int student_age,int class_id,int major_id,int college_id,int cdtopic_id,Date updated_at) {
  
+    	String updateStr = "";
     	int count = 0;//记录是否有修改
         Connection conn = conn();
         //信息有改动时才修改
@@ -366,7 +376,9 @@ public class Student {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 学号:"+stu.student_number+"->"+student_number;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 学号"+stu.student_number+"为"+student_number+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -379,7 +391,9 @@ public class Student {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 姓名:"+stu.student_name+"->"+student_name;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 姓名"+stu.student_name+"为"+student_name+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -392,7 +406,9 @@ public class Student {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 性别:"+stu.student_sex+"->"+student_sex;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 性别"+stu.student_sex+"为"+student_sex+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -409,7 +425,9 @@ public class Student {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 年龄:"+stu.student_age+"->"+student_age;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 年龄"+stu.student_age+"为"+student_age+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -422,7 +440,9 @@ public class Student {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 班级ID:"+stu.class_id+"->"+class_id;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 班级ID"+stu.class_id+"为"+class_id+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -435,7 +455,9 @@ public class Student {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 专业ID:"+stu.major_id+"->"+major_id;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 专业ID"+stu.major_id+"为"+major_id+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -448,7 +470,9 @@ public class Student {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 学院ID:"+stu.college_id+"->"+college_id;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 学院ID"+stu.college_id+"为"+college_id+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -465,7 +489,9 @@ public class Student {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 课题ID:"+stu.cdtopic_id+"->"+cdtopic_id;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 课题ID"+stu.cdtopic_id+"为"+cdtopic_id+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -478,8 +504,10 @@ public class Student {
                 ps.setTimestamp(1, new Timestamp(updated_at.getTime()));
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 修改时间:"+stu.updated_at+"->"+updated_at;
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("数据库语句检查或执行出错！修改学生 "+stu.student_id+" 修改时间"+stu.updated_at+"为"+updated_at+"失败。");
                 return false;
             }
         }
@@ -488,6 +516,10 @@ public class Student {
             conn.close();
         } catch (SQLException e1) {
             e1.printStackTrace();
+            logger.error("修改学生 "+stu.student_id+" 信息"+updateStr+"后数据库关闭失败！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改学生 "+stu.student_id+" 信息成功！"+updateStr);
         }
         return true;
     }
@@ -502,7 +534,7 @@ public class Student {
              ps.executeUpdate();
          } catch (Exception e) {
              e.printStackTrace();
-             System.out.println("数据库语句检查或执行出错");
+             logger.error("数据库语句检查或执行出错！置空所有选择了课题为 "+cdtopic_id+" 的学生的所选课题信息失败。");
              return false;
          } finally {
         	 String updateSql = "update student set updated_at = ? where cdtopic_id="+ cdtopic_id;
@@ -513,6 +545,7 @@ public class Student {
                  ps.close();
              } catch (SQLException e1) {
                  e1.printStackTrace();
+                 logger.error("数据库语句检查或执行出错！置空所有选择了课题为 "+cdtopic_id+" 的学生的所选课题信息后更改学生信息修改时间失败。");
                  return false;
              }
              try {
@@ -520,13 +553,16 @@ public class Student {
                  conn.close();
              } catch (SQLException e1) {
                  e1.printStackTrace();
+                 logger.error("置空所有选择了课题为 "+cdtopic_id+" 的学生的所选课题信息后数据库关闭出错！");
              }
          }
+         logger.info("置空所有选择了课题为 "+cdtopic_id+" 的学生的所选课题信息成功。");
          return true;
     }
     
     //退选课题（设置学生所选课题为空）
     public boolean emptyCDTopicByStudentID(int student_id) {
+    	 int cdtopic_id = queryStudentByID(student_id).getCdtopicID();
     	 Connection conn = conn();
          String updateSQL = "update student set cdtopic_id=null where student_id="+student_id;
          PreparedStatement ps = null;
@@ -535,7 +571,7 @@ public class Student {
              ps.executeUpdate();
          } catch (Exception e) {
              e.printStackTrace();
-             System.out.println("数据库语句检查或执行出错");
+             logger.error("数据库语句检查或执行出错！学生 "+student_id+" 退选课题 "+cdtopic_id+" 失败。");
              return false;
          } finally {
         	 String updateSql = "update student set updated_at = ? where student_id="+ student_id;
@@ -546,6 +582,7 @@ public class Student {
                  ps.close();
              } catch (SQLException e1) {
                  e1.printStackTrace();
+                 logger.error("数据库语句检查或执行出错！学生 "+student_id+" 退选课题 "+cdtopic_id+" 后更改修改时间失败。");
                  return false;
              }
              try {
@@ -553,8 +590,10 @@ public class Student {
                  conn.close();
              } catch (SQLException e1) {
                  e1.printStackTrace();
+                 logger.error("学生 "+student_id+" 退选课题 "+cdtopic_id+" 后数据库关闭出错！");
              }
          }
+         logger.info("学生 "+student_id+" 退选课题 "+cdtopic_id+" 成功。");
          return true;
     }
     
@@ -579,6 +618,7 @@ public class Student {
                  ps.close();
              } catch (SQLException e1) {
                  e1.printStackTrace();
+                 logger.error("学生 "+student_id+" 选择课题 "+cdtopic_id+" 后更改修改时间失败。");
                  return false;
              }
              try {
@@ -586,8 +626,10 @@ public class Student {
                  conn.close();
              } catch (SQLException e1) {
                  e1.printStackTrace();
+                 logger.error("学生 "+student_id+" 选择课题 "+cdtopic_id+" 后关闭数据库失败。");
              }
          }
+         logger.info("学生 "+student_id+" 选择课题 "+cdtopic_id+" 成功。");
          return true;
     }
     
@@ -599,7 +641,7 @@ public class Student {
 
     //获取所有数据量（无条件）
     public int CountOfAll() {
-    	int count;
+    	int count = 0;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
@@ -611,13 +653,14 @@ public class Student {
             count = rs.getInt(1);
         }catch(Exception e2) {
             e2.printStackTrace();
-            return 0;
+            logger.error("数据库语句检查或执行出错！无条件获取学生数据量失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("无条件获取学生数据量后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -660,13 +703,14 @@ public class Student {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return stuList;
+            logger.error("数据库语句检查或执行出错！按条件获取学生信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("按条件获取学生信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -732,13 +776,14 @@ public class Student {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return stuList;
+            logger.error("数据库语句检查或执行出错！获取学生分页信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("获取学生分页信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -806,13 +851,14 @@ public class Student {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            logger.error("数据库语句检查或执行出错！获取学生信息失败！");
         }finally{
             try {
                 queryRS.close();
                 queryStatement.close();
                 queryConn.close();
             } catch (SQLException e1) {
+            	logger.error("获取学生信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -829,7 +875,7 @@ public class Student {
             connection = DriverManager.getConnection(url);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("数据库连接出错");
+            logger.error("数据库连接出错！");
             return null;
         }
         return connection;

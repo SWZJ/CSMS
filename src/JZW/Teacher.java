@@ -7,6 +7,8 @@ import java.util.Date;
 import java.sql.*;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class Teacher {
 	private int teacher_id;			//教师主键
     private String teacher_number;	//教师编号
@@ -17,6 +19,7 @@ public class Teacher {
     private Date created_at;		//新增时间
     private Date updated_at;		//修改时间
     private Date deleted_at;		//删除时间
+    private static Logger logger = Logger.getLogger(User.class);	//输出日志
  
     public Teacher() {}
  
@@ -138,7 +141,7 @@ public class Teacher {
             ps.executeUpdate();
         } catch (Exception e1) {
             e1.printStackTrace();
-            System.out.println("添加教师信息失败！");
+            logger.error("数据库语句检查或执行出错！添加教师信息失败："+teacher_number+" "+teacher_name+" "+teacher_position);
             return false;
         } finally {
             try {
@@ -146,9 +149,10 @@ public class Teacher {
                 conn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
-                return false;
+                logger.error("添加教师信息"+teacher_number+" "+teacher_name+" "+teacher_position+"后数据库关闭失败！");
             }
         }
+        logger.info("添加教师信息成功："+teacher_number+" "+teacher_name+" "+teacher_position);
         return true;
     }
  
@@ -161,17 +165,19 @@ public class Teacher {
             ps = conn.prepareStatement(deleteSql);
             ps.executeUpdate();
         } catch (Exception e) {
+        	logger.error("数据库语句检查或执行出错！删除教师 "+teacher_id+" 失败。");
             e.printStackTrace();
-            System.out.println("数据库语句检查或执行出错");
             return false;
         } finally {
             try {
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("删除教师 "+teacher_id+" 后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
+        logger.info("删除教师 "+teacher_id+" 成功。");
         return true;
     }
  
@@ -201,6 +207,7 @@ public class Teacher {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
+            logger.error("数据库语句检查或执行出错！教师信息查询失败。");
             return null;
         }finally{
             try {
@@ -209,6 +216,7 @@ public class Teacher {
                 queryConn.close();
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("查询教师信息后数据库关闭出错！");
             }
         }
         return teaList;
@@ -253,6 +261,7 @@ public class Teacher {
     //修改教师信息
     public boolean updateTeacher(Teacher tea,String teacher_number,String teacher_name,String teacher_position,Date updated_at) {
  
+    	String updateStr = "";
     	int count = 0;//记录是否有修改
         Connection conn = conn();
         //信息有改动时才修改
@@ -263,7 +272,9 @@ public class Teacher {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 编号:"+tea.teacher_number+"->"+teacher_number;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改教师 "+tea.teacher_id+" 编号"+tea.teacher_number+"为"+teacher_number+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -276,7 +287,9 @@ public class Teacher {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 姓名:"+tea.teacher_name+"->"+teacher_name;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改教师 "+tea.teacher_id+" 姓名"+tea.teacher_name+"为"+teacher_name+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -289,7 +302,9 @@ public class Teacher {
                 PreparedStatement ps = conn.prepareStatement(updateSql);
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 职称:"+tea.teacher_position+"->"+teacher_position;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改教师 "+tea.teacher_id+" 职称"+tea.teacher_position+"为"+teacher_position+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -302,7 +317,9 @@ public class Teacher {
                 ps.setTimestamp(1, new Timestamp(updated_at.getTime()));
                 ps.executeUpdate();
                 ps.close();
+                updateStr += " 修改时间:"+tea.updated_at+"->"+updated_at;
             } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改教师 "+tea.teacher_id+" 修改时间"+tea.updated_at+"为"+updated_at+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -312,6 +329,10 @@ public class Teacher {
             conn.close();
         } catch (SQLException e1) {
             e1.printStackTrace();
+            logger.error("修改教师 "+tea.teacher_id+" 信息"+updateStr+"后数据库关闭出错！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改教师 "+tea.teacher_id+" 信息成功！"+updateStr);
         }
         return true;
     }
@@ -330,32 +351,29 @@ public class Teacher {
                 return true;
             } catch (SQLException e1) {
                 e1.printStackTrace();
+                logger.error("数据库语句检查或执行出错！刷新教师 "+teacher_id+" 拥有的课题总数失败。");
                 return false;
             } 
-    	}else	return false;
+    	}else {
+    		logger.warn("传入的教师ID必须为正整数！刷新教师 "+teacher_id+" 拥有的课题总数失败。");
+    		return false;
+    	}
     }
     
     //刷新所有教师拥有的课题总数
     public boolean refreshCDTopicCountOfAll() {
     	Connection conn = conn();
-    	CDTopic cdt = new CDTopic();
     	List<Teacher> teaList = getTeacherInfo();
 		for(Teacher teacher:teaList) {
-			String updateSql = "update teacher set teacher_cdtcount='"+cdt.queryCDTopicByTeacherID(teacher.getID()).size()+"' where teacher_id=" + teacher.getID();
-			try {
-                PreparedStatement ps = conn.prepareStatement(updateSql);
-                ps.executeUpdate();
-                ps.close();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-                return false;
-            } 
+			teacher.refreshCDTopicCountByID(teacher.getID());
 		}
 		try {
 			conn.close();
+			logger.info("刷新所有教师拥有的课题总数成功！");
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			logger.error("刷新所有教师拥有的课题总数后数据库关闭失败！");
 			return false;
 		}
     }
@@ -368,7 +386,7 @@ public class Teacher {
     
     //获取所有数据量（无条件）
     public int CountOfAll() {
-    	int count;
+    	int count = 0;
         ResultSet rs = null;
         PreparedStatement ps = null;
         Connection conn = null;
@@ -380,13 +398,14 @@ public class Teacher {
             count = rs.getInt(1);
         }catch(Exception e2) {
             e2.printStackTrace();
-            return 0;
+            logger.error("数据库语句检查或执行出错！无条件获取教师数据量失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("无条件获取教师数据量后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -426,13 +445,14 @@ public class Teacher {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return teaList;
+            logger.error("数据库语句检查或执行出错！按条件获取教师信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("按条件获取教师信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -491,13 +511,14 @@ public class Teacher {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return teaList;
+            logger.error("数据库语句检查或执行出错！获取教师分页信息失败！");
         }finally{
             try {
                 rs.close();
                 ps.close();
                 conn.close();
             } catch (SQLException e1) {
+            	logger.error("获取教师分页信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -557,13 +578,14 @@ public class Teacher {
             }
         }catch(Exception e2) {
             e2.printStackTrace();
-            return null;
+            logger.error("数据库语句检查或执行出错！获取教师信息失败！");
         }finally{
             try {
                 queryRS.close();
                 queryStatement.close();
                 queryConn.close();
             } catch (SQLException e1) {
+            	logger.error("获取教师信息后数据库关闭出错！");
                 e1.printStackTrace();
             }
         }
@@ -580,7 +602,7 @@ public class Teacher {
             connection = DriverManager.getConnection(url);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("数据库连接出错");
+            logger.error("数据库连接出错！");
             return null;
         }
         return connection;

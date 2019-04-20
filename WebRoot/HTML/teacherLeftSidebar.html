@@ -15,7 +15,7 @@
                         	<li><a href="/CSMS/SWZJ/teacher/myTopic/teacherAllTopic.jsp" id="teacherAllTopic" class="">我拥有的课题</a></li>
                         	<li><a href="/CSMS/SWZJ/teacher/myTopic/teacherActiveTopic.jsp" id="teacherActiveTopic" class="">已生效课题</a></li>
                             <li><a href="/CSMS/SWZJ/teacher/myTopic/teacherFailedTopic.jsp" id="teacherFailedTopic" class="">未生效课题</a></li>
-                            <li><a href="/CSMS/SWZJ/teacher/myTopic/teacherStudentOfTopic.jsp" id="teacherStudentOfTopic" class="">选题学生</a></li>
+                            <li><a href="/CSMS/SWZJ/teacher/myTopic/teacherTopicOfStudent.jsp" id="teacherTopicOfStudent" class="">选题学生</a></li>
                         </ul>
                     </div>
                 </li>
@@ -65,8 +65,8 @@
 			document.getElementById("teacherActiveTopic").className = "active";
 		}else if(pathname.indexOf("teacherFailedTopic") != -1){
 			document.getElementById("teacherFailedTopic").className = "active";
-		}else if(pathname.indexOf("teacherStudentOfTopic") != -1){
-			document.getElementById("teacherStudentOfTopic").className = "active";
+		}else if(pathname.indexOf("teacherTopicOfStudent") != -1){
+			document.getElementById("teacherTopicOfStudent").className = "active";
 		}else if(pathname.indexOf("teacherAllTopic") != -1){
 			document.getElementById("teacherAllTopic").className = "active";
 		}
