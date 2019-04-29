@@ -48,9 +48,9 @@
 	                <i class="icon-submenu lnr lnr-chevron-down"></i>
 	            </a>
 	            <ul class="dropdown-menu">
-	                <li><a href="#"><i class="lnr lnr-user"></i> <span>我的信息</span></a></li>
-	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
-	                <li><a href="#"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
+	                <li><a href="/CSMS/SWZJ/user/userCenter.jsp" target="_blank"><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
+	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-bubble"></i> <span>Message</span></a></li>
+	                <li><a href="/CSMS/SWZJ/user/set/userSet.jsp" target="_blank"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
 	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
 	            </ul>
 	        </li>
@@ -74,7 +74,7 @@
      <div style="padding: 80px 0px;text-align: center">
         <h2>上传我的课题报告</h2><hr>
         <h4><span style="color:red">上传要求：</span>文件名中必须含课题名称、班级、姓名和学号。（例：神葳计划 计科17-3BJ 李浩葳 14172401437）</h4>
-        <p><span  style="color:#DA26C9">最多上传10篇报告</span>&ensp;&ensp;&ensp;已上传报告数：<%=reportCount %></p>
+        <p><span  style="color:#E308E4">最多上传10篇报告</span>&ensp;&ensp;&ensp;已上传报告数：<%=reportCount %></p>
         <form method="post" action="${pageContext.request.contextPath}/servlet/UploadHandleServlet?branch=student&id=${user.getTeacherID()}" onsubmit="return checkFile()?checkID():false" target="_self" enctype="multipart/form-data">
         	<input type="hidden" name="username" value="${user.getName()}">
             <button type="button" class="btn btn-default" onclick="transferclick()" style="margin: 40px">

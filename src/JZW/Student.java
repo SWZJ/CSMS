@@ -294,7 +294,7 @@ public class Student {
         }catch(Exception e2) {
             e2.printStackTrace();
             logger.error("数据库语句检查或执行出错！学生信息查询失败。");
-            return null;
+            return stuList;
         }finally{
             try {
                 queryRS.close();

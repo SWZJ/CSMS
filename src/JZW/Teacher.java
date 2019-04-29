@@ -208,7 +208,7 @@ public class Teacher {
         }catch(Exception e2) {
             e2.printStackTrace();
             logger.error("数据库语句检查或执行出错！教师信息查询失败。");
-            return null;
+            return teaList;
         }finally{
             try {
                 queryRS.close();
@@ -234,9 +234,13 @@ public class Teacher {
     }
  
     //查询教师信息（按编号查找）
-    public List<Teacher> queryTeacherByNumber(String teacher_number) {
+    public Teacher queryTeacherByNumber(String teacher_number) {
     	String querySql = "select * from teacher where teacher_number="+"'"+teacher_number+"'";
-    	return queryTeacher(querySql);
+    	if(queryTeacher(querySql).size()!=0) {
+        	return queryTeacher(querySql).get(0);
+        }else {
+        	return new Teacher();
+        }
     }
     
     //查询教师信息（按姓名查找）
@@ -380,7 +384,7 @@ public class Teacher {
     
     //判断编号是否存在
     public boolean isExist_number(String teacher_number) {
-    	if(queryTeacherByNumber(teacher_number).size() != 0)	return true;
+    	if(queryTeacherByNumber(teacher_number).getID() != 0)	return true;
     	else return false;
     }
     

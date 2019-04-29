@@ -267,7 +267,7 @@ public class CDTopic {
         }catch(Exception e2) {
             e2.printStackTrace();
             logger.error("数据库语句检查或执行出错！课题信息查询失败。");
-            return null;
+            return cdtList;
         }finally{
             try {
                 queryRS.close();

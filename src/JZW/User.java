@@ -13,13 +13,20 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
+
+import emailController.Sendemail;
 
 public class User {
 	private int user_id;			//用户主键
     private String user_account;	//用户账号
     private String user_password;	//用户密码
     private String user_name;		//用户名
+    private String user_email;		//用户邮箱
+    private String user_question;	//用户密保问题
+    private String user_answer;		//用户密保答案
     private int user_root;			//用户权限
     private String user_root_name; 	//用户权限名称
     private boolean user_deleted;	//用户是否已删除
@@ -76,6 +83,33 @@ public class User {
     
     public void setName(String user_name) {
     	this.user_name = user_name;
+    }
+    
+    public String getQuestion() {
+    	if(user_question==null)	return "";
+    	else	return user_question;
+    }
+    
+    public void setQuestion(String user_question) {
+    	this.user_question = user_question;
+    }
+    
+    public String getAnswer() {
+    	if(user_answer==null)	return "";
+    	else	return user_answer;
+    }
+    
+    public void setAnswer(String user_answer) {
+    	this.user_answer = user_answer;
+    }
+    
+    public String getEmail() {
+    	if(user_email==null)	return "";
+    	else	return user_email;
+    }
+    
+    public void setEmail(String user_email) {
+    	this.user_email = user_email;
     }
     
     public int getRoot() {
@@ -211,7 +245,6 @@ public class User {
         return true;
     }
     
-    
     //查询用户信息
     public List<User> queryUser(String querySql) {
         List<User> userList = new ArrayList<User>();
@@ -229,6 +262,9 @@ public class User {
             	user.user_account = queryRS.getString("user_account");
             	user.user_password = queryRS.getString("user_password");
             	user.user_name = queryRS.getString("user_name");
+            	user.user_email = queryRS.getString("user_email");
+            	user.user_question = queryRS.getString("user_question");
+            	user.user_answer = queryRS.getString("user_answer");
             	user.user_root = queryRS.getInt("user_root");
             	user.user_root_name = queryRS.getString("user_root_name");
             	user.user_deleted = queryRS.getBoolean("user_deleted");
@@ -242,7 +278,7 @@ public class User {
         }catch(Exception e2) {
             e2.printStackTrace();
             logger.error("数据库语句检查或执行出错！用户信息查询失败。");
-            return null;
+            return userList;
         }finally{
             try {
                 queryRS.close();
@@ -276,11 +312,25 @@ public class User {
         }
     }
     
+    //邮箱查找用户
+    public User queryUserByEmail(String user_email) {
+        String querySql = "select * from user where user_email="+"'"+user_email+"'";
+        if(queryUser(querySql).size()!=0) {
+        	return queryUser(querySql).get(0);
+        }else {
+        	return new User();
+        }
+    }
+    
     //账号密码查找用户
     public User queryUserByAccountPassword(String account,String password) {
     	String querySql = "select * from user where user_account="+"'"+account+"'"+" and user_password="+"'"+password+"'";
     	if(queryUser(querySql).size()!=0) {
-        	return queryUser(querySql).get(0);
+    		User user = queryUser(querySql).get(0);
+    		if(user.getAccount().equals(account)&&user.getPassword().equals(password))
+    			return user;
+    		else
+    			return new User();
         }else {
         	return new User();
         }
@@ -327,7 +377,7 @@ public class User {
                 ps.setTimestamp(1, new Timestamp(nowTime.getTime()));
                 ps.executeUpdate();
                 ps.close();
-                updateStr += " 修改时间:"+user.updated_at+"->"+updated_at;
+                updateStr += " 修改时间:"+user.updated_at+"->"+nowTime;
             } catch (SQLException e1) {
             	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 修改时间"+user.updated_at+"为"+updated_at+"失败。");
                 e1.printStackTrace();
@@ -346,7 +396,53 @@ public class User {
         return true;
     }
     
-
+    //修改用户邮箱
+    public boolean updateUserEmail(User user,String user_email) {
+    	String updateStr = "";
+    	int count = 0;//记录是否有修改
+    	Date nowTime = new Date();
+    	Connection conn = conn();
+        //信息有改动时才修改
+        if(user_email.equals(user.user_email) == false) {
+        	count++;
+            String updateSql = "update user set user_email='"+user_email+"' where user_id=" + user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 邮箱:"+user.user_email+"->"+user_email;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 邮箱"+user.user_email+"为"+user_email+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        if(nowTime != user.updated_at&&count != 0) {
+        	String updateSql = "update user set updated_at = ? where user_id="+ user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.setTimestamp(1, new Timestamp(nowTime.getTime()));
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 修改时间:"+user.updated_at+"->"+nowTime;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 修改时间"+user.updated_at+"为"+updated_at+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        try {
+            conn.close();
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+            logger.error("修改用户 "+user.user_id+" 信息"+updateStr+"后数据库关闭失败！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改用户 "+user.user_id+" 信息成功！"+updateStr);
+        }
+        return true;
+    }
+    
     //验证账号密码是否正确
 	public User validateAccountPassword(String account,String password) {
     	User user = queryUserByAccountPassword(account, password);
@@ -364,6 +460,18 @@ public class User {
 			return user.queryUserByAccount(account);
 		}
 		return null;
+    }
+    
+	//判断账号是否存在
+    public boolean isExist_account(String user_account) {
+    	if(queryUserByAccount(user_account).getID() != 0)	return true;
+    	else return false;
+    }
+	
+    //判断邮箱是否存在
+    public boolean isExist_email(String user_email) {
+    	if(queryUserByEmail(user_email).getID() != 0)	return true;
+    	else return false;
     }
     
 	//获取所有数据量（无条件）
@@ -411,6 +519,9 @@ public class User {
             	user.user_account = rs.getString("user_account");
             	user.user_password = rs.getString("user_password");
             	user.user_name = rs.getString("user_name");
+            	user.user_email = rs.getString("user_email");
+            	user.user_question = rs.getString("user_question");
+            	user.user_answer = rs.getString("user_answer");
             	user.user_root = rs.getInt("user_root");
             	user.user_root_name = rs.getString("user_root_name");
             	user.user_deleted = rs.getBoolean("user_deleted");
@@ -479,6 +590,9 @@ public class User {
             	user.user_account = rs.getString("user_account");
             	user.user_password = rs.getString("user_password");
             	user.user_name = rs.getString("user_name");
+            	user.user_email = rs.getString("user_email");
+            	user.user_question = rs.getString("user_question");
+            	user.user_answer = rs.getString("user_answer");
             	user.user_root = rs.getInt("user_root");
             	user.user_root_name = rs.getString("user_root_name");
             	user.user_deleted = rs.getBoolean("user_deleted");
@@ -555,6 +669,9 @@ public class User {
             	user.user_account = queryRS.getString("user_account");
             	user.user_password = queryRS.getString("user_password");
             	user.user_name = queryRS.getString("user_name");
+            	user.user_email = queryRS.getString("user_email");
+            	user.user_question = queryRS.getString("user_question");
+            	user.user_answer = queryRS.getString("user_answer");
             	user.user_root = queryRS.getInt("user_root");
             	user.user_root_name = queryRS.getString("user_root_name");
             	user.user_deleted = queryRS.getBoolean("user_deleted");
@@ -597,4 +714,44 @@ public class User {
         return connection;
     }
 
+    public String sendCode() throws Exception {
+    	String code = getCode(6);
+    	Sendemail email = new Sendemail();
+		String to = this.getEmail();
+		String title = "神葳总局邮箱验证";
+		String content ="<div style='width:640px; background:#fff; border:solid 1px #efefef; margin:0 auto; padding:0 0 0 0'>"+
+			" <table width='560' border='0' align='center' cellpadding='0' cellspacing='0' style=' margin:0 auto; margin-left:30px; margin-right:30px;'>"+
+			"    <tbody>"+
+			"      <td>"+
+			"      <h3 style='font-weight:normal; font-size:18px'>您好！<span style='font-weight:bold; margin-left:5px;'>"+this.getName()+"</span></h3>"+
+			"      <p style='margin:5px 0; padding:3px 0;color:#666; font-size:14px'>神葳总局邮箱验证通知:</p>"+
+			"      <p style='color:#666; font-size:14px'>您正在进行神葳总局用户邮箱验证，您收到的邮箱验证码为： "+
+			"      <p style='color:red; font-size:28px'>"+code+
+			"      <p style='margin:5px 0; padding:3px 0;color:#666; font-size:14px'>如果验证码已经失效，请回到神葳总局重新发送验证码，谢谢您的合作！</p>"+
+			"      <p style='margin:5px 0; padding:3px 0;color:#666; font-size:14px'>如非本人操作，请忽略此邮件，由此给您带来的不便请谅解！</p>"+
+			"      <p style='margin:5px 0; padding:3px 0;color:#666; font-size:14px'>感谢您对神葳总局的支持。</p>"+
+			"      </td>"+
+			"    </tbody>"+
+			" </table>"+
+			"</div>";
+		if(email.send(to,title,content)){
+			logger.info(this.getID()+" 发送邮箱验证码成功！");
+			return code;
+		}else {
+			logger.error(this.getID()+" 发送邮箱验证码失败！");
+			return null;
+		}
+    }
+    
+    public static String getCode(int n) {
+		String string = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		StringBuffer code = new StringBuffer();
+		for (int i = 0; i < n; i++) {
+			Random random = new Random();
+			int index = random.nextInt(string.length());
+			char ch = string.charAt(index);
+			code.append(ch);
+		}
+		return code.toString();
+	}
 }
