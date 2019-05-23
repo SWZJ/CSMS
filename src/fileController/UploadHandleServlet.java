@@ -7,9 +7,12 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.ProgressListener;
@@ -21,24 +24,29 @@ import org.apache.log4j.Logger;
 * @ClassName: UploadHandleServlet
 *
 */ 
+@WebServlet("/servlet/UploadHandleServlet")
 public class UploadHandleServlet extends HttpServlet {
-
+	
 	private static final long serialVersionUID = 2390128404412934362L;
 	private static Logger logger = Logger.getLogger(UploadHandleServlet.class);	//输出日志
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		HttpSession session = request.getSession(true);  
 		//获取文件夹分支索引
-		String branch = request.getParameter("branch");
+		String branch = request.getParameter("branch")==null?"":request.getParameter("branch");
 		//获取索引ID
-		String id = request.getParameter("id");
+		int id = request.getParameter("id")==null?0:Integer.parseInt(request.getParameter("id"));
         //得到上传文件的保存目录，将上传的文件存放于WEB-INF目录下，不允许外界直接访问，保证上传文件的安全
         String savePath = this.getServletContext().getRealPath("/WEB-INF/upload/"+branch+"/"+id);
+        String savePathcopy = "E://CSMS-public/upload/"+branch+"/"+id;
+        /*if(id != 0)	savePath+="/"+id;*/
         File file = new File(savePath);
         //如果目录不存在
         if(!file.exists()){
             //创建目录
             file.mkdirs();
         }
+        File filecopy = new File(savePathcopy);if(!filecopy.exists()){filecopy.mkdirs();}
         /*//消息提示
         String message = "";*/
         String filename = "";
@@ -97,8 +105,11 @@ public class UploadHandleServlet extends HttpServlet {
                     String saveFilename = makeFileName(filename);
                     //得到文件的保存目录
                     String realSavePath = makePath(saveFilename, savePath);
+                    String realSavePathcopy = makePath(saveFilename, savePathcopy);
                     //创建一个文件输出流
                     FileOutputStream out = new FileOutputStream(realSavePath + "\\" + saveFilename);
+                    //复制一份到本地文件夹
+                    FileOutputStream outcopy = new FileOutputStream(realSavePathcopy + "\\" + saveFilename);
                     //创建一个缓冲区
                     byte buffer[] = new byte[1024];
                     //判断输入流中的数据是否已经读完的标识
@@ -107,37 +118,39 @@ public class UploadHandleServlet extends HttpServlet {
                     while((len=in.read(buffer))>0){
                         //使用FileOutputStream输出流将缓冲区的数据写入到指定的目录(savePath + "\\" + filename)当中
                         out.write(buffer, 0, len);
+                        outcopy.write(buffer, 0, len);
                     }
                     //关闭输入流
                     in.close();
                     //关闭输出流
                     out.close();
+                    outcopy.close();
                     //删除处理文件上传时生成的临时文件
                     //item.delete();
                 }
             }
         }catch (FileUploadBase.FileSizeLimitExceededException e) {
             e.printStackTrace();
-            request.setAttribute("message", "报告 "+filename+" 上传失败：单个文件超出最大值！！！");
+            session.setAttribute("message", "报告 "+filename+" 上传失败：单个文件超出最大值！！！");
             logger.warn("报告 "+filename+" 上传失败：单个文件超出最大值！");
-            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentUploadReportMessage.jsp").forward(request, response);
+            response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
             return;
         }catch (FileUploadBase.SizeLimitExceededException e) {
             e.printStackTrace();
-            request.setAttribute("message", "报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！！！");
+            session.setAttribute("message", "报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！！！");
             logger.warn("报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！");
-            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentUploadReportMessage.jsp").forward(request, response);
+            response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
             return;
         }catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("message","报告 "+filename+" 上传失败：遇到未知错误！！！");
+            session.setAttribute("message","报告 "+filename+" 上传失败：遇到未知错误！！！");
             logger.error("报告 "+filename+" 上传失败：遇到未知错误！");
-            request.getRequestDispatcher("/SWZJ/student/uploadReport/studentUploadReportMessage.jsp").forward(request, response);
+            response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
             return;
         }
         logger.info("报告 "+filename+" 上传成功！");
-        request.setAttribute("message","报告 "+filename+" 上传成功！！！");
-        request.getRequestDispatcher("/SWZJ/student/uploadReport/studentUploadReportMessage.jsp").forward(request, response);
+        session.setAttribute("message","报告 "+filename+" 上传成功！！！");
+        response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
     }
     
     /**
@@ -155,7 +168,6 @@ public class UploadHandleServlet extends HttpServlet {
      * 为防止一个目录下面出现太多文件，要使用hash算法打散存储
     * @Method: makePath
     * @Description: 
-    *
     * @param filename 文件名，要根据文件名生成存储目录
     * @param savePath 文件存储路径
     * @return 新的存储目录

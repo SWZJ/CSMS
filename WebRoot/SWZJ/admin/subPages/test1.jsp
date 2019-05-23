@@ -12,6 +12,7 @@
         else return false;
  	}
 	</script>
+	<script src="/CSMS/ValidateJS/loading.js"></script>
   </head>
 
   <body>

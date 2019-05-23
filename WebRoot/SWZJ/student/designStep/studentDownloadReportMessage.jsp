@@ -5,14 +5,14 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>报告下载出错</title>
+    <title>报告操作结果</title>
   </head>
   
   <body>
   	<script>
   		/* alert('${message}'); */
   		<% session.setAttribute("message",request.getAttribute("message")); %>
-  		window.location.href = "${pageContext.request.contextPath}/servlet/ListFileServlet?location=studentMyReport&branch=student&id=0&queryStr=${user.getName()}";
+  		window.location.href = "/CSMS/servlet/ListFileServlet?location=studentMyReport&branch=student&id=0&queryStr=${user.getName()}";
   	</script>
   </body>
 </html>

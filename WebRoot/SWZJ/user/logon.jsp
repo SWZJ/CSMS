@@ -4,7 +4,7 @@
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 <!-- 账号验证JS -->
 <script src="/CSMS/ValidateJS/User/user_account.js"></script>
@@ -67,7 +67,8 @@
 						<label for="user_account" class="col-sm-2 control-label"><a class="text-danger">*</a>账号</label>
 						<div class="col-sm-9">
 							<input type="text" class="form-control" id="user_account" name="user_account" 
-							placeholder="账号（6~18位字符,只能包含英文字母、数字、下划线）" value="" onblur="checkUser_account()">
+							placeholder="账号（6~18位字符,只能包含英文字母、数字、下划线）" value="" onchange="checkUser_account()"
+							oninput="Inputing(document.getElementById('user_account_span'),document.getElementById('user_account_class'))">
 							<span id="user_account_span"></span>
 						</div>
 					</div>
@@ -76,7 +77,8 @@
 						<label for="user_password" class="col-sm-2 control-label"><a class="text-danger">*</a>密码</label>
 						<div class="col-sm-9">
 							<input type="password" class="form-control" id="user_password" name="user_password" 
-							placeholder="密码（6~18位字符,必须包含数字、字母或特殊字符其中两项）" value="" onblur="checkUser_password()">
+							placeholder="密码（6~18位字符,必须包含数字、字母或特殊字符其中两项及以上及以上）" value="" onchange="checkUser_password()"
+							oninput="Inputing(document.getElementById('user_password_span'),document.getElementById('user_password_class'))">
 							<span id="user_password_span"></span>
 						</div>
 						<img id="eyeImg" onclick="hideShowPsw()" height="35" width="35" src="/CSMS/public/assets/img/invisible.png" alt="密码是否可见">
@@ -86,7 +88,8 @@
 						<label for="user_name" class="col-sm-2 control-label"><a class="text-danger">*</a>用户名</label>
 						<div class="col-sm-9">
 							<input type="text" class="form-control" id="user_name" name="user_name" 
-							placeholder="用户名（只能为汉字、字母或数字，长度为2-5）" value="" onblur="checkUser_name()">
+							placeholder="用户名（只能为汉字、字母或数字，长度为2-5）" value="" onchange="checkUser_name()"
+							oninput="Inputing(document.getElementById('user_name_span'),document.getElementById('user_name_class'))">
 							<span id="user_name_span"></span>
 						</div>
 					</div>
@@ -95,13 +98,14 @@
 						<label for="user_authCode" class="col-sm-2 control-label"><a class="text-danger"></a>授权码</label>
 						<div class="col-sm-9">
 							<input type="text" class="form-control" id="user_authCode" name="user_authCode" 
-							placeholder="授权码（用于注册超级管理员，不填写授权码则默认注册为教师）" value="" onblur="checkUser_authCode()">
+							placeholder="授权码（用于注册超级管理员，不填写授权码则默认注册为教师）" value="" onchange="checkUser_authCode()"
+							oninput="Inputing(document.getElementById('user_authCode_span'),document.getElementById('user_authCode_class'))">
 							<span id="user_authCode_span"></span>
 						</div>
 					</div>
 					
 					<div class="form-group">
-						<button type="submit" class="btn btn-primary">注册</button>
+						<button type="submit" class="btn btn-primary" id="logonBtn">注册</button>
 						<a class="btn btn-primary" href="#" onClick="history.back(-1)">取消</a>
 					</div>
 					
@@ -127,10 +131,11 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
+<%@include file="/CommonView/javaScript.jsp" %>
+<!-- 密码是否可见 -->
 <script type="text/javascript">
     var eyeImg = document.getElementById("eyeImg");
     var passwordInput = document.getElementById("user_password");
@@ -143,6 +148,38 @@
             eyeImg.src = "/CSMS/public/assets/img/invisible.png";
         }
     }
+</script>
+<!-- 判断账号是否存在 -->
+<script>
+	$(document).ready(function() {
+		function IsAccountExist(){
+			$.ajax({
+				type:"post",
+				url:"/CSMS/manageInfo/UserIsAccountExist",
+				datatype: "json", 
+				async:false,
+				data:{
+					"user_account":$("#user_account").val(),
+				},
+				success:function(result) {
+					if(checkUser_account()==false)	return;
+					var r = JSON.parse(result);
+					if(r.isExist==true){//账号已存在。
+						$("#user_account_span").html("<label class=\"control-label text-danger\" for=\"user_account\">"+r.errorMes+"</label>")
+						$("#user_account_class").attr("class","form-group has-error"); 
+					}else{//账号不存在。
+						$("#user_account_span").html("<label class=\"control-label text-success\" for=\"user_account\">"+r.successMes+"</label>")
+						$("#user_account_class").attr("class","form-group has-success");
+					}
+				},
+				error:function(){
+					alert("回调出错！");
+				}
+			});
+		}
+		$("#logonBtn").click(IsAccountExist);
+		$("#user_account").change(IsAccountExist);
+	});
 </script>
 
 </body>

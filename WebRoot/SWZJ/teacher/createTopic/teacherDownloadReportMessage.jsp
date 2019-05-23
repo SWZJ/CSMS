@@ -11,7 +11,7 @@
   	<script>
   		/* alert('${message}'); */
   		<% session.setAttribute("message",request.getAttribute("message")); %>
-  		window.location.href = "${pageContext.request.contextPath}/servlet/ListFileServlet?location=teacherReportOfStudent&branch=student&id=${ user.getTeacherID() }";
+  		window.location.href = "/CSMS/servlet/ListFileServlet?location=teacherReportOfStudent&branch=student&id=${ user.getTeacherID() }";
   	</script>
   </body>
 </html>

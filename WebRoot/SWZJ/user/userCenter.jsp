@@ -5,82 +5,173 @@
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
+
+<style>
+table td:nth-child(1){
+	text-align:left;
+}
+table td:nth-child(2){
+	text-align:left;
+}
+table td:nth-child(3){
+	text-align:left;
+}
+table td:nth-child(4){
+	text-align:center;
+}
+table td p:nth-child(1){
+	margin:5px 0;
+}
+table td p:nth-child(1){
+	margin:10px 0;
+}
+.title{
+	font-size:18px
+}
+.text {
+	color: grey;
+	font-size:14px
+}
+</style>
 
 </head>
 
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = new User().queryUserByID(((User)session.getAttribute("user")).getID());	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="/CSMS/SWZJ/user/userCenter.jsp"><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
-	                <!-- <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-bubble"></i> <span>Message</span></a></li> -->
-	                <li><a href="/CSMS/SWZJ/user/set/userSet.jsp" target="_blank"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/userLeftSidebar.html" %>
+<%@include file="/CommonView/userLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
 <!-- MAIN CONTENT -->
 <div class="main-content">
 
-<!-- ERROR TIP -->
-<!-- END ERROR TIP -->
+<!-- INFO TIP -->
+<%@include file="/CommonView/infoTip.jsp" %>
+<!-- END INFO TIP -->
         
      <div class="container-fluid">
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><%= user.getName() %></div>
+                <div class="panel panel-default" style="text-align:center">
+                    <div class="panel-heading"><p style="margin:3px 0;color:; font-size:28px"><strong style="color:;"><%= user.getName() %></strong>&ensp;的个人中心</p></div>
                     <div class="panel-body">
-                    	你是 <%= user.getRootName() %> ！
+
+			            <!-- 头像开始 -->
+			            <div class="avatar">
+			                <a href="javascript:void(0);" onclick="" title="修改头像" data-target="#changeModal" data-toggle="modal">
+			                	<img src="/CSMS/public/userAvatar/<%=user.getID()%>.jpg" id="user-photo" class="img-circle" alt="Avatar" width="140" height="140"
+	                			onerror="this.src='/CSMS/public/userAvatar/<%=user.getRoot()==0?new Student().queryStudentByID(user.getStudentID()).getSex():"未知"%>.jpg';this.onerror=null"/> 
+			                </a>
+			            </div>
+			            <!-- 头像结束 -->
+			            <p style="margin:5px 0;color:rgb(0, 170, 255); font-size:22px"><%=user.getAccount() %></p>
+						<p class="title"><span>帐号类型：</span><span><%=user.getRootName() %></span></p>
+	       				<table class="table table-hover" style="text-align:center;">
+				            <colgroup>
+				                <col style="width:8%">
+				                <col style="width:55%">
+				                <col style="width:20%">
+				                <col style="width:17%">
+				            </colgroup>
+				            <tbody>
+				            
+				            <tr>
+				                <td style="vertical-align:middle;">
+				                    <img src="/CSMS/public/assets/img/icon_password.png" height="45">
+				                </td>
+				                <td>
+				                    <p class="title">帐号密码</p>
+				                    <p class="text">为了保护帐号安全，登录时使用</p>
+				                </td>
+				                <td style="vertical-align:middle;">
+				                    <i class="lnr lnr-checkmark-circle"></i><span>已设置</span>
+				                </td>
+				                <td style="vertical-align:middle;">
+				                    <a href="userManageInfo/updatePassword.jsp" class="btn btn-default">修改</a>
+				                </td>
+				            </tr>
+				
+				            <tr>
+				                <td style="vertical-align:middle;">
+				                    <img src="/CSMS/public/assets/img/icon_bindmobile.png" height="45">
+				                </td>
+				                <td>
+				                    <p class="title">联系手机<span style="color: grey;"><%if(user.getPhone().length()!=0)out.print("（"+user.getPhoneHide()+"）"); %></span></p>
+				                    <p class="text">用于找回密码、安全验证</p>
+				                </td>
+				                <td style="vertical-align:middle;">
+				                	<%if(user.getPhone().length()==0){ %>
+				                		<i class="lnr lnr-cross-circle"></i><span>未绑定</span>
+				                	<%}else{%>
+				                		<i class="lnr lnr-checkmark-circle"></i><span>已绑定</span>
+				                	<%} %>
+                                </td>
+				                <td style="vertical-align:middle;">
+				                	<%if(user.getPhone().length()==0){ %>
+				                		<a href="phone/bindPhone.jsp" class="btn btn-default">绑定</a>
+				                	<%}else{%>
+				                		<a href="phone/tobindPhone.jsp" class="btn btn-default">修改</a>
+				                	<%} %>
+				                </td>
+				            </tr>
+				            
+				            <tr>
+				                <td style="vertical-align:middle;">
+				                    <img src="/CSMS/public/assets/img/icon_bindemial.png" height="45">
+				                </td>
+				                <td>
+				                    <p class="title">联系邮箱<span style="color: grey;"><%if(user.getEmail().length()!=0)out.print("（"+user.getEmailHide()+"）"); %></span></p>
+				                    <p class="text">用于找回密码、安全验证</p>
+				                </td>
+				                <td style="vertical-align:middle;">
+                                    <%if(user.getEmail().length()==0){ %>
+				                		<i class="lnr lnr-cross-circle"></i><span>未绑定</span>
+				                	<%}else{%>
+				                		<i class="lnr lnr-checkmark-circle"></i><span>已绑定</span>
+				                	<%} %>
+                                </td>
+				                <td style="vertical-align:middle;">
+				                	<%if(user.getEmail().length()==0){ %>
+				                		<a href="email/bindEmail.jsp" class="btn btn-default">绑定</a>
+				                	<%}else{%>
+				                		<a href="email/tobindEmail.jsp" class="btn btn-default">修改</a>
+				                	<%} %>
+				                </td>
+				            </tr>
+				            
+				            <tr>
+				                <td style="vertical-align:middle;">
+				                    <img src="/CSMS/public/assets/img/icon_information.png" height="45">
+				                </td>
+				                <td>
+				                    <p class="title">用户信息</p>
+				                    <p class="text">帐号归属者的基本资料</p>
+				                </td>
+				                <td style="vertical-align:middle;">
+                                    <i class="lnr lnr-checkmark-circle"></i><span>已认证</span>
+                                </td>
+				                <td style="vertical-align:middle;">
+				                    <a href="userManageInfo/userInfo.jsp" class="btn btn-default">查看</a>
+				                </td>
+				            </tr>
+				            
+			                </tbody>
+			       		</table>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    	
+    <form id="avaterForm" action="userAvatarUpload.jsp" target="_blank" method="post" style="display:none">
+    	<input type="text" name="id" id="id" value="<%=user.getID()%>">
+    	<input type="text" name="dataURL" id="dataURL" value="">
+    </form>
 
 </div>
 <!-- END MAIN CONTENT -->
@@ -88,10 +179,12 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
+<%@include file="/CommonView/javaScript.jsp" %>
+<!-- 修改头像模态框 -->
+<%@include file="/CommonView/avatarModal.jsp" %>
 
 </body>
 </html>

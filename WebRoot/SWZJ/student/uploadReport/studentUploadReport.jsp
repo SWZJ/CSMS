@@ -1,81 +1,38 @@
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
-<%@ page language="java" import="java.util.*,JZW.*,fileController.FileManage" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*,JZW.*,fileController.*" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 </head>
 
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = (User)session.getAttribute("user");	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="/CSMS/SWZJ/user/userCenter.jsp" target="_blank"><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
-	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-bubble"></i> <span>Message</span></a></li>
-	                <li><a href="/CSMS/SWZJ/user/set/userSet.jsp" target="_blank"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
+<% int teacher_id = new CDTopic().queryCDTopicByID(new Student().queryStudentByID(user.getStudentID()).getCdtopicID()).getTeacherID(); user.setTeacherID(teacher_id); %>
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/studentLeftSidebar.html" %>
+<%@include file="/CommonView/studentLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
 <!-- MAIN CONTENT -->
 <div class="main-content">
 
-<!-- ERROR TIP -->
-<!-- END ERROR TIP -->
+<!-- INFO TIP -->
+<%@include file="/CommonView/infoTip.jsp" %>
+<!-- END INFO TIP -->
      
      <%Student student = new Student().queryStudentByID(user.getStudentID()); %>
-     <%int reportCount = new FileManage().fileCount("student", 0, user.getName()); %>
+     <%ListFile list = new ListFile();int reportCount = list.getFileMap(request, response, "student", 0, user.getName()); %>
      <div style="padding: 80px 0px;text-align: center">
         <h2>上传我的课题报告</h2><hr>
         <h4><span style="color:red">上传要求：</span>文件名中必须含课题名称、班级、姓名和学号。（例：神葳计划 计科17-3BJ 李浩葳 14172401437）</h4>
         <p><span  style="color:#E308E4">最多上传10篇报告</span>&ensp;&ensp;&ensp;已上传报告数：<%=reportCount %></p>
-        <form method="post" action="${pageContext.request.contextPath}/servlet/UploadHandleServlet?branch=student&id=${user.getTeacherID()}" onsubmit="return checkFile()?checkID():false" target="_self" enctype="multipart/form-data">
+        <form method="post" action="/CSMS/servlet/UploadHandleServlet?branch=student&id=${user.getTeacherID()}" onsubmit="return checkFile()?checkID():false" target="_self" enctype="multipart/form-data">
         	<input type="hidden" name="username" value="${user.getName()}">
             <button type="button" class="btn btn-default" onclick="transferclick()" style="margin: 40px">
                 <span class="glyphicon glyphicon-inbox" style="font-size: 100px" title="选择课题报告文件"></span>
@@ -141,10 +98,10 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
+<%@include file="/CommonView/javaScript.jsp" %>
 
 </body>
 </html>

@@ -4,12 +4,12 @@
 <%
     //获取邮箱验证信息
 	request.setCharacterEncoding("UTF-8");
-	String _token = request.getParameter("_token");
-	String operation = request.getParameter("operation");
-    String email = request.getParameter("email");
-    String account = request.getParameter("account");
-    Integer user_id = Integer.valueOf(request.getParameter("id"));
-    Long hqtime = Long.valueOf(request.getParameter("poke"));
+	String _token = request.getParameter("_token")==null?"":request.getParameter("_token");
+	String operation = request.getParameter("operation")==null?"":request.getParameter("operation");
+    String email = request.getParameter("email")==null?"":request.getParameter("email");
+    String account = request.getParameter("account")==null?"":request.getParameter("account");
+    Integer user_id = request.getParameter("id")==null?0:Integer.valueOf(request.getParameter("id"));
+    Long hqtime = request.getParameter("poke")==null?0:Long.valueOf(request.getParameter("poke"));
     Long lag = (System.currentTimeMillis() - hqtime) / (1000 * 60);
 %>
 <%if(lag>60*24){%>
@@ -19,7 +19,7 @@
 <%@ page language="java" import="java.util.*,JZW.*,emailController.*" pageEncoding="utf-8"%>
 
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 <!-- 邮箱验证JS -->
 <script src="/CSMS/ValidateJS/User/user_email.js"></script>
@@ -65,58 +65,12 @@ form input:focus {
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = new User().queryUserByID(((User)session.getAttribute("user")).getID());	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
 <%if(!account.equals(user.getAccount())||user_id!=user.getID()||!_token.equals("lyGZwiU0GA6BPKKRIX9f8DSzkNptSO17ftcyrUlV")){%>	<!-- 防止篡改url -->
 	<script>alert("篡改URL是非法操作！")</script>
 <% request.getSession().invalidate();return;} %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="/CSMS/SWZJ/user/userCenter.jsp"><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
-	                <!-- <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-bubble"></i> <span>Message</span></a></li> -->
-	                <li><a href="/CSMS/SWZJ/user/set/userSet.jsp" target="_blank"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
-<!-- END 导航栏 -->
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/userLeftSidebar.html" %>
+<%@include file="/CommonView/userLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
@@ -154,14 +108,15 @@ form input:focus {
 							<div class="form-group" id="user_email_class">
 								<label for="user_email" class="control-label"><a class="text-danger"></a>邮&ensp;箱</label><hr>
 								<input type="text" class="form-control" id="user_email" name="user_email" 
-								placeholder="请输入要改绑的邮箱" value="" autocomplete="off" onblur="checkUser_email()">
+								placeholder="请输入要改绑的邮箱" value="" autocomplete="off" onchange="checkUser_email()"
+								oninput="Inputing(document.getElementById('user_email_span'),document.getElementById('user_email_class'))">
 								<input type="hidden" name="tobin" value="1">
 								<span id="user_email_span"></span>
 							</div>
 							<br>
 							<div class="form-group">
 								<button type="submit" title="发送验证邮件绑定邮箱" class="btn btn-primary">改绑邮箱</button>
-							</div>	
+							</div>
 						</form>
 		    		<%}else{
 						if(user.updateUserEmail(user.queryUserByID(user_id), email)){%>
@@ -207,10 +162,10 @@ form input:focus {
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
+<%@include file="/CommonView/javaScript.jsp" %>
 
 </body>
 </html>

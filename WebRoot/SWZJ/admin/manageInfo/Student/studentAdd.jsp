@@ -5,7 +5,7 @@
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 <!-- 学号验证JS -->
 <script src="/CSMS/ValidateJS/Student/student_number.js"></script>
@@ -45,54 +45,9 @@
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = (User)session.getAttribute("user");	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="/CSMS/SWZJ/user/userCenter.jsp" target="_blank"><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
-	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-bubble"></i> <span>Message</span></a></li>
-	                <li><a href="/CSMS/SWZJ/user/set/userSet.jsp" target="_blank"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/adminLeftSidebar.html" %>
+<%@include file="/CommonView/adminLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
@@ -111,7 +66,8 @@
                     <label for="student_number" class="col-sm-2 control-label"><a class="text-danger">*</a>学号</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="student_number" name="student_number" 
-                        placeholder="请输入学生学号（全为数字且长度为11）" value="" onblur="checkStudent_number()">
+                        placeholder="请输入学生学号（全为数字且长度为11）" value="" onchange="checkStudent_number()"
+                        oninput="Inputing(document.getElementById('student_number_span'),document.getElementById('student_number_class'))">
                         <span id="student_number_span"></span>
                     </div>
                 </div>
@@ -120,7 +76,8 @@
                     <label for="student_name" class="col-sm-2 control-label"><a class="text-danger">*</a>姓名</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="student_name" name="student_name" 
-                        placeholder="请输入学生姓名" value="" onblur="checkStudent_name()">
+                        placeholder="请输入学生姓名" value="" onchange="checkStudent_name()"
+                        oninput="Inputing(document.getElementById('student_name_span'),document.getElementById('student_name_class'))">
                         <span id="student_name_span"></span>
                     </div>
                 </div>
@@ -128,9 +85,9 @@
                 <div class="form-group" id="student_sex_class">
                     <label for="student_sex" class="col-sm-2 control-label"><a class="text-danger">*</a>性别</label>
                     <div class="col-sm-8">
-                    	&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="男">男</label>
-		    			&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="女">女</label>
-						&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="未知" onblur="checkStudent_sex()">未知</label>
+                    	&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="男" onchange="checkStudent_sex()">男</label>
+		    			&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="女" onchange="checkStudent_sex()">女</label>
+						&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="未知" onchange="checkStudent_sex()">未知</label>
 						<label class="control-label text-danger" for="student_sex">&emsp;</label><br>
 						<span id="student_sex_span"></span>
                     </div>
@@ -140,7 +97,8 @@
                     <label for="student_age" class="col-sm-2 control-label"><a class="text-danger"></a>年龄</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="student_age" name="student_age" 
-                        placeholder="请输入学生年龄" value="" onblur="checkStudent_age()">
+                        placeholder="请输入学生年龄" value="" onchange="checkStudent_age()"
+                        oninput="Inputing(document.getElementById('student_age_span'),document.getElementById('student_age_class'))">
                         <span id="student_age_span"></span>
                     </div>
                 </div>
@@ -148,7 +106,7 @@
                 <div class="form-group" id="student_class_class">
                     <label for="student_class" class="col-sm-2 control-label"><a class="text-danger">*</a>班级</label>
                     <div class="col-sm-8">
-                        <select class="form-control" id="student_class" name="student_class" onblur="checkStudent_class()">
+                        <select class="form-control" id="student_class" name="student_class" onchange="checkStudent_class()">
 	                        <option value = 0>--请选择所属班级--</option>
 	                        <option value = 1>计科17-3BJ</option>
                         </select>
@@ -159,7 +117,7 @@
                 <div class="form-group" id="student_major_class">
                     <label for="student_major" class="col-sm-2 control-label"><a class="text-danger">*</a>专业</label>
                     <div class="col-sm-8">
-                        <select class="form-control" id="student_major" name="student_major" onblur="checkStudent_major()">
+                        <select class="form-control" id="student_major" name="student_major" onchange="checkStudent_major()">
 	                        <option value = 0>--请选择所属专业--</option>
 	                        <option value = 1>计算机科学与技术</option>
                         </select>
@@ -170,7 +128,7 @@
 				<div class="form-group" id="student_college_class">
                     <label for="student_college" class="col-sm-2 control-label"><a class="text-danger">*</a>学院</label>
                     <div class="col-sm-8">
-                        <select class="form-control" id="student_college" name="student_college" onblur="checkStudent_college()">
+                        <select class="form-control" id="student_college" name="student_college" onchange="checkStudent_college()">
 	                        <option value = 0>--请选择所属学院--</option>
 	                        <option value = 1>信息学院</option>
                         </select>
@@ -197,7 +155,7 @@
 
                 <div class="form-group">
                     <div class="col-sm-offset-5 col-sm-6">
-                        <button type="submit" class="btn btn-primary">提交</button>
+                        <button type="submit" class="btn btn-primary" id="addBtn">提交</button>
                         <a class="btn btn-primary" href="#" onClick="history.back(-1)">返回</a>
                     </div>
                 </div>
@@ -212,10 +170,42 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
+<%@include file="/CommonView/javaScript.jsp" %>
+<!-- 判断学号是否存在 -->
+<script>
+	$(document).ready(function() {
+		function IsNumExist(){
+			$.ajax({
+				type:"post",
+				url:"/CSMS/manageInfo/StudentIsNumExist",
+				datatype: "json",
+				async:false,
+				data:{
+					"student_number":$("#student_number").val(),
+				},
+				success:function(result) {
+					if(checkStudent_number()==false)	return;
+					var r = JSON.parse(result);
+					if(r.isExist==true){//学号已存在
+						$("#student_number_span").html("<label class=\"control-label text-danger\" for=\"student_number\">"+r.errorMes+"</label>")
+						$("#student_number_class").attr("class","form-group has-error"); 
+					}else{//学号不存在。
+						$("#student_number_span").html("")
+						$("#student_number_class").attr("class","form-group has-success");
+					}
+				},
+				error:function(){
+					alert("回调出错！");
+				}
+			});
+		}
+		$("#addBtn").click(IsNumExist);
+		$("#student_number").change(IsNumExist);
+	});
+</script>
 
 </body>
 </html>

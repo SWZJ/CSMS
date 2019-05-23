@@ -5,7 +5,7 @@
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 <!-- 编号验证JS -->
 <script src="/CSMS/ValidateJS/CDTopic/cdtopic_number.js"></script>
@@ -36,54 +36,9 @@
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = (User)session.getAttribute("user");	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="/CSMS/SWZJ/user/userCenter.jsp" target="_blank"><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
-	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-bubble"></i> <span>Message</span></a></li>
-	                <li><a href="/CSMS/SWZJ/user/set/userSet.jsp" target="_blank"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/adminLeftSidebar.html" %>
+<%@include file="/CommonView/adminLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
@@ -102,7 +57,8 @@
                     <label for="cdtopic_number" class="col-sm-2 control-label"><a class="text-danger">*</a>编号</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="cdtopic_number" name="cdtopic_number" 
-                        placeholder="请输入课题编号（长度为10—12，例如：2019JZW12137）" value="" onblur="checkCDTopic_number()">
+                        placeholder="请输入课题编号（长度为10—12，例如：2019JZW12137）" value="" onchange="checkCDTopic_number()"
+                        oninput="Inputing(document.getElementById('cdtopic_number_span'),document.getElementById('cdtopic_number_class'))">
                         <span id="cdtopic_number_span"></span>
                     </div>
                 </div>
@@ -111,7 +67,8 @@
                     <label for="cdtopic_name" class="col-sm-2 control-label"><a class="text-danger">*</a>名称</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="cdtopic_name" name="cdtopic_name" 
-                        placeholder="请输入课题名称" value="" onblur="checkCDTopic_name()">
+                        placeholder="请输入课题名称" value="" onchange="checkCDTopic_name()"
+                        oninput="Inputing(document.getElementById('cdtopic_name_span'),document.getElementById('cdtopic_name_class'))">
                         <span id="cdtopic_name_span"></span>
                     </div>
                 </div>
@@ -120,7 +77,8 @@
                     <label for="cdtopic_keyword" class="col-sm-2 control-label"><a class="text-danger"></a>关键字</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="cdtopic_keyword" name="cdtopic_keyword" 
-                        placeholder="请输入课题关键字" value="" onblur="checkCDTopic_keyword()">
+                        placeholder="请输入课题关键字" value="" onchange="checkCDTopic_keyword()"
+                        oninput="Inputing(document.getElementById('cdtopic_keyword_span'),document.getElementById('cdtopic_keyword_class'))">
                         <span id="cdtopic_keyword_span"></span>
                     </div>
                 </div>
@@ -129,7 +87,8 @@
                     <label for="cdtopic_实现技术" class="col-sm-2 control-label"><a class="text-danger"></a>实现技术</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="cdtopic_technology" name="cdtopic_technology" 
-                        placeholder="请输入课题实现技术" value="" onblur="checkCDTopic_technology()">
+                        placeholder="请输入课题实现技术" value="" onchange="checkCDTopic_technology()"
+                        oninput="Inputing(document.getElementById('cdtopic_technology_span'),document.getElementById('cdtopic_technology_class'))">
                         <span id="cdtopic_technology_span"></span>
                     </div>
                 </div>
@@ -153,7 +112,7 @@
 
                 <div class="form-group">
                     <div class="col-sm-offset-5 col-sm-6">
-                        <button type="submit" class="btn btn-primary">提交</button>
+                        <button type="submit" class="btn btn-primary" id="addBtn">提交</button>
                         <a class="btn btn-primary" href="#" onClick="history.back(-1)">返回</a>
                     </div>
                 </div>
@@ -168,10 +127,42 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
+<%@include file="/CommonView/javaScript.jsp" %>
+<!-- 判断编号是否存在 -->
+<script>
+	$(document).ready(function() {
+		function IsNumExist(){
+			$.ajax({
+				type:"post",
+				url:"/CSMS/manageInfo/CDTopicIsNumExist",
+				datatype: "json", 
+				async:false,
+				data:{
+					"cdtopic_number":$("#cdtopic_number").val(),
+				},
+				success:function(result) {
+					if(checkCDTopic_number()==false)	return;
+					var r = JSON.parse(result);
+					if(r.isExist==true){//编号已存在。
+						$("#cdtopic_number_span").html("<label class=\"control-label text-danger\" for=\"cdtopic_number\">"+r.errorMes+"</label>")
+						$("#cdtopic_number_class").attr("class","form-group has-error"); 
+					}else{//编号不存在。
+						$("#cdtopic_number_span").html("")
+						$("#cdtopic_number_class").attr("class","form-group has-success");
+					}
+				},
+				error:function(){
+					alert("回调出错！");
+				}
+			});
+		}
+		$("#addBtn").click(IsNumExist);
+		$("#cdtopic_number").change(IsNumExist);
+	});
+</script>
 
 </body>
 </html>

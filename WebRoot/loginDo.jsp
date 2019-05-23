@@ -14,7 +14,7 @@
 		if(user.getPassword().equals("123456")){%>
 		<script>
 			while(true){
-				var password1 = prompt("你是第一次登录或未修改过初始密码！\n请设置你的登录密码（不能为\"123456\"）\n6~18位字符,必须包含数字、字母或特殊字符其中两项","");
+				var password1 = prompt("你是第一次登录或未修改过初始密码！\n请设置你的登录密码（不能为\"123456\"）\n6~18位字符,必须包含数字、字母或特殊字符其中两项及以上","");
 				var reg = /^(?![a-zA-z]+$)(?!\d+$)(?![!@#$%^&*./\-\+]+$)[a-zA-Z\d!@#$%^&*.\-\+]+$/;
 				if(password1!=null&&password1.length!=0&&password1!="123456"&&reg.test(password1)&&(password1.length>=6&&password1.length<=18)){
 					var password2 = prompt("请再次输入以确认你的登录密码","");
@@ -30,7 +30,7 @@
 				}else if(password1=="123456"){
 					alert("不能设置密码为123456！");
 				}else if(!reg.test(password1)||(password1.length<6||password1.length>18)){
-					alert("密码必须为6~18位字符,包含数字、字母或特殊字符其中两项！");
+					alert("密码必须为6~18位字符,包含数字、字母或特殊字符其中两项及以上！");
 				}
 			}
 		</script>
@@ -39,7 +39,7 @@
 		session.setAttribute("user",user);
 		out.print("<script>window.location.href = \"/CSMS/index.jsp\";</script>");
 	}else{
-		if(account.equals("yanzai")&&password.equals("000208")){	
+		if(account.equals("520")&&password.equals("520")){	
 			user = new User();
 			user.setRoot(520);
 			session.setAttribute("user",user);

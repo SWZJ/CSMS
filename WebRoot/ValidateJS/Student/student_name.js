@@ -24,7 +24,7 @@ function checkStudent_name(){
 	    }else{
 			//符合规则
 	        spanNode.innerHTML = "";  
-	        document.getElementById("student_name_class").className = "form-group";    
+	        document.getElementById("student_name_class").className = "form-group has-success";    
 	        return true;  
 		}
 	}

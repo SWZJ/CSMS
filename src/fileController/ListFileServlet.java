@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,21 +15,24 @@ import javax.servlet.http.HttpServletResponse;
 * @Description: 列出所有下载文件
 *
 */ 
+@WebServlet("/servlet/ListFileServlet")
 public class ListFileServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = 6877071904504488723L;
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//获取当前url位置
-		String location = request.getParameter("location");
+		String location = request.getParameter("location")==null?"":request.getParameter("location");
 		//获取文件夹分支索引
-		String branch = request.getParameter("branch");
+		String branch = request.getParameter("branch")==null?"":request.getParameter("branch");
 		//获取索引ID
-		int id=Integer.parseInt(request.getParameter("id"));
+		int id = request.getParameter("id")==null?0:Integer.parseInt(request.getParameter("id"));
 		//获取搜索字段
 		String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr");
         //获取上传文件的目录
-        String uploadFilePath = this.getServletContext().getRealPath("/WEB-INF/upload/"+branch);
+		String path = request.getSession().getServletContext().getRealPath("/");
+		String uploadFilePath = path+"/WEB-INF/upload/"+branch;
+        /*String uploadFilePath = this.getServletContext().getRealPath("/WEB-INF/upload/"+branch);*/
         if(id != 0)	uploadFilePath+="/"+id;
         File file = new File(uploadFilePath);
         //如果目录不存在

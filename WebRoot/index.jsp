@@ -20,9 +20,8 @@
 		}else if(user.getRoot() == 9){
 			response.sendRedirect("/CSMS/SWZJ/teacher/teacher.jsp");
 		}else{
-			//response.sendRedirect("/CSMS/login.jsp");
 			if(user.getRoot()==520)
-			response.sendRedirect("yanzai.jsp");
+			response.sendRedirect("520.jsp");
 		}
 	}
 %>

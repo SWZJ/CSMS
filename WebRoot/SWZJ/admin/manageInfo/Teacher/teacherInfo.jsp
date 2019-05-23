@@ -5,82 +5,25 @@
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 </head>
 
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = (User)session.getAttribute("user");	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="/CSMS/SWZJ/user/userCenter.jsp" target="_blank"><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
-	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-bubble"></i> <span>Message</span></a></li>
-	                <li><a href="/CSMS/SWZJ/user/set/userSet.jsp" target="_blank"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/adminLeftSidebar.html" %>
+<%@include file="/CommonView/adminLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
 <!-- MAIN CONTENT -->
 <div class="main-content">
 
-<!-- ERROR TIP -->
-<% String message = (String)session.getAttribute("message"); %>
-<%if(message != null){
-	if(message.indexOf("成功") != -1){
-		out.print("<div class=\"alert alert-success alert-dismissible\" role=\"alert\">");
-		out.print("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>");
-		out.print("<i class=\"fa fa-check-circle\"></i>"+message+"</div>");
-	}else{
-		out.print("<div class=\"alert alert-danger alert-dismissible\" role=\"alert\">");
-		out.print("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>");
-		out.print("<i class=\"fa fa-close\"></i>"+message+"</div>");
-	}
-}%>
-<% session.removeAttribute("message"); %>
-<!-- END ERROR TIP -->
+<!-- INFO TIP -->
+<%@include file="/CommonView/infoTip.jsp" %>
+<!-- END INFO TIP -->
 
     <div class="panel">
         <div class="panel-heading" >
@@ -211,96 +154,12 @@
 		</div>
 		
 		<!-- 选择页码 -->
-		<%session.setAttribute("queryStr", queryStr);%>
-		<%@include file="/HTML/selectPages.html" %>
-		<%session.removeAttribute("queryStr");%>
+		<%@include file="/CommonView/selectPages.jsp" %>
 
 	</div>
 	
-	<div>
-		<div class="pull-left">
-			<ul class="pagination">
-				<% 
-					String url = request.getRequestURI() + "?";
-					if(request.getQueryString()!=null){
-						url = request.getRequestURI() + "?" + URLDecoder.decode(request.getQueryString(),"utf-8") +"&";
-					}
-					if(url.indexOf("page")!=-1){
-						int pageLen = 6+(Page+"").length();
-						url = url.substring(0, url.length()-pageLen);
-					}
-					if(pageCount<=end){
-						if(Page == 1){
-							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
-						}else{
-							out.print(String.format("<li><a href=\""+url+"page=%d\">首页</a></li>",1));
-						}
-						
-						end = pageCount;
-						
-						if(Page>1){
-						  out.print(String.format("<li><a href=\""+url+"page=%d\">&laquo;</a></li>",Page-1));
-						}
-						
-						for(int i=start;i<=end;i++){
-						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\""+url+"page=%d\">%d</a></li>",i,i);
-						  if(i==Page){
-						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
-						  }
-						  out.print(pageinfo);
-						}
-						
-						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\""+url+"page=%d\">&raquo;</a></li>",Page+1));
-						}
-						
-						if(Page == pageCount){
-							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
-						}else{
-							out.print(String.format("<li><a href=\""+url+"page=%d\">尾页</a></li>",pageCount));
-						}
-						
-					}else{
-						if(Page == 1){
-							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
-						}else{
-							out.print(String.format("<li><a href=\""+url+"page=%d\">首页</a></li>",1));
-						}
-						if(Page>=7){
-						  start=Page-5;
-						  end=Page+4;
-						}
-						if(start>(pageCount-10)){
-						  start=pageCount-9;
-						}
-						if(Page>1){
-						  out.print(String.format("<li><a href=\""+url+"page=%d\">&laquo;</a></li>",Page-1));
-						}
-						
-						for(int i=start;i<=end;i++){
-						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\""+url+"page=%d\">%d</a></li>",i,i);
-						  if(i==Page){
-						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
-						  }
-						  out.print(pageinfo);
-						}
-						
-						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\""+url+"page=%d\">&raquo;</a></li>",Page+1));
-						}
-						
-						if(Page == pageCount){
-							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
-						}else{
-							out.print(String.format("<li><a href=\""+url+"page=%d\">尾页</a></li>",pageCount));
-						}
-					}
-			     %>
-			</ul>
-		</div>
-	</div>
+	<!-- 分页 -->
+	<%@include file="/CommonView/pagination.jsp" %>
 
 </div>
 <!-- END MAIN CONTENT -->
@@ -308,29 +167,10 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
-<!-- SELECT  -->
-<script>
-   $(document).ready(function(){
-       //页面行数改变，刷新页面
-       $("#selectPages").change(function(){
-           $("#pageNumForm").submit();
-       });
-   });
-</script>
-<!-- END SELECT  -->
-<!-- GET SELECT PAGES FROM INPUT -->
-<script>
-	$("#selectPages option").each(function() {
-        if($(this).val()=='<%= pageSize %>'){
-        	$(this).prop('selected',true);
-       	}
-    });
-</script>
-<!-- END GET SELECT PAGES FROM INPUT -->
+<%@include file="/CommonView/javaScript.jsp" %>
 <!-- 选中职称 -->
 <script>
 	$("#teacher_position option").each(function() {

@@ -5,7 +5,7 @@
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 <!-- 编号验证JS -->
 <script src="/CSMS/ValidateJS/Teacher/teacher_number.js"></script>
@@ -33,54 +33,9 @@
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = (User)session.getAttribute("user");	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="/CSMS/SWZJ/user/userCenter.jsp" target="_blank"><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
-	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-bubble"></i> <span>Message</span></a></li>
-	                <li><a href="/CSMS/SWZJ/user/set/userSet.jsp" target="_blank"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp?user_id=${user.getID()}&user_name=${user.getName()}"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/adminLeftSidebar.html" %>
+<%@include file="/CommonView/adminLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
@@ -99,7 +54,8 @@
                     <label for="teacher_number" class="col-sm-2 control-label"><a class="text-danger">*</a>编号</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="teacher_number" name="teacher_number" 
-                        placeholder="请输入教师编号（全为数字且长度为10）" value="" onblur="checkTeacher_number()">
+                        placeholder="请输入教师编号（全为数字且长度为10）" value="" onchange="checkTeacher_number()"
+                        oninput="Inputing(document.getElementById('teacher_number_span'),document.getElementById('teacher_number_class'))">
                         <span id="teacher_number_span"></span>
                     </div>
                 </div>
@@ -108,7 +64,8 @@
                     <label for="teacher_name" class="col-sm-2 control-label"><a class="text-danger">*</a>名称</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="teacher_name" name="teacher_name" 
-                        placeholder="请输入教师姓名" value="" onblur="checkTeacher_name()">
+                        placeholder="请输入教师姓名" value="" onchange="checkTeacher_name()"
+                        oninput="Inputing(document.getElementById('teacher_name_span'),document.getElementById('teacher_name_class'))">
                         <span id="teacher_name_span"></span>
                     </div>
                 </div>
@@ -116,7 +73,7 @@
                 <div class="form-group" id="teacher_position_class">
                     <label for="teacher_position" class="col-sm-2 control-label"><a class="text-danger">*</a>职称</label>
                     <div class="col-sm-8">
-                        <select class="form-control" id="teacher_position" name="teacher_position" onblur="checkTeacher_position()">
+                        <select class="form-control" id="teacher_position" name="teacher_position" onchange="checkTeacher_position()">
 	                        <option value = "">--请选择教师职称--</option>
 	                        <option value = "助教">助教</option>
 	                        <option value = "讲师">讲师</option>
@@ -130,7 +87,7 @@
 
                 <div class="form-group">
                     <div class="col-sm-offset-5 col-sm-6">
-                        <button type="submit" class="btn btn-primary">提交</button>
+                        <button type="submit" class="btn btn-primary" id="addBtn">提交</button>
                         <a class="btn btn-primary" href="#" onClick="history.back(-1)">返回</a>
                     </div>
                 </div>
@@ -145,10 +102,42 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
+<%@include file="/CommonView/javaScript.jsp" %>
+<!-- 判断编号是否存在 -->
+<script>
+	$(document).ready(function() {
+		function IsNumExist(){
+			$.ajax({
+				type:"post",
+				url:"/CSMS/manageInfo/TeacherIsNumExist",
+				datatype: "json",
+				async:false,
+				data:{
+					"teacher_number":$("#teacher_number").val(),
+				},
+				success:function(result) {
+					if(checkTeacher_number()==false)	return;
+					var r = JSON.parse(result);
+					if(r.isExist==true){//编号已存在
+						$("#teacher_number_span").html("<label class=\"control-label text-danger\" for=\"teacher_number\">"+r.errorMes+"</label>")
+						$("#teacher_number_class").attr("class","form-group has-error"); 
+					}else{//编号不存在。
+						$("#teacher_number_span").html("")
+						$("#teacher_number_class").attr("class","form-group has-success");
+					}
+				},
+				error:function(){
+					alert("回调出错！");
+				}
+			});
+		}
+		$("#addBtn").click(IsNumExist);
+		$("#teacher_number").change(IsNumExist);
+	});
+</script>
 
 </body>
 </html>

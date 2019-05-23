@@ -6,7 +6,7 @@
 
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 <body>
 <!-- WRAPPER -->

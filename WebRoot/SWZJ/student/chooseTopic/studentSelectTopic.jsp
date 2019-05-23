@@ -4,8 +4,8 @@
 <%
     //获取上一个页面传递过来的数据
 	request.setCharacterEncoding("UTF-8");
-	Integer student_id = Integer.valueOf(request.getParameter("id"));
-	Integer cdtopic_id = Integer.valueOf(request.getParameter("cdtopic_id"));
+	Integer student_id = request.getParameter("id")==null?0:Integer.valueOf(request.getParameter("id"));
+	Integer cdtopic_id = request.getParameter("cdtopic_id")==null?0:Integer.valueOf(request.getParameter("cdtopic_id"));
 	Student stu = new Student();
 	String cdtopic_name = new CDTopic().queryCDTopicByID(cdtopic_id).getName();
 	

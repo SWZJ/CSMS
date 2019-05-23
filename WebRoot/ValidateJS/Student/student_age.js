@@ -18,7 +18,7 @@ function checkStudent_age(){
     }else{
 		//符合规则
         spanNode.innerHTML = "";  
-        document.getElementById("student_age_class").className = "form-group";    
+        document.getElementById("student_age_class").className = "form-group has-success";    
         return true;  
 	}
 }

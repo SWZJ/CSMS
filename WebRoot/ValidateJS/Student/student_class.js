@@ -12,7 +12,7 @@ function checkStudent_class(){
 	}else{
 		//符合规则
         spanNode.innerHTML = "";  
-        document.getElementById("student_class_class").className = "form-group";    
+        document.getElementById("student_class_class").className = "form-group has-success";    
         return true;
 	}
 }

@@ -23,9 +23,13 @@ function checkUser_account(){
 	        return false;  
 	    }else{
 			//符合规则
-	        spanNode.innerHTML = "";  
-	        document.getElementById("user_account_class").className = "form-group";   
-	        return true;  
+			if(spanNode.innerHTML.indexOf("success")!=-1)	return true;
+			else if(spanNode.innerHTML.indexOf("danger")!=-1)	return false;
+			else{
+				spanNode.innerHTML = "";
+		        document.getElementById("user_account_class").className = "form-group";   
+		        return true;  
+			}
 		}
 	}
 }

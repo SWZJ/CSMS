@@ -1,5 +1,4 @@
-<%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
-<%@ page language="java" import="java.util.*,java.sql.*" pageEncoding="UTF-8"%>
+<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -11,7 +10,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <base href="<%=basePath%>">
     
     <title>My JSP 'test5.jsp' starting page</title>
-    
+
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
 	<meta http-equiv="expires" content="0">    
@@ -24,57 +23,42 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-    <h1>节奏葳的测试页面</h1><hr>
-    
-    <%
-    	Connection connection = null;
-        try {
-            String driver = "com.mysql.cj.jdbc.Driver";
-            String url = "jdbc:mysql://localhost/课程设计选题管理系统?useSSL=true&serverTimezone=GMT&user=root&password=root";
-            Class.forName(driver);
-            connection = DriverManager.getConnection(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("数据库连接出错");
-        }
-        
-        ResultSet queryRS = null;
-        Statement queryStatement = null;
-        Connection queryConn = null;
-        try{
-            queryConn = connection;
-            queryStatement = queryConn.createStatement();
-            String sqlQuery = "select * from student";
-            queryRS = queryStatement.executeQuery(sqlQuery);
-            while(queryRS.next()) {
-				out.print(queryRS.getInt("student_id"));
-				out.print(queryRS.getString("student_number"));
-				out.print(queryRS.getString("student_name"));
-				out.print(queryRS.getString("student_sex"));
-				out.print(queryRS.getInt("student_age"));
-				out.print(queryRS.getString("student_class"));
-				out.print(queryRS.getString("student_major"));
-				out.print(queryRS.getInt("cdtopic_id"));
-				out.print(queryRS.getInt("created_at"));
-				out.print(queryRS.getInt("updated_at"));
-				out.print(queryRS.getInt("deleted_at"));
-				out.print("<br>");
-            }
-        }catch(Exception e2) {
-            e2.printStackTrace();
-        }finally{
-            try {
-                queryRS.close();
-                queryStatement.close();
-                queryConn.close();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
-        }
-    
-    
-     %>
-    
-
+	  <div style="text-align:center">
+		<h1>节奏葳的测试页面</h1><hr>
+		<input id="username" name="username" value=""><br><br>
+		<input id="id" name="id" value=""><br><br>
+		<button id="btn">测试</button>
+		
+	  </div>
+   
+    <!-- Javascript -->
+	<%@include file="/CommonView/javaScript.jsp" %>
+	<script>
+	$(document).ready(function() {
+		$("#btn").click(function(){
+		$.ajax({
+			type:"post",
+			url:"/CSMS/Aja",
+			datatype: "json", 
+			data:{
+				"username":$("#username").val(),
+				"id":$("#id").val(),
+			},
+			success:function(data) {
+				alert(data);
+				//var rr = eval('('+data+')');
+				var rr = JSON.parse(data);
+				$("#id").val(rr.username);
+				alert("成功回调！");
+			},
+			error:function(data){
+				alert("回调出错！");
+			}
+			
+		});
+		
+		});
+	});
+	</script>
   </body>
 </html>

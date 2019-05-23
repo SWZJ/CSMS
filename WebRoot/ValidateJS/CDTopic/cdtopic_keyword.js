@@ -24,7 +24,7 @@ function checkCDTopic_keyword(){
 	    }else{
 			//符合规则
 	        spanNode.innerHTML = "";  
-	        document.getElementById("cdtopic_keyword_class").className = "form-group";    
+	        document.getElementById("cdtopic_keyword_class").className = "form-group has-success";    
 	        return true;  
 		}
 	}

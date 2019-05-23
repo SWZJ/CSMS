@@ -12,7 +12,7 @@ function checkTeacher_position(){
 	}else{
 		//符合规则
         spanNode.innerHTML = "";  
-        document.getElementById("teacher_position_class").className = "form-group";    
+        document.getElementById("teacher_position_class").className = "form-group has-success";    
         return true;  
 	}
 }

@@ -1,5 +1,8 @@
 package JZW;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,6 +14,7 @@ import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -18,12 +22,14 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import emailController.Sendemail;
+import phoneController.PhoneCode;
 
 public class User {
 	private int user_id;			//用户主键
     private String user_account;	//用户账号
     private String user_password;	//用户密码
     private String user_name;		//用户名
+    private String user_phone;		//用户手机号
     private String user_email;		//用户邮箱
     private String user_question;	//用户密保问题
     private String user_answer;		//用户密保答案
@@ -85,6 +91,34 @@ public class User {
     	this.user_name = user_name;
     }
     
+    public String getPhone() {
+    	if(user_phone==null)	return "";
+    	else	return user_phone;
+    }
+    
+    public String getPhoneHide() {
+    	if(user_phone==null)	return "";
+    	else	return user_phone.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
+    
+    public void setPhone(String user_phone) {
+    	this.user_phone = user_phone;
+    }
+    
+    public String getEmail() {
+    	if(user_email==null)	return "";
+    	else	return user_email;
+    }
+    
+    public String getEmailHide() {
+    	if(user_email==null)	return "";
+    	else	return user_email.replaceAll("(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)", "$1****$3$4");
+    }
+    
+    public void setEmail(String user_email) {
+    	this.user_email = user_email;
+    }
+    
     public String getQuestion() {
     	if(user_question==null)	return "";
     	else	return user_question;
@@ -101,15 +135,6 @@ public class User {
     
     public void setAnswer(String user_answer) {
     	this.user_answer = user_answer;
-    }
-    
-    public String getEmail() {
-    	if(user_email==null)	return "";
-    	else	return user_email;
-    }
-    
-    public void setEmail(String user_email) {
-    	this.user_email = user_email;
     }
     
     public int getRoot() {
@@ -261,6 +286,7 @@ public class User {
                 user.user_id = queryRS.getInt("user_id");
             	user.user_account = queryRS.getString("user_account");
             	user.user_password = queryRS.getString("user_password");
+            	user.user_phone = queryRS.getString("user_phone");
             	user.user_name = queryRS.getString("user_name");
             	user.user_email = queryRS.getString("user_email");
             	user.user_question = queryRS.getString("user_question");
@@ -315,6 +341,16 @@ public class User {
     //邮箱查找用户
     public User queryUserByEmail(String user_email) {
         String querySql = "select * from user where user_email="+"'"+user_email+"'";
+        if(queryUser(querySql).size()!=0) {
+        	return queryUser(querySql).get(0);
+        }else {
+        	return new User();
+        }
+    }
+    
+    //手机号查找用户
+    public User queryUserByPhone(String user_phone) {
+        String querySql = "select * from user where user_phone="+"'"+user_phone+"'";
         if(queryUser(querySql).size()!=0) {
         	return queryUser(querySql).get(0);
         }else {
@@ -443,6 +479,53 @@ public class User {
         return true;
     }
     
+    //修改用户手机号
+    public boolean updateUserPhone(User user,String user_phone) {
+    	String updateStr = "";
+    	int count = 0;//记录是否有修改
+    	Date nowTime = new Date();
+    	Connection conn = conn();
+        //信息有改动时才修改
+        if(user_phone.equals(user.user_phone) == false) {
+        	count++;
+            String updateSql = "update user set user_phone='"+user_phone+"' where user_id=" + user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 手机号:"+user.user_phone+"->"+user_phone;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 手机号"+user.user_phone+"为"+user_phone+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        if(nowTime != user.updated_at&&count != 0) {
+        	String updateSql = "update user set updated_at = ? where user_id="+ user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.setTimestamp(1, new Timestamp(nowTime.getTime()));
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 修改时间:"+user.updated_at+"->"+nowTime;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 修改时间"+user.updated_at+"为"+updated_at+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        try {
+            conn.close();
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+            logger.error("修改用户 "+user.user_id+" 信息"+updateStr+"后数据库关闭失败！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改用户 "+user.user_id+" 信息成功！"+updateStr);
+        }
+        return true;
+    }
+    
     //验证账号密码是否正确
 	public User validateAccountPassword(String account,String password) {
     	User user = queryUserByAccountPassword(account, password);
@@ -471,6 +554,12 @@ public class User {
     //判断邮箱是否存在
     public boolean isExist_email(String user_email) {
     	if(queryUserByEmail(user_email).getID() != 0)	return true;
+    	else return false;
+    }
+    
+    //判断手机号是否存在
+    public boolean isExist_phone(String user_phone) {
+    	if(queryUserByPhone(user_phone).getID() != 0)	return true;
     	else return false;
     }
     
@@ -519,6 +608,7 @@ public class User {
             	user.user_account = rs.getString("user_account");
             	user.user_password = rs.getString("user_password");
             	user.user_name = rs.getString("user_name");
+            	user.user_phone = rs.getString("user_phone");
             	user.user_email = rs.getString("user_email");
             	user.user_question = rs.getString("user_question");
             	user.user_answer = rs.getString("user_answer");
@@ -590,6 +680,7 @@ public class User {
             	user.user_account = rs.getString("user_account");
             	user.user_password = rs.getString("user_password");
             	user.user_name = rs.getString("user_name");
+            	user.user_phone = rs.getString("user_phone");
             	user.user_email = rs.getString("user_email");
             	user.user_question = rs.getString("user_question");
             	user.user_answer = rs.getString("user_answer");
@@ -669,6 +760,7 @@ public class User {
             	user.user_account = queryRS.getString("user_account");
             	user.user_password = queryRS.getString("user_password");
             	user.user_name = queryRS.getString("user_name");
+            	user.user_phone = queryRS.getString("user_phone");
             	user.user_email = queryRS.getString("user_email");
             	user.user_question = queryRS.getString("user_question");
             	user.user_answer = queryRS.getString("user_answer");
@@ -714,8 +806,8 @@ public class User {
         return connection;
     }
 
-    public String sendCode() throws Exception {
-    	String code = getCode(6);
+    //发送邮箱验证码
+    public boolean sendEmailCode(String code) throws Exception {
     	Sendemail email = new Sendemail();
 		String to = this.getEmail();
 		String title = "神葳总局邮箱验证";
@@ -735,18 +827,19 @@ public class User {
 			" </table>"+
 			"</div>";
 		if(email.send(to,title,content)){
-			logger.info(this.getID()+" 发送邮箱验证码成功！");
-			return code;
+			logger.info(this.getID()+" 发送邮箱验证码 "+code+" 成功！"+to);
+			return true;
 		}else {
-			logger.error(this.getID()+" 发送邮箱验证码失败！");
-			return null;
+			logger.error(this.getID()+" 发送邮箱验证码 "+code+" 失败！"+to);
+			return false;
 		}
     }
     
-    public static String getCode(int n) {
+    //创建邮箱验证码
+    public static String getEmailCode() {
 		String string = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		StringBuffer code = new StringBuffer();
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < 6; i++) {
 			Random random = new Random();
 			int index = random.nextInt(string.length());
 			char ch = string.charAt(index);
@@ -754,4 +847,35 @@ public class User {
 		}
 		return code.toString();
 	}
+    
+    //发送手机验证码
+    public boolean sendPhoneCode(String to,String code) throws Exception {
+    	PhoneCode phone = new PhoneCode();
+    	if(phone.sendPhoneCode(to,code)){
+			logger.info(this.getID()+" 发送手机验证码 "+code+" 成功！"+to);
+			return true;
+		}else {
+			logger.error(this.getID()+" 发送手机验证码 "+code+" 失败！"+to);
+			return false;
+		}
+    }
+    
+    //创建手机短信验证码
+    public static String getPhoneCode() {
+    	String random = (int) ((Math.random() * 9 + 1) * 100000) + "";
+		return random;
+	}
+    
+    public void decodeBase64DataURLToImage(String dataURL, String path, String imgName) throws IOException {
+        // 将dataURL开头的非base64字符删除
+        String base64 = dataURL.substring(dataURL.indexOf(",") + 1);
+        FileOutputStream write = new FileOutputStream(new File(path  + "\\" + imgName));
+        FileOutputStream write1 = new FileOutputStream(new File("C:\\Users\\LHW98\\Documents\\GitHub\\CSMS\\WebRoot\\public\\userAvatar\\" + imgName));
+        byte[] decoderBytes = Base64.getDecoder().decode(base64);
+        write.write(decoderBytes);
+        write.close();
+        byte[] decoderBytes1 = Base64.getDecoder().decode(base64);
+        write1.write(decoderBytes1);
+        write1.close();
+    }
 }

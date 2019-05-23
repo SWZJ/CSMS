@@ -13,7 +13,7 @@ import java.util.Date;
 public class Message {
 	private int message_id;				//消息主键
     private String message_identifier;	//消息编号
-    private String message_type;		//消息类型
+    private int message_type;		//消息类型
     private String message_summary;		//消息概述
     private String message_content;		//消息内容
     private boolean message_readed;		//消息是否已阅读
@@ -43,11 +43,22 @@ public class Message {
         this.message_identifier = message_identifier;
     }
  
-    public String getType() {
-        return message_type;
+    public String getTypeStr() {
+    	switch(message_type) {
+    	case 0:return "dot bg-info";
+    	case 1:return "dot bg-success";
+    	case 2:return "dot bg-danger";
+    	case 3:return "dot bg-primary";
+    	case 4:return "dot bg-warning";
+    	default:return "dot bg-info";
+    	}
+    }
+    
+    public int getType() {
+    	return message_type;
     }
  
-    public void setType(String message_type) {
+    public void setType(int message_type) {
         this.message_type = message_type;
     }
  
@@ -254,7 +265,7 @@ public class Message {
             	mes = new Message();
                 mes.message_id = queryRS.getInt("message_id");
                 mes.message_identifier = queryRS.getString("message_identifier");
-                mes.message_type = queryRS.getString("message_type");
+                mes.message_type = queryRS.getInt("message_type");
                 mes.message_summary = queryRS.getString("message_summary");
                 mes.message_content = queryRS.getString("message_content");
                 mes.message_readed = queryRS.getBoolean("message_readed");
@@ -340,7 +351,7 @@ public class Message {
     }
     
     //修改消息信息
-    public boolean updateMessage(Message mes,String message_identifier,String message_type,String message_summary,String message_content,int sender_id,int receiver_id,Date updated_at) {
+    public boolean updateMessage(Message mes,String message_identifier,int message_type,String message_summary,String message_content,int sender_id,int receiver_id,Date updated_at) {
     	
     	String updateStr = "";
     	int count = 0;//记录是否有修改
@@ -361,7 +372,7 @@ public class Message {
             }
         }
         
-        if(message_type.equals(mes.message_type) == false) {
+        if(message_type!=mes.message_type) {
         	count++;
         	String updateSql = "update message set message_type='"+message_type+"' where message_id=" + mes.message_id;
             try {
@@ -573,7 +584,7 @@ public class Message {
             	mes = new Message();
                 mes.message_id = rs.getInt("message_id");
                 mes.message_identifier = rs.getString("message_identifier");
-                mes.message_type = rs.getString("message_type");
+                mes.message_type = rs.getInt("message_type");
                 mes.message_summary = rs.getString("message_summary");
                 mes.message_content = rs.getString("message_content");
                 mes.message_readed = rs.getBoolean("message_readed");
@@ -644,7 +655,7 @@ public class Message {
             	mes = new Message();
                 mes.message_id = rs.getInt("message_id");
                 mes.message_identifier = rs.getString("message_identifier");
-                mes.message_type = rs.getString("message_type");
+                mes.message_type = rs.getInt("message_type");
                 mes.message_summary = rs.getString("message_summary");
                 mes.message_content = rs.getString("message_content");
                 mes.message_readed = rs.getBoolean("message_readed");
@@ -723,7 +734,7 @@ public class Message {
                 mes = new Message();
                 mes.message_id = queryRS.getInt("message_id");
                 mes.message_identifier = queryRS.getString("message_identifier");
-                mes.message_type = queryRS.getString("message_type");
+                mes.message_type = queryRS.getInt("message_type");
                 mes.message_summary = queryRS.getString("message_summary");
                 mes.message_content = queryRS.getString("message_content");
                 mes.message_readed = queryRS.getBoolean("message_readed");
