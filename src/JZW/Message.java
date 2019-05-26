@@ -5,6 +5,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -13,7 +15,7 @@ import java.util.Date;
 public class Message {
 	private int message_id;				//消息主键
     private String message_identifier;	//消息编号
-    private int message_type;		//消息类型
+    private int message_type;			//消息类型
     private String message_summary;		//消息概述
     private String message_content;		//消息内容
     private boolean message_readed;		//消息是否已阅读
@@ -184,8 +186,35 @@ public class Message {
     	this.deleted_at = deleted_at;
     }
  
-    //添加消息信息
-	public boolean CreateMessage(String message_identifier,String message_type,String message_summary,String message_content,int sender_id,int receiver_id,Date created_at) {
+    //发送多条消息信息
+	public boolean sendMoreMessage(int message_type,String message_summary,String message_content,int sender_id,List<Integer> receiver_list) {
+		for(int id:receiver_list) {
+			sendSingleMessage(message_type, message_summary, message_content, sender_id, id);
+		}
+        logger.info(sender_id+"群发消息成功："+message_identifier+" "+message_type+" "+message_summary+" "+message_content+" "+sender_id+" "+receiver_list);
+        return true;
+    }
+ 
+	public static String getRandomIden() {
+		String[] chars = new String[] { "a", "b", "c", "d", "e", "f",  
+                "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",  
+                "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5",  
+                "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I",  
+                "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",  
+                "W", "X", "Y", "Z" };  
+        Random r = new Random();
+        StringBuffer shortBuffer = new StringBuffer();  
+        String uuid = UUID.randomUUID().toString().replace("-", "");  
+        for (int i = 0; i < 8; i++) {  
+            String str = uuid.substring(i * 4, i * 4 + 4);  
+            int x = Integer.parseInt(str, 16);  
+            shortBuffer.append(chars[x % 0x3E]);  
+        }  
+        return shortBuffer.toString()+(r.nextInt(899)+100);  
+	}
+	
+	//发送单条消息信息
+	public boolean sendSingleMessage(int message_type,String message_summary,String message_content,int sender_id,int receiver_id) {
 		String insertSql = 
         		"insert into message("
         			+ "message_identifier,"
@@ -198,15 +227,23 @@ public class Message {
         		+ "values(?,?,?,?,?,?,?)";
         Connection conn = conn();
         PreparedStatement ps = null;
+        String message_identifier = getRandomIden();
+        while(true) {
+    		if(isExist_identifier(message_identifier)) {
+    			message_identifier = getRandomIden();
+    		}else {
+    			break;
+    		}
+    	}
         try {
         	ps = conn.prepareStatement(insertSql);
         	ps.setString(1, message_identifier);
-        	if(!message_type.equals(""))	ps.setString(2, message_type);
+        	ps.setInt(2, message_type);
         	ps.setString(3, message_summary);
         	ps.setString(4, message_content);
         	if(sender_id != 0)		ps.setInt(5, sender_id);	else 	ps.setNull(5, Types.INTEGER);
         	if(receiver_id != 0)	ps.setInt(6, receiver_id);	else 	ps.setNull(6, Types.INTEGER);
-        	ps.setTimestamp(7, new Timestamp(created_at.getTime()));
+        	ps.setTimestamp(7, new Timestamp(new Date().getTime()));
             ps.executeUpdate();
         } catch (Exception e1) {
             e1.printStackTrace();
@@ -221,10 +258,35 @@ public class Message {
                 logger.error("添加消息"+message_identifier+" "+message_type+" "+message_summary+" "+message_content+" "+sender_id+" "+receiver_id+"后数据库关闭出错！");
             }
         }
-        logger.error("添加消息成功："+message_identifier+" "+message_type+" "+message_summary+" "+message_content+" "+sender_id+" "+receiver_id);
+        logger.info("添加消息成功："+message_identifier+" "+message_type+" "+message_summary+" "+message_content+" "+sender_id+" "+receiver_id);
         return true;
     }
- 
+	
+	//软删除消息信息
+    public boolean softDeleteGradeByID(int message_id) {
+    	Connection conn = conn();
+    	String updateSql = "update message set message_deleted='"+1+"' where message_id=" + message_id;
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement(updateSql);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("数据库语句检查或执行出错！软删除消息 "+message_id+" 失败。");
+            return false;
+        } finally {
+            try {
+                ps.close();
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+                logger.error("软删除消息 "+message_id+" 后数据库关闭出错！");
+            }
+        }
+        logger.info("软删除消息 "+message_id+" 成功。");
+        return true;
+    }
+	
     //删除消息信息
     public boolean deleteMessageByID(int message_id) {
         Connection conn = conn();
@@ -307,12 +369,12 @@ public class Message {
  
     //查询消息信息（按编号查找）
     public List<Message> queryMessageByIden(String message_identifier) {
-    	String querySql = "select * from student where message_identifier="+"'"+message_identifier+"'";
+    	String querySql = "select * from message where message_identifier="+"'"+message_identifier+"'";
     	return queryMessage(querySql);
     }
     
     //查询消息信息（按类型查找）
-    public List<Message> queryMessageByType(String message_type) {
+    public List<Message> queryMessageByType(int message_type) {
     	String querySql = "select * from message where message_type="+"'"+message_type+"'";
         return queryMessage(querySql);
     }
@@ -766,8 +828,11 @@ public class Message {
     public Connection conn() {
     	Connection connection = null;
         try {
-            String driver = "com.mysql.cj.jdbc.Driver";
-            String url = "jdbc:mysql://localhost/csms?useSSL=true&serverTimezone=Asia/Shanghai&user=root&password=root";
+        	String driver = MySQLConfig.DRIVER;
+            String database = MySQLConfig.DATABASE;
+            String username = MySQLConfig.USERNAME;
+            String password = MySQLConfig.PASSWORD;
+            String url = "jdbc:mysql://localhost/"+database+"?useSSL=true&serverTimezone=Asia/Shanghai&user="+username+"&password="+password+"";
             Class.forName(driver);
             connection = DriverManager.getConnection(url);
         } catch (Exception e) {

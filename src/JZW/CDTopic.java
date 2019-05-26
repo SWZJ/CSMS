@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +24,7 @@ public class CDTopic {
 	private String cdtopic_keyword;		//关键字
 	private String cdtopic_technology;	//实现技术
 	private int cdtopic_headcount;		//选题人数
+	private double cdtopic_grade;		//课题评分
 	private boolean cdtopic_active;		//课题是否生效
 	private boolean cdtopic_deleted;	//课题是否删除
 	private int teacher_id;				//教师外键
@@ -81,6 +83,23 @@ public class CDTopic {
     
     public void setHeadcount(int cdtopic_headcount) {
     	this.cdtopic_headcount = cdtopic_headcount;
+    }
+    
+    public String getGradeStr() {
+    	if(cdtopic_grade==0)	return "无";
+    	else {
+    		DecimalFormat df = new DecimalFormat("0.00"); 
+    		return df.format(cdtopic_grade);
+    	}
+    	
+    }
+    
+    public double getGrade() {
+    	return cdtopic_grade;
+    }
+    
+    public void setGrade(double cdtopic_grade) {
+    	this.cdtopic_grade = cdtopic_grade;
     }
     
     public String getActiveStr() {
@@ -256,6 +275,7 @@ public class CDTopic {
             	cdt.cdtopic_keyword = queryRS.getString("cdtopic_keyword");
             	cdt.cdtopic_technology = queryRS.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = queryRS.getInt("cdtopic_headcount");
+            	cdt.cdtopic_grade = queryRS.getDouble("cdtopic_grade");
             	cdt.cdtopic_active = queryRS.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = queryRS.getBoolean("cdtopic_deleted");
             	cdt.teacher_id = queryRS.getInt("teacher_id");
@@ -325,6 +345,7 @@ public class CDTopic {
                 	cdt.cdtopic_keyword = queryRS.getString("cdtopic_keyword");
                 	cdt.cdtopic_technology = queryRS.getString("cdtopic_technology");
                 	cdt.cdtopic_headcount = queryRS.getInt("cdtopic_headcount");
+                	cdt.cdtopic_grade = queryRS.getDouble("cdtopic_grade");
                 	cdt.cdtopic_active = queryRS.getBoolean("cdtopic_active");
                 	cdt.cdtopic_deleted = queryRS.getBoolean("cdtopic_deleted");
                 	cdt.teacher_id = queryRS.getInt("teacher_id");
@@ -649,6 +670,7 @@ public class CDTopic {
             	cdt.cdtopic_keyword = rs.getString("cdtopic_keyword")==null?"":rs.getString("cdtopic_keyword");
             	cdt.cdtopic_technology = rs.getString("cdtopic_technology")==null?"":rs.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = rs.getInt("cdtopic_headcount");
+            	cdt.cdtopic_grade = rs.getDouble("cdtopic_grade");
             	cdt.cdtopic_active = rs.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = rs.getBoolean("cdtopic_deleted");
             	cdt.teacher_id = rs.getInt("teacher_id");
@@ -721,6 +743,7 @@ public class CDTopic {
             	cdt.cdtopic_keyword = rs.getString("cdtopic_keyword")==null?"":rs.getString("cdtopic_keyword");
             	cdt.cdtopic_technology = rs.getString("cdtopic_technology")==null?"":rs.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = rs.getInt("cdtopic_headcount");
+            	cdt.cdtopic_grade = rs.getDouble("cdtopic_grade");
             	cdt.cdtopic_active = rs.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = rs.getBoolean("cdtopic_deleted");
             	cdt.teacher_id = rs.getInt("teacher_id");
@@ -767,7 +790,7 @@ public class CDTopic {
     }
     
     //返回分页数据（是否删除+是否有效+所属教师ID+搜索字段）（boolean型的2表示不考虑该条件）
-    public List<CDTopic> cutPageData(int page,int pageSize,int cdtopic_deleted,int cdtopic_active,int teacher_id,String queryStr){
+    public List<CDTopic> cutPageData(int page,int pageSize,int cdtopic_deleted,int cdtopic_active,int teacher_id,String sortStr,String sortOrder,String queryStr){
     	if(cdtopic_deleted==2&&cdtopic_active==2&&teacher_id==0&&queryStr.length()==0) {
     		return cutPageDataByString(page,pageSize,"select * from cdtopic limit ?,?",queryStr);
     	}else {
@@ -776,7 +799,8 @@ public class CDTopic {
     		if(cdtopic_active!=2)	querySql += " cdtopic_active = "+cdtopic_active+" and";
     		if(teacher_id!=0)		querySql += " teacher_id = "+teacher_id+" and";
     		querySql = querySql.substring(0, querySql.length()-3);
-    		querySql += "limit ?,?";
+    		querySql += " order by "+sortStr+" "+sortOrder;
+    		querySql += " limit ?,?";
     		return cutPageDataByString(page,pageSize,querySql,queryStr);
     	}
     }
@@ -801,6 +825,7 @@ public class CDTopic {
             	cdt.cdtopic_keyword = queryRS.getString("cdtopic_keyword");
             	cdt.cdtopic_technology = queryRS.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = queryRS.getInt("cdtopic_headcount");
+            	cdt.cdtopic_grade = queryRS.getDouble("cdtopic_grade");
             	cdt.cdtopic_active = queryRS.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = queryRS.getBoolean("cdtopic_deleted");
             	cdt.teacher_id = queryRS.getInt("teacher_id");
@@ -829,8 +854,11 @@ public class CDTopic {
     public Connection conn() {
     	Connection connection = null;
         try {
-            String driver = "com.mysql.cj.jdbc.Driver";
-            String url = "jdbc:mysql://localhost/csms?useSSL=true&serverTimezone=Asia/Shanghai&user=root&password=root";
+        	String driver = MySQLConfig.DRIVER;
+            String database = MySQLConfig.DATABASE;
+            String username = MySQLConfig.USERNAME;
+            String password = MySQLConfig.PASSWORD;
+            String url = "jdbc:mysql://localhost/"+database+"?useSSL=true&serverTimezone=Asia/Shanghai&user="+username+"&password="+password+"";
             Class.forName(driver);
             connection = DriverManager.getConnection(url);
         } catch (Exception e) {

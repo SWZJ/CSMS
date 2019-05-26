@@ -37,17 +37,6 @@
                     </div>
                 </li>
                 
-                <li>
-                    <a href="#message" data-toggle="collapse" id="#message" class="collapsed">
-                    <i class="lnr lnr-bubble"></i><span>Message</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
-                    <div id="message" class="collapse">
-                        <ul class="nav">
-                        	<li><a href="/CSMS/SWZJ/message/myMessage.jsp" id="myMessage" class="">My message</a></li>
-                        	<li><a href="/CSMS/SWZJ/message/sendMessage.jsp" id="sendMessage" class="">Send message</a></li>
-                        </ul>
-                    </div>
-                </li>
-                
             </ul>
         </nav>
     </div>

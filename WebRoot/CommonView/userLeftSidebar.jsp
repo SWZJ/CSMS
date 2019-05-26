@@ -44,18 +44,17 @@
                     </div>
                 </li>
                 
-                
-               
-                <!-- <li>
-                    <a href="#message" data-toggle="collapse" id="#message" class="collapsed">
-                    <i class="lnr lnr-bubble"></i><span>Message</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
-                    <div id="message" class="collapse">
+                <li>
+                    <a href="#question" data-toggle="collapse" id="#question" class="collapsed">
+                    <i class="lnr lnr-question-circle"></i><span>密保问题管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <div id="question" class="collapse">
                         <ul class="nav">
-                        	<li><a href="/CSMS/SWZJ/message/myMessage.jsp" id="myMessage" class="">My message</a></li>
-                        	<li><a href="/CSMS/SWZJ/message/sendMessage.jsp" id="sendMessage" class="">Send message</a></li>
+                            <li><a href="/CSMS/SWZJ/user/question/setQuestion.jsp" id="setQuestion" class="">密保问题设置</a></li>
+                            <li><a href="/CSMS/SWZJ/user/question/updateQuestion.jsp" id="updateQuestion" class="">密保问题修改</a></li>
                         </ul>
                     </div>
-                </li> -->
+                </li>
+                
                 
             </ul>
         </nav>
@@ -112,14 +111,14 @@
 	}
 	
 	
-	/* //用户消息菜单
-	if(pathname.indexOf("message") != -1){
-		document.getElementById("#message").className = "active";
-		document.getElementById("message").className = "collapse in";
-		if(pathname.indexOf("myMessage") != -1){
-			document.getElementById("myMessage").className = "active";
-		}else if(pathname.indexOf("sendMessage") != -1){
-			document.getElementById("sendMessage").className = "active";
+	//用户密保问题管理菜单
+	if(pathname.indexOf("question") != -1){
+		document.getElementById("#question").className = "active";
+		document.getElementById("question").className = "collapse in";
+		if(pathname.indexOf("setQuestion") != -1){
+			document.getElementById("setQuestion").className = "active";
+		}else if(pathname.indexOf("updateQuestion") != -1){
+			document.getElementById("updateQuestion").className = "active";
 		}
-	} */
+	}
 </script>

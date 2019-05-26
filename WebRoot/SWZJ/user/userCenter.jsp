@@ -63,7 +63,7 @@ table td p:nth-child(1){
 			            <!-- 头像开始 -->
 			            <div class="avatar">
 			                <a href="javascript:void(0);" onclick="" title="修改头像" data-target="#changeModal" data-toggle="modal">
-			                	<img src="/CSMS/public/userAvatar/<%=user.getID()%>.jpg" id="user-photo" class="img-circle" alt="Avatar" width="140" height="140"
+			                	<img src="/CSMS/public/userAvatar/<%=user.getID()%>.jpg?temp=<%=Math.random()%>" id="user-photo" class="img-circle" alt="Avatar" width="140" height="140"
 	                			onerror="this.src='/CSMS/public/userAvatar/<%=user.getRoot()==0?new Student().queryStudentByID(user.getStudentID()).getSex():"未知"%>.jpg';this.onerror=null"/> 
 			                </a>
 			            </div>
@@ -101,7 +101,7 @@ table td p:nth-child(1){
 				                </td>
 				                <td>
 				                    <p class="title">联系手机<span style="color: grey;"><%if(user.getPhone().length()!=0)out.print("（"+user.getPhoneHide()+"）"); %></span></p>
-				                    <p class="text">用于找回密码、安全验证</p>
+				                    <p class="text">用于找回密码、安全验证、作为登录账号</p>
 				                </td>
 				                <td style="vertical-align:middle;">
 				                	<%if(user.getPhone().length()==0){ %>
@@ -125,7 +125,7 @@ table td p:nth-child(1){
 				                </td>
 				                <td>
 				                    <p class="title">联系邮箱<span style="color: grey;"><%if(user.getEmail().length()!=0)out.print("（"+user.getEmailHide()+"）"); %></span></p>
-				                    <p class="text">用于找回密码、安全验证</p>
+				                    <p class="text">用于找回密码、安全验证、作为登录账号</p>
 				                </td>
 				                <td style="vertical-align:middle;">
                                     <%if(user.getEmail().length()==0){ %>
@@ -146,6 +146,30 @@ table td p:nth-child(1){
 				            <tr>
 				                <td style="vertical-align:middle;">
 				                    <img src="/CSMS/public/assets/img/icon_information.png" height="45">
+				                </td>
+				                <td>
+				                    <p class="title">密保问题</p>
+				                    <p class="text">用户找回密码、安全验证</p>
+				                </td>
+				                <td style="vertical-align:middle;">
+				                	<%if(user.getQuestion().length()==0){ %>
+				                		<i class="lnr lnr-cross-circle"></i><span>未设置</span>
+				                	<%}else{%>
+				                		<i class="lnr lnr-checkmark-circle"></i><span>已设置</span>
+				                	<%} %>
+                                </td>
+				                <td style="vertical-align:middle;">
+				                	<%if(user.getQuestion().length()==0){ %>
+				                		<a href="question/setQuestion.jsp" class="btn btn-default">设置</a>
+				                	<%}else{%>
+				                		<a href="question/updateQuestion.jsp" class="btn btn-default">修改</a>
+				                	<%} %>
+				                </td>
+				            </tr>
+				            
+				            <tr>
+				                <td style="vertical-align:middle;">
+				                    <img src="/CSMS/public/assets/img/icon_userdata.png" height="40" style="margin-left: 6px;">
 				                </td>
 				                <td>
 				                    <p class="title">用户信息</p>

@@ -339,23 +339,15 @@ public class User {
     }
     
     //邮箱查找用户
-    public User queryUserByEmail(String user_email) {
+    public List<User> queryUserByEmail(String user_email) {
         String querySql = "select * from user where user_email="+"'"+user_email+"'";
-        if(queryUser(querySql).size()!=0) {
-        	return queryUser(querySql).get(0);
-        }else {
-        	return new User();
-        }
+        return queryUser(querySql);
     }
     
     //手机号查找用户
-    public User queryUserByPhone(String user_phone) {
+    public List<User> queryUserByPhone(String user_phone) {
         String querySql = "select * from user where user_phone="+"'"+user_phone+"'";
-        if(queryUser(querySql).size()!=0) {
-        	return queryUser(querySql).get(0);
-        }else {
-        	return new User();
-        }
+        return queryUser(querySql);
     }
     
     //账号密码查找用户
@@ -402,6 +394,53 @@ public class User {
                 updateStr += " 密码:"+user.user_password+"->"+user_password;
             } catch (SQLException e1) {
             	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 密码"+user.user_password+"为"+user_password+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        if(nowTime != user.updated_at&&count != 0) {
+        	String updateSql = "update user set updated_at = ? where user_id="+ user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.setTimestamp(1, new Timestamp(nowTime.getTime()));
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 修改时间:"+user.updated_at+"->"+nowTime;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 修改时间"+user.updated_at+"为"+updated_at+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        try {
+            conn.close();
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+            logger.error("修改用户 "+user.user_id+" 信息"+updateStr+"后数据库关闭失败！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改用户 "+user.user_id+" 信息成功！"+updateStr);
+        }
+        return true;
+    }
+    
+    //修改用户名
+    public boolean updateUserName(User user,String user_name) {
+    	String updateStr = "";
+    	int count = 0;//记录是否有修改
+    	Date nowTime = new Date();
+    	Connection conn = conn();
+        //信息有改动时才修改
+        if(user_name.equals(user.user_name) == false) {
+        	count++;
+            String updateSql = "update user set user_name='"+user_name+"' where user_id=" + user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 用户名:"+user.user_name+"->"+user_name;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 用户名"+user.user_name+"为"+user_name+"失败。");
                 e1.printStackTrace();
                 return false;
             }
@@ -526,6 +565,67 @@ public class User {
         return true;
     }
     
+    //修改用户密保问题答案
+    public boolean updateUserQuestionAnswer(User user,String user_question,String user_answer) {
+    	String updateStr = "";
+    	int count = 0;//记录是否有修改
+    	Date nowTime = new Date();
+    	Connection conn = conn();
+        //信息有改动时才修改
+        if(user_question.equals(user.user_question) == false) {
+        	count++;
+            String updateSql = "update user set user_question='"+user_question+"' where user_id=" + user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 密保问题:"+user.user_question+"->"+user_question;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 密保问题"+user.user_question+"为"+user_question+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        if(user_answer.equals(user.user_answer) == false) {
+        	count++;
+            String updateSql = "update user set user_answer='"+user_answer+"' where user_id=" + user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 密保答案:"+user.user_answer+"->"+user_answer;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 密保答案"+user.user_answer+"为"+user_answer+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        if(nowTime != user.updated_at&&count != 0) {
+        	String updateSql = "update user set updated_at = ? where user_id="+ user.user_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.setTimestamp(1, new Timestamp(nowTime.getTime()));
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 修改时间:"+user.updated_at+"->"+nowTime;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改用户 "+user.user_id+" 修改时间"+user.updated_at+"为"+updated_at+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        try {
+            conn.close();
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+            logger.error("修改用户 "+user.user_id+" 信息"+updateStr+"后数据库关闭失败！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改用户 "+user.user_id+" 信息成功！"+updateStr);
+        }
+        return true;
+    }
+    
     //验证账号密码是否正确
 	public User validateAccountPassword(String account,String password) {
     	User user = queryUserByAccountPassword(account, password);
@@ -553,13 +653,13 @@ public class User {
 	
     //判断邮箱是否存在
     public boolean isExist_email(String user_email) {
-    	if(queryUserByEmail(user_email).getID() != 0)	return true;
+    	if(queryUserByEmail(user_email).size() != 0)	return true;
     	else return false;
     }
     
     //判断手机号是否存在
     public boolean isExist_phone(String user_phone) {
-    	if(queryUserByPhone(user_phone).getID() != 0)	return true;
+    	if(queryUserByPhone(user_phone).size() != 0)	return true;
     	else return false;
     }
     
@@ -794,8 +894,11 @@ public class User {
     public Connection conn() {
     	Connection connection = null;
         try {
-            String driver = "com.mysql.cj.jdbc.Driver";
-            String url = "jdbc:mysql://localhost/csms?useSSL=true&serverTimezone=Asia/Shanghai&user=root&password=root";
+        	String driver = MySQLConfig.DRIVER;
+            String database = MySQLConfig.DATABASE;
+            String username = MySQLConfig.USERNAME;
+            String password = MySQLConfig.PASSWORD;
+            String url = "jdbc:mysql://localhost/"+database+"?useSSL=true&serverTimezone=Asia/Shanghai&user="+username+"&password="+password+"";
             Class.forName(driver);
             connection = DriverManager.getConnection(url);
         } catch (Exception e) {
@@ -866,6 +969,7 @@ public class User {
 		return random;
 	}
     
+    //上传用户头像
     public void decodeBase64DataURLToImage(String dataURL, String path, String imgName) throws IOException {
         // 将dataURL开头的非base64字符删除
         String base64 = dataURL.substring(dataURL.indexOf(",") + 1);

@@ -58,7 +58,7 @@ Teacher tea = new Teacher().queryTeacherByID(user.getTeacherID());
 		                    <td><%= user.getEmailHide() %></td>
 		                </tr>
 		                <tr>
-		                    <td>用户类型</td>
+		                    <td>账号类型</td>
 		                    <td><%= user.getRootName() %></td>
 		                </tr>
 		                <%if(user.getRoot()==0){ %>

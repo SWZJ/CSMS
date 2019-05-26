@@ -142,13 +142,12 @@
 			</table>
 		</div>
 		
-		<!-- 选择页码 -->
-		<%@include file="/CommonView/selectPages.jsp" %>
-
-	</div>
-	
+	<!-- 选择页码 -->
+	<%@include file="/CommonView/selectPages.jsp" %>
 	<!-- 分页 -->
 	<%@include file="/CommonView/pagination.jsp" %>
+
+	</div>
 
 </div>
 <!-- END MAIN CONTENT -->

@@ -100,6 +100,7 @@
 					<th>人员数</th>
 					<th>所属教师</th>
 					<th>生效状态</th>
+					<th>评分</th>
 					<!-- <th>添加时间</th>
 					<th>修改时间</th> -->
 					</tr>
@@ -118,7 +119,7 @@
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,teacher_id,queryStr);
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,teacher_id,"cdtopic_grade","DESC",queryStr);
 					for(CDTopic cdtopic:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -133,6 +134,7 @@
 						out.print("<td>"+cdtopic.getHeadcount()+"</td>");
 						out.print("<td>"+cdtopic.getTeacherName()+"</td>");
 						out.print("<td>"+cdtopic.getActiveStr()+"</td>");
+						out.print("<td>"+cdtopic.getGradeStr()+"</td>");
 						/* out.print("<td>"+cdtopic.getCreated()+"</td>");
 						out.print("<td>"+cdtopic.getUpdated()+"</td>"); */
 					}
@@ -141,13 +143,12 @@
 			</table>
 		</div>
 		
-		<!-- 选择页码 -->
-		<%@include file="/CommonView/selectPages.jsp" %>
-
-	</div>
-	
+	<!-- 选择页码 -->
+	<%@include file="/CommonView/selectPages.jsp" %>
 	<!-- 分页 -->
 	<%@include file="/CommonView/pagination.jsp" %>
+
+	</div>
 
 </div>
 <!-- END MAIN CONTENT -->

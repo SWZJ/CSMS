@@ -1,6 +1,7 @@
 package JZW;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +16,7 @@ public class Teacher {
     private String teacher_name;	//教师姓名
     private String teacher_position;//教师职称
     private int teacher_cdtcount;	//教师拥有的课题总数
+    private double teacher_grade;	//教师评分
     private boolean teacher_deleted;//教师是否已删除
     private Date created_at;		//新增时间
     private Date updated_at;		//修改时间
@@ -61,6 +63,22 @@ public class Teacher {
  
     public void setCDTcount(int teacher_cdtcount) {
         this.teacher_cdtcount = teacher_cdtcount;
+    }
+    
+    public String getGradeStr() {
+    	if(teacher_grade==0)	return "无";
+    	else {
+    		DecimalFormat df = new DecimalFormat("0.0"); 
+    		return df.format(teacher_grade);
+    	}
+    }
+    
+    public double getGrade() {
+    	return teacher_grade;
+    }
+    
+    public void setGrade(double teacher_grade) {
+    	this.teacher_grade = teacher_grade;
     }
     
     public String getIsDeleteStr() {
@@ -199,6 +217,7 @@ public class Teacher {
                 tea.teacher_name = queryRS.getString("teacher_name");
                 tea.teacher_position = queryRS.getString("teacher_position");
                 tea.teacher_cdtcount = queryRS.getInt("teacher_cdtcount");
+                tea.teacher_grade = queryRS.getDouble("teacher_grade");
                 tea.teacher_deleted = queryRS.getBoolean("teacher_deleted");
                 tea.created_at = queryRS.getTimestamp("created_at");
                 tea.updated_at = queryRS.getTimestamp("updated_at");
@@ -434,6 +453,7 @@ public class Teacher {
                 tea.teacher_name = rs.getString("teacher_name");
                 tea.teacher_position = rs.getString("teacher_position");
                 tea.teacher_cdtcount = rs.getInt("teacher_cdtcount");
+                tea.teacher_grade = rs.getDouble("teacher_grade");
                 tea.teacher_deleted = rs.getBoolean("teacher_deleted");
                 tea.created_at = rs.getTimestamp("created_at");
                 tea.updated_at = rs.getTimestamp("updated_at");
@@ -500,6 +520,7 @@ public class Teacher {
                 tea.teacher_name = rs.getString("teacher_name");
                 tea.teacher_position = rs.getString("teacher_position");
                 tea.teacher_cdtcount = rs.getInt("teacher_cdtcount");
+                tea.teacher_grade = rs.getDouble("teacher_grade");
                 tea.teacher_deleted = rs.getBoolean("teacher_deleted");
                 tea.created_at = rs.getTimestamp("created_at");
                 tea.updated_at = rs.getTimestamp("updated_at");
@@ -573,6 +594,7 @@ public class Teacher {
                 tea.teacher_number = queryRS.getString("teacher_number");
                 tea.teacher_name = queryRS.getString("teacher_name");
                 tea.teacher_position = queryRS.getString("teacher_position");
+                tea.teacher_grade = queryRS.getDouble("teacher_grade");
                 tea.teacher_cdtcount = queryRS.getInt("teacher_cdtcount");
                 tea.teacher_deleted = queryRS.getBoolean("teacher_deleted");
                 tea.created_at = queryRS.getTimestamp("created_at");
@@ -600,8 +622,11 @@ public class Teacher {
     public Connection conn() {
     	Connection connection = null;
         try {
-            String driver = "com.mysql.cj.jdbc.Driver";
-            String url = "jdbc:mysql://localhost/csms?useSSL=true&serverTimezone=Asia/Shanghai&user=root&password=root";
+        	String driver = MySQLConfig.DRIVER;
+            String database = MySQLConfig.DATABASE;
+            String username = MySQLConfig.USERNAME;
+            String password = MySQLConfig.PASSWORD;
+            String url = "jdbc:mysql://localhost/"+database+"?useSSL=true&serverTimezone=Asia/Shanghai&user="+username+"&password="+password+"";
             Class.forName(driver);
             connection = DriverManager.getConnection(url);
         } catch (Exception e) {

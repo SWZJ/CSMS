@@ -134,6 +134,8 @@
         }
     }); */ 
     
+    /* window.location.reload(); */
+    
     $('#dataURL').val(photo);
     $('#avaterForm').submit();
     
@@ -146,6 +148,7 @@
         $('#changeModal').modal('hide');
 		/* location.replace(location.href); */
     });
+	
 
 }
 

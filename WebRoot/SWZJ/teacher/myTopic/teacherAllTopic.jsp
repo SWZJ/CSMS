@@ -40,7 +40,7 @@
 				        <form class="form-inline" id="searchForm" role="form" method="get" action="">
 				            <div class="form-group">
 				            	<span class="panel-title">信息查询&emsp;&emsp;&emsp;&emsp;</span>
-				            	<span>课题查询:</span>
+				            	<%-- <span>课题查询:</span>
 				                <select title="选择课题" id="cdtopic_id" name="cdtopic_id" class="form-control field">
 				                    <option value = 0>不限课题</option>
 				                    <%
@@ -50,7 +50,7 @@
 			                        	}
 			                         %>
 				                </select>
-				                <span class="form-group-btn"><a onclick="searchCDT()" class="btn btn-primary">查询</a></span>
+				                <span class="form-group-btn"><a onclick="searchCDT()" class="btn btn-primary">查询</a></span> --%>
 				            </div>
 				            <script type="text/javascript">
 								function searchCDT() {
@@ -113,7 +113,7 @@
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,2,2,user.getTeacherID(),queryStr);
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,2,2,user.getTeacherID(),"cdtopic_grade","ASC",queryStr);
 					for(CDTopic cdtopic:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -136,13 +136,12 @@
 			</table>
 		</div>
 		
-		<!-- 选择页码 -->
-		<%@include file="/CommonView/selectPages.jsp" %>
-
-	</div>
-	
+	<!-- 选择页码 -->
+	<%@include file="/CommonView/selectPages.jsp" %>
 	<!-- 分页 -->
 	<%@include file="/CommonView/pagination.jsp" %>
+
+	</div>
 
 </div>
 <!-- END MAIN CONTENT -->

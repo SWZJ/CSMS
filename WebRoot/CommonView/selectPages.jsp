@@ -5,7 +5,8 @@
 <div class="panel-footer">
     <div class="col-md-2">
         <form class="form-inline" id="pageNumForm" role="form" method="get" action="">
-        	<input type="hidden" name="queryStr" value="<%=queryStr%>">
+        	<%if(request.getParameter("cdtopic_id")!=null){ %><input type="hidden" name="cdtopic_id" value="<%=request.getParameter("cdtopic_id")%>"><%} %>
+        	<%if(request.getParameter("queryStr")!=null){ %><input type="hidden" name="cdtopic_id" value="<%=request.getParameter("queryStr")%>"><%} %>
             <div class="form-group">
                 <select title="显示行数" id="selectPages" name="selectPages" class="form-control field">
                     <option value="10" id="10">显示10行</option>

@@ -46,12 +46,16 @@
 				<th>人员数</th>
 				<th>所属教师</th>
 				<th>职称</th>
-				<th>生效状态</th>
+				<!-- <th>生效状态</th> -->
+				<th>评分</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-				<td><a href="/CSMS/SWZJ/student/chooseTopic/studentDropTopic.jsp?id=<%=user.getStudentID()%>" onclick="return confirm('确定要退选这个课题吗？');"><span class="label label-danger">退选课题</span></a></td>
+				<td>
+				<a href="studentDropTopic.jsp?id=<%=user.getStudentID()%>" onclick="return confirm('确定要退选这个课题吗？');"><span class="label label-danger">退选课题</span></a>
+				<a href="studentCDTopicDetail.jsp?cdtopic_id=<%=cdt.getID()%>"><span class="label label-primary">课题详情</span></a>
+				</td>
 				<td><%= cdt.getNum() %></td>
 				<td><%= cdt.getName() %></td>
 				<td><%= cdt.getKeyword() %></td>
@@ -59,7 +63,8 @@
 				<td><%= cdt.getHeadcount() %></td>
 				<td><%= cdt.getTeacherName() %></td>
 				<td><%= new Teacher().queryTeacherByID(cdt.getTeacherID()).getPosition() %></td>
-				<td><%= cdt.getActiveStr() %></td>
+				<%-- <td><%= cdt.getActiveStr() %></td> --%>
+				<td><%= cdt.getGradeStr() %></td>
 				</tr>
 			</tbody>
 		</table>
@@ -140,7 +145,8 @@
 					<th>实现技术</th>
 					<th>人员数</th>
 					<th>所属教师</th>
-					<th>生效状态</th>
+					<!-- <th>生效状态</th> -->
+					<th>评分</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -157,31 +163,34 @@
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,teacher_id,queryStr);
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,teacher_id,"cdtopic_grade","DESC",queryStr);
 					for(CDTopic cdtopic:cutList) {
 						if(cdtopic.getID()==cdt.getID())	continue;
 						out.print("<tr>");
-						out.print("<td><a href=\"/CSMS/SWZJ/student/chooseTopic/studentSelectTopic.jsp?id="+user.getStudentID()+"&cdtopic_id="+cdtopic.getID()+"\" onclick=\"return IsSelectCDTopic()?confirm('确定选择这个课题吗？'):false\"><span class=\"label label-primary\">选择课题</span></a></td>");
+						out.print("<td>");
+						out.print("<a href=\"studentSelectTopic.jsp?id="+user.getStudentID()+"&cdtopic_id="+cdtopic.getID()+"\" onclick=\"return IsSelectCDTopic()?confirm('确定选择这个课题吗？'):false\"><span class=\"label label-success\">选择课题</span></a>");
+						out.print("&ensp;<a href=\"studentCDTopicDetail.jsp?cdtopic_id="+cdtopic.getID()+"\"><span class=\"label label-primary\">课题详情</span></a></td>");
+						out.print("</td>");
 						out.print("<td>"+cdtopic.getNum()+"</td>");
 						out.print("<td>"+cdtopic.getName()+"</td>");
 						out.print("<td>"+cdtopic.getKeyword()+"</td>");
 						out.print("<td>"+cdtopic.getTechnology()+"</td>");
 						out.print("<td>"+cdtopic.getHeadcount()+"</td>");
 						out.print("<td>"+cdtopic.getTeacherName()+"</td>");
-						out.print("<td>"+cdtopic.getActiveStr()+"</td>");
+						/* out.print("<td>"+cdtopic.getActiveStr()+"</td>"); */
+						out.print("<td>"+cdtopic.getGradeStr()+"</td>");
 					}
 				%>
 				</tbody>
 			</table>
 		</div>
 		
-		<!-- 选择页码 -->
-		<%@include file="/CommonView/selectPages.jsp" %>
-
-	</div>
-	
+	<!-- 选择页码 -->
+	<%@include file="/CommonView/selectPages.jsp" %>
 	<!-- 分页 -->
 	<%@include file="/CommonView/pagination.jsp" %>
+
+	</div>
 
 </div>
 <!-- END MAIN CONTENT -->
@@ -215,7 +224,6 @@
 	}
 </script>
 <!-- END 是否已选择课题 -->
-
 
 </body>
 </html>

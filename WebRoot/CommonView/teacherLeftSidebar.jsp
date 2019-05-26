@@ -31,18 +31,7 @@
                         </ul>
                     </div>
                 </li>
-                
-                <li>
-                    <a href="#message" data-toggle="collapse" id="#message" class="collapsed">
-                    <i class="lnr lnr-bubble"></i><span>Message</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
-                    <div id="message" class="collapse">
-                        <ul class="nav">
-                        	<li><a href="/CSMS/SWZJ/message/myMessage.jsp" id="myMessage" class="">My message</a></li>
-                        	<li><a href="/CSMS/SWZJ/message/sendMessage.jsp" id="sendMessage" class="">Send message</a></li>
-                        </ul>
-                    </div>
-                </li>
-                
+  
             </ul>
         </nav>
     </div>
@@ -82,15 +71,5 @@
 			document.getElementById("teacherReportOfStudent").className = "active";
 		}
 	}
-	
-	//教师消息菜单
-	if(pathname.indexOf("message") != -1){
-		document.getElementById("#message").className = "active";
-		document.getElementById("message").className = "collapse in";
-		if(pathname.indexOf("myMessage") != -1){
-			document.getElementById("myMessage").className = "active";
-		}else if(pathname.indexOf("sendMessage") != -1){
-			document.getElementById("sendMessage").className = "active";
-		}
-	}
+
 </script>

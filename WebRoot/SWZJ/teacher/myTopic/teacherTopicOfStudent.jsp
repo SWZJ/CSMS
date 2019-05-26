@@ -40,8 +40,9 @@
 				        <form class="form-inline" id="searchForm" role="form" method="get" action="">
 				            <div class="form-group">
 				            	<span class="panel-title">信息查询&emsp;&emsp;&emsp;&emsp;</span>
-				            	<span>课题查询:</span>
-				                <select title="选择课题" id="cdtopic_id" name="cdtopic_id" class="form-control field">
+				            	<div class="right" style="margin-top:-8px">
+				            		<span>课题查询:</span>
+				            		<select title="选择课题" id="cdtopic_id" name="cdtopic_id" class="form-control field">
 				                    <option value = 0>不限课题</option>
 				                    <%
 			                        	List<CDTopic> cdtList = new CDTopic().queryByCondition(0, 2, user.getTeacherID(), "");
@@ -51,6 +52,8 @@
 			                         %>
 				                </select>
 				                <span class="form-group-btn"><a onclick="searchCDT()" class="btn btn-primary">查询</a></span>
+				            	</div>
+				                
 				            </div>
 				            <script type="text/javascript">
 								function searchCDT() {
@@ -60,6 +63,8 @@
 				        </form>
 				    </div>
 				    <% String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr"); //搜索字段 %>
+				    <% if(new CDTopic().queryCDTopicByName(queryStr).size()!=0){cdtopic_id = new CDTopic().queryCDTopicByName(queryStr).get(0).getID();queryStr="";} %>
+				    <% if(new CDTopic().queryCDTopicByNumber(queryStr).size()!=0){cdtopic_id = new CDTopic().queryCDTopicByNumber(queryStr).get(0).getID();queryStr="";} %>
 			        <div class="col-md-4 col-sm-4 col-lg-4">
 						<form role="form" class="form-horizontal" method="get" id="searchCDTopic" action="">
 							<div class="input-group">
@@ -159,13 +164,12 @@
 			</table>
 		</div>
 		
-		<!-- 选择页码 -->
-		<%@include file="/CommonView/selectPages.jsp" %>
-
-	</div>
-	
+	<!-- 选择页码 -->
+	<%@include file="/CommonView/selectPages.jsp" %>
 	<!-- 分页 -->
 	<%@include file="/CommonView/pagination.jsp" %>
+
+	</div>
 
 </div>
 <!-- END MAIN CONTENT -->

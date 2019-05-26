@@ -85,9 +85,9 @@
                 <div class="form-group" id="student_sex_class">
                     <label for="student_sex" class="col-sm-2 control-label"><a class="text-danger">*</a>性别</label>
                     <div class="col-sm-8">
-                    	&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="男" onchange="checkStudent_sex()">男</label>
-		    			&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="女" onchange="checkStudent_sex()">女</label>
-						&emsp;<label><input  id="student_sex" type="radio" name="student_sex" value="未知" onchange="checkStudent_sex()">未知</label>
+                    	&emsp;<label><input id="student_sex" type="radio" name="student_sex" value="男" onchange="checkStudent_sex()">男</label>
+		    			&emsp;<label><input id="student_sex" type="radio" name="student_sex" value="女" onchange="checkStudent_sex()">女</label>
+						&emsp;<label><input id="student_sex" type="radio" name="student_sex" value="未知" onchange="checkStudent_sex()">未知</label>
 						<label class="control-label text-danger" for="student_sex">&emsp;</label><br>
 						<span id="student_sex_span"></span>
                     </div>

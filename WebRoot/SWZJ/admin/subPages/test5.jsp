@@ -14,8 +14,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<meta http-equiv="pragma" content="no-cache">
 	<meta http-equiv="cache-control" content="no-cache">
 	<meta http-equiv="expires" content="0">    
-	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-	<meta http-equiv="description" content="This is my page">
+	<meta http-equiv="keywords" content="节奏葳,神葳总局,JZW,SWJZ,CSMS,课程设计选题管理系统,选题">
+	<meta http-equiv="description" content="CSMS-课程设计选题管理系统">
+	<meta name="author" content="节奏葳,神葳总局">
 	<!--
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	-->

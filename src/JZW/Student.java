@@ -869,8 +869,11 @@ public class Student {
     public Connection conn() {
     	Connection connection = null;
         try {
-            String driver = "com.mysql.cj.jdbc.Driver";
-            String url = "jdbc:mysql://localhost/csms?useSSL=true&serverTimezone=Asia/Shanghai&user=root&password=root";
+        	String driver = MySQLConfig.DRIVER;
+            String database = MySQLConfig.DATABASE;
+            String username = MySQLConfig.USERNAME;
+            String password = MySQLConfig.PASSWORD;
+            String url = "jdbc:mysql://localhost/"+database+"?useSSL=true&serverTimezone=Asia/Shanghai&user="+username+"&password="+password+"";
             Class.forName(driver);
             connection = DriverManager.getConnection(url);
         } catch (Exception e) {

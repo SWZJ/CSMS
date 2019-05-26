@@ -40,7 +40,7 @@
 				        <form class="form-inline" id="searchForm" role="form" method="get" action="">
 				            <div class="form-group">
 				            	<span class="panel-title">信息查询&emsp;&emsp;&emsp;&emsp;</span>
-				            	<span>课题查询:</span>
+				            	<%-- <span>课题查询:</span>
 				                <select title="选择课题" id="cdtopic_id" name="cdtopic_id" class="form-control field">
 				                    <option value = 0>不限课题</option>
 				                    <%
@@ -50,7 +50,7 @@
 			                        	}
 			                         %>
 				                </select>
-				                <span class="form-group-btn"><a onclick="searchCDT()" class="btn btn-primary">查询</a></span>
+				                <span class="form-group-btn"><a onclick="searchCDT()" class="btn btn-primary">查询</a></span> --%>
 				            </div>
 				            <script type="text/javascript">
 								function searchCDT() {
@@ -115,7 +115,7 @@
 				%>
 					<tr>
 				<%
-					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,1,user.getTeacherID(),queryStr);
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,1,user.getTeacherID(),"cdtopic_grade","ASC",queryStr);
 					for(CDTopic cdtopic:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -138,13 +138,12 @@
 			</table>
 		</div>
 		
-		<!-- 选择页码 -->
-		<%@include file="/CommonView/selectPages.jsp" %>
-
-	</div>
-	
+	<!-- 选择页码 -->
+	<%@include file="/CommonView/selectPages.jsp" %>
 	<!-- 分页 -->
 	<%@include file="/CommonView/pagination.jsp" %>
+
+	</div>
 
 </div>
 <!-- END MAIN CONTENT -->
@@ -156,7 +155,7 @@
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
 <%@include file="/CommonView/javaScript.jsp" %>
-<!-- 选中课题 -->
+<%-- <!-- 选中课题 -->
 <script>
 	$("#cdtopic_id option").each(function() {
         if($(this).val()=='<%= cdtopic_id %>'){
@@ -164,7 +163,7 @@
        	}
     });
 </script>
-<!-- END 选中课题 -->
+<!-- END 选中课题 --> --%>
 
 
 </body>

@@ -181,8 +181,6 @@
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
 <%@include file="/CommonView/javaScript.jsp" %>
-
-
 <!-- 获取性别 -->
 <script>
 	$("#student_sex[type='radio']").each(function() {
