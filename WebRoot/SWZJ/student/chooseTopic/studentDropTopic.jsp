@@ -2,17 +2,30 @@
 <%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
 
 <%
+	Message mes = new Message();
     //获取上一个页面传递过来的数据
 	request.setCharacterEncoding("UTF-8");
 	Integer student_id = request.getParameter("id")==null?0:Integer.valueOf(request.getParameter("id"));
+	Integer cdtopic_id = request.getParameter("cdtopic_id")==null?0:Integer.valueOf(request.getParameter("cdtopic_id"));
 	Student stu = new Student().queryStudentByID(student_id);
-	String cdtopic_name = stu.getCDTopicName();
+	CDTopic cdt = new CDTopic().queryCDTopicByID(cdtopic_id);
 	
-	if(stu.emptyCDTopicByStudentID(student_id)){//删除课题信息时，先将学生表中对应的课题信息置空
+	//消息概述
+	String message_summary = "课题 "+cdt.getName()+" 被退选";
+	//消息内容
+	String message_content = "您的课题 "+cdt.getName()+" 已被学生 "+stu.getName()+" 退选！";
+	//消息发送者用户ID
+	int sender_id = 1;//系统消息
+	//消息接收者用户ID
+	int receiver_id = new Teacher().queryTeacherByID(cdt.getTeacherID()).getUserID();
+	//发送消息
+	boolean m = mes.sendSingleMessage(3, message_summary, message_content, sender_id, receiver_id);
+
+	if(stu.emptyCDTopicByStudentID(student_id)){
 		new CDTopic().refreshHeadcountByID(stu.getCdtopicID());
-    	session.setAttribute("message", "你已成功退选课题 "+cdtopic_name+" ！");
+    	session.setAttribute("message", "你已成功退选课题 "+cdt.getName()+" ！");
 	}else{
-		session.setAttribute("message", "遇到未知错误！可能是服务器正在维护或者其他未知原因！退选课题 "+cdtopic_name+" 失败！");
+		session.setAttribute("message", "遇到未知错误！可能是服务器正在维护或者其他未知原因！退选课题 "+cdt.getName()+" 失败！");
 	}
 	out.print("<script>window.location.href = \"/CSMS/SWZJ/student/chooseTopic/studentChooseTopic.jsp\";</script>");
 %>

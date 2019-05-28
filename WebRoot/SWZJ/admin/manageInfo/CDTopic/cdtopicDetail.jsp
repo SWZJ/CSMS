@@ -1,5 +1,5 @@
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
-<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*,JZW.*,fileController.*" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
@@ -20,6 +20,10 @@
 <div class="main">
 <!-- MAIN CONTENT -->
 <div class="main-content">
+
+<!-- INFO TIP -->
+<%@include file="/CommonView/infoTip.jsp" %>
+<!-- END INFO TIP -->
 
 	<%
 		int cdtopic_id = Integer.valueOf(request.getParameter("id"));
@@ -50,7 +54,7 @@
                     <td><%= cdt.getTechnology() %></td>
                 </tr>
                 <tr>
-                    <td>人员数</td>
+                    <td>选题人数</td>
                     <td><%= cdt.getHeadcount() %></td>
                 </tr>
                 <tr>
@@ -58,9 +62,45 @@
                     <td><%= cdt.getTeacherName() %></td>
                 </tr>
                 <tr>
-                    <td>是否生效</td>
+                    <td>生效状态</td>
                     <td><%= cdt.getActiveStr() %></td>
+                </tr>
+                <tr>
+                    <td>审核状态</td>
+                    <td><%= cdt.getStatusStr() %></td>
                 </tr>  
+                <tr>
+                    <td>审核意见</td>
+                    <td><%= cdt.getOpinion() %></td>
+                </tr>
+                <tr>
+                    <td>开题报告</td>
+                    <td>
+                    <%request.setAttribute("fileNameMap", new ListFile().getFileMap(request, response, "teacher", cdtopic_id, "")); %>
+					<!-- 教师上传过开题报告 -->
+                    <c:if test="${fileNameMap.size()!=0 }">
+						<c:forEach var="me" items="${fileNameMap}" varStatus="statu">
+						<!-- 只取最后提交的开题报告 -->
+						<c:if test="${statu.last}">
+							<c:url value="/servlet/DownLoadServlet" var="downurl">
+								<c:param name="filename" value="${me.key}"></c:param>
+							</c:url>
+							<c:url value="/servlet/DeleteFileServlet" var="deleteurl">
+								<c:param name="filename" value="${me.key}"></c:param>
+							</c:url>
+							<a href="${downurl}&location=cdtopicDetail&branch=teacher&id=<%=cdtopic_id%>" title="下载开题报告">${me.value.trim()}</a>
+							<div class="text-right" style="margin-top:-22px;">
+		                    	<a href="${deleteurl}&location=cdtopicDetail&branch=teacher&id=<%=cdtopic_id%>" onclick="return confirm('确定要删除该开题报告吗？');"><span class="label label-danger">删除开题报告</span></a>				
+							</div>
+						</c:if>
+						</c:forEach>
+					</c:if>
+					<!-- 未上传开题报告 -->
+					<c:if test="${fileNameMap.size()==0 }">
+						未上传开题报告
+					</c:if>
+                    </td>
+                </tr>        
                 <tr>
                     <td>添加日期</td>
                     <td><%= cdt.getCreated() %></td>

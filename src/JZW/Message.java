@@ -50,8 +50,8 @@ public class Message {
     	case 0:return "dot bg-info";
     	case 1:return "dot bg-success";
     	case 2:return "dot bg-danger";
-    	case 3:return "dot bg-primary";
-    	case 4:return "dot bg-warning";
+    	case 3:return "dot bg-warning";
+    	case 4:return "dot bg-primary";
     	default:return "dot bg-info";
     	}
     }
@@ -116,7 +116,7 @@ public class Message {
     	if(sender_id!=0) {
     		return new User().queryUserByID(sender_id).getName();
     	}else {
-    		return "";
+    		return "系统通知";
     	}
     }
     
@@ -209,7 +209,7 @@ public class Message {
             String str = uuid.substring(i * 4, i * 4 + 4);  
             int x = Integer.parseInt(str, 16);  
             shortBuffer.append(chars[x % 0x3E]);  
-        }  
+        }
         return shortBuffer.toString()+(r.nextInt(899)+100);  
 	}
 	
@@ -240,9 +240,9 @@ public class Message {
         	ps.setString(1, message_identifier);
         	ps.setInt(2, message_type);
         	ps.setString(3, message_summary);
-        	ps.setString(4, message_content);
-        	if(sender_id != 0)		ps.setInt(5, sender_id);	else 	ps.setNull(5, Types.INTEGER);
-        	if(receiver_id != 0)	ps.setInt(6, receiver_id);	else 	ps.setNull(6, Types.INTEGER);
+        	if(message_content.length()==0)	ps.setNull(4, Types.VARCHAR);	else	ps.setString(4, message_content);
+        	ps.setInt(5, sender_id);
+        	ps.setInt(6, receiver_id);
         	ps.setTimestamp(7, new Timestamp(new Date().getTime()));
             ps.executeUpdate();
         } catch (Exception e1) {

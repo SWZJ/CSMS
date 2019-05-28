@@ -9,7 +9,7 @@
 	}else{
 		out.print("<div class=\"alert alert-danger alert-dismissible\" role=\"alert\">");
 		out.print("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>");
-		out.print("<i class=\"fa fa-close\"></i>"+message+"</div>");
+		out.print("<i class=\"fa fa-times-circle\"></i>"+message+"</div>");
 	}
 }%>
 <% session.removeAttribute("message"); %>

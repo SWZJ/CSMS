@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.ServletException;
@@ -19,6 +20,11 @@ import org.apache.commons.fileupload.ProgressListener;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
+
+import JZW.CDTopic;
+import JZW.Message;
+import JZW.Student;
+import JZW.Teacher;
  
 /**
 * @ClassName: UploadHandleServlet
@@ -40,6 +46,11 @@ public class UploadHandleServlet extends HttpServlet {
         String savePath = this.getServletContext().getRealPath("/WEB-INF/upload/"+branch+"/"+id);
         String savePathcopy = "E://CSMS-public/upload/"+branch+"/"+id;
         /*if(id != 0)	savePath+="/"+id;*/
+        //如果是老师上传开题报告则先删除原有文件夹
+        if(branch.equals("teacher")==true) {
+        	new DeleteFileServlet().deleteDirectory(savePath);
+        	new DeleteFileServlet().deleteDirectory(savePathcopy);
+        }
         File file = new File(savePath);
         //如果目录不存在
         if(!file.exists()){
@@ -131,26 +142,68 @@ public class UploadHandleServlet extends HttpServlet {
             }
         }catch (FileUploadBase.FileSizeLimitExceededException e) {
             e.printStackTrace();
-            session.setAttribute("message", "报告 "+filename+" 上传失败：单个文件超出最大值！！！");
-            logger.warn("报告 "+filename+" 上传失败：单个文件超出最大值！");
-            response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+            if(branch.equals("sutdent")) {
+            	session.setAttribute("message", "课题报告报告 "+filename+" 上传失败：单个文件大小超出最大值！！！");
+                logger.warn("课题报告报告 "+filename+" 上传失败：单个文件大小超出最大值！");
+                response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+            }else if(branch.equals("teacher")) {
+            	session.setAttribute("message", "开题报告 "+filename+" 上传失败：单个文件大小超出最大值！！！");
+                logger.warn("开题报告报告 "+filename+" 上传失败：单个文件大小超出最大值！");
+                response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/teacher/myTopic/teacherCDTopicDetail.jsp?id="+id+"\";</script>");
+            }
             return;
         }catch (FileUploadBase.SizeLimitExceededException e) {
             e.printStackTrace();
-            session.setAttribute("message", "报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！！！");
-            logger.warn("报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！");
-            response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+            if(branch.equals("sutdent")) {
+            	session.setAttribute("message", "课题报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！！！");
+                logger.warn("课题报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！");
+                response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+            }else if(branch.equals("teacher")) {
+            	session.setAttribute("message", "开题报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！！！");
+                logger.warn("开题报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！");
+                response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/teacher/myTopic/teacherCDTopicDetail.jsp?id="+id+"\";</script>");
+            }
             return;
         }catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("message","报告 "+filename+" 上传失败：遇到未知错误！！！");
-            logger.error("报告 "+filename+" 上传失败：遇到未知错误！");
-            response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+            if(branch.equals("sutdent")) {
+            	session.setAttribute("message","课题报告 "+filename+" 上传失败：遇到未知错误！！！");
+                logger.error("课题报告 "+filename+" 上传失败：遇到未知错误！");
+                response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+            }else if(branch.equals("teacher")) {
+            	session.setAttribute("message","开题报告 "+filename+" 上传失败：遇到未知错误！！！");
+                logger.error("开题报告 "+filename+" 上传失败：遇到未知错误！");
+                response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/teacher/myTopic/teacherCDTopicDetail.jsp?id="+id+"\";</script>");
+            }
             return;
         }
-        logger.info("报告 "+filename+" 上传成功！");
-        session.setAttribute("message","报告 "+filename+" 上传成功！！！");
-        response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+        if(branch.equals("sutdent")) {
+        	logger.info("课题报告 "+filename+" 上传成功！");
+            session.setAttribute("message","课题报告 "+filename+" 上传成功！！！");
+            response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+        }else if(branch.equals("teacher")) {
+        	CDTopic cdt = new CDTopic().queryCDTopicByID(id);
+        	Teacher tea = new Teacher().queryTeacherByID(cdt.getTeacherID());
+        	Message mes = new Message();
+    	    //消息概述
+    		String message_summary = "课题 "+cdt.getName()+" 开题报告更新";
+    		//消息内容
+    		String message_content = "课题 "+cdt.getName()+" 所属教师 "+tea.getName()+" 更新了开题报告,请留意。";
+    		//消息发送者用户ID
+    		int sender_id = 1;//系统消息
+    		//消息接收者用户ID
+    		List<Student> stuList = new Student().queryStudentByCDTopic(id);
+    		ArrayList<Integer> receiver_list = new ArrayList<Integer>();
+    		for(Student stu:stuList) {
+    			if(stu.getUserID()!=1)
+    				receiver_list.add(stu.getUserID());
+    		}
+    		//发送消息
+    		mes.sendMoreMessage(4, message_summary, message_content, sender_id, receiver_list);
+        	logger.info("开题报告 "+filename+" 上传成功！");
+            session.setAttribute("message","开题报告 "+filename+" 上传成功！！！");
+            response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/teacher/myTopic/teacherCDTopicDetail.jsp?id="+id+"\";</script>");
+        }
     }
     
     /**

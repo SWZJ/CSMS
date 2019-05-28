@@ -40,21 +40,21 @@
 					<% int class_id = request.getParameter("class_id")== null ? 0 : Integer.parseInt(request.getParameter("class_id")); //班级ID %>
 					<div class="col-md-8 col-sm-8 col-lg-8">
 				        <form class="form-inline" id="searchForm" role="form" method="post" action="">
-				            <div class="form-group">
-				            	<span class="panel-title">信息查询&emsp;&emsp;</span>
-				            	<span>学院:</span>
-				                <select title="选择学院" id="college_id" name="college_id" class="form-control field">
+				        <span class="panel-title">信息查询&emsp;&emsp;</span>
+				            <div class="form-group right" style="margin-top:-8px">
+				            	<span style="font-size:15px">学院:</span>
+				                <select title="选择学院" id="college_id" name="college_id" class="form-control input-sm">
 				                    <option value="">信息学院</option>
 				                </select>
-				                <span>专业:</span>
-				                <select title="选择专业" id="major_id" name="major_id" class="form-control field">
+				                <span style="font-size:15px">专业:</span>
+				                <select title="选择专业" id="major_id" name="major_id" class="form-control input-sm">
 				                    <option value="">计算机科学与技术</option>
 				                </select>
-				                <span>班级:</span>
-				                <select title="选择班级" id="class_id" name="class_id" class="form-control field">
+				                <span style="font-size:15px">班级:</span>
+				                <select title="选择班级" id="class_id" name="class_id" class="form-control input-sm">
 				                    <option value="">计科17-3BJ</option>
 				                </select>
-				                <span class="form-group-btn"><a onclick="return search()" class="btn btn-primary">查询</a></span>
+				                <span class="form-group-btn"><a onclick="return search()" class="btn btn-primary ">查询</a></span>
 				            </div>
 				        </form>
 				    </div>

@@ -24,6 +24,7 @@
 		var cdtopic_keyword = checkCDTopic_keyword();
 		var cdtopic_technology = checkCDTopic_technology();
 		if(cdtopic_number&&cdtopic_name&&cdtopic_keyword&&cdtopic_technology){
+			$("#teacher_id").removeAttr("disabled");
 			return true;
 		}else{  
 			return false;  
@@ -140,6 +141,38 @@
     });
 </script>
 <!-- END 获取所属教师 -->
+<!-- 判断编号是否存在 -->
+<script>
+	$(document).ready(function() {
+		function IsNumExist(){
+			$.ajax({
+				type:"post",
+				url:"/CSMS/manageInfo/CDTopicIsNumExist",
+				datatype: "json", 
+				async:false,
+				data:{
+					"cdtopic_number":$("#cdtopic_number").val(),
+				},
+				success:function(result) {
+					if(checkCDTopic_number()==false)	return;
+					var r = JSON.parse(result);
+					if(r.isExist==true){//编号已存在。
+						$("#cdtopic_number_span").html("<label class=\"control-label text-danger\" for=\"cdtopic_number\">"+r.errorMes+"</label>")
+						$("#cdtopic_number_class").attr("class","form-group has-error"); 
+					}else{//编号不存在。
+						$("#cdtopic_number_span").html("")
+						$("#cdtopic_number_class").attr("class","form-group has-success");
+					}
+				},
+				error:function(){
+					alert("回调出错！");
+				}
+			});
+		}
+		$("#addBtn").click(IsNumExist);
+		$("#cdtopic_number").change(IsNumExist);
+	});
+</script>
 
 </body>
 </html>

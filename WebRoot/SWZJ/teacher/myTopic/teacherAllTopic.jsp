@@ -92,9 +92,10 @@
 					<th>名称</th>
 					<th>关键字</th>
 					<th>实现技术</th>
-					<th>人员数</th>
+					<!-- <th>选题人数</th> -->
 					<!-- <th>所属教师</th> -->
 					<th>生效状态</th>
+					<th>审核状态</th>
 					<!-- <th>添加时间</th>
 					<th>修改时间</th> -->
 					</tr>
@@ -102,8 +103,8 @@
 				<tbody>
 				<%
 					CDTopic cdt=new CDTopic();
-					/* cdt.refreshHeadcountOfAll();//刷新所有课题的人员数 */
-					int recordCount = cdt.queryByCondition(2,2,user.getTeacherID(),queryStr).size();   		//记录总数
+					/* cdt.refreshHeadcountOfAll();//刷新所有课题的选题人数 */
+					int recordCount = cdt.queryByCondition(2,2,-1,user.getTeacherID(),queryStr).size();   		//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
@@ -113,25 +114,34 @@
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,2,2,user.getTeacherID(),"cdtopic_grade","ASC",queryStr);
-					for(CDTopic cdtopic:cutList) {
-						out.print("<tr>");
-						out.print("<td>");
-						out.print("<a href=\"/CSMS/SWZJ/teacher/myTopic/teacherCdtopicDetail.jsp?id="+cdtopic.getID()+"\">详情</a>&ensp;");
-						out.print("<a href=\"/CSMS/SWZJ/teacher/myTopic/teacherCdtopicAmend.jsp?id="+cdtopic.getID()+"\">修改</a>&ensp;");
-						out.print("<a href=\"/CSMS/SWZJ/teacher/myTopic/teacherCdtopicDoDelete.jsp?id="+cdtopic.getID()+"\" onclick=\"if (confirm('确定要删除这个课题吗？') == false) return false;\">删除</a>");
-						out.print("</td>");
-						out.print("<td>"+cdtopic.getNum()+"</td>");
-						out.print("<td>"+cdtopic.getName()+"</td>");
-						out.print("<td>"+cdtopic.getKeyword()+"</td>");
-						out.print("<td>"+cdtopic.getTechnology()+"</td>");
-						out.print("<td>"+cdtopic.getHeadcount()+"</td>");
-						/* out.print("<td>"+cdtopic.getTeacherName()+"</td>"); */
-						out.print("<td>"+cdtopic.getActiveStr()+"</td>");
-						/* out.print("<td>"+cdtopic.getCreated()+"</td>");
-						out.print("<td>"+cdtopic.getUpdated()+"</td>"); */
-					}
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,2,2,-1,user.getTeacherID(),"cdtopic_status","DESC",queryStr);
+					request.setAttribute("cutList", cutList);
 				%>
+				<c:forEach var="cdt" items="${cutList}">
+					<tr>
+					<td>
+						<a href="teacherCDTopicDetail.jsp?id=${cdt.getID() }"><span class="label label-info">详情</span></a>
+						<a href="teacherCdtopicAmend.jsp?id=${cdt.getID() }"><span class="label label-primary">修改</span></a>
+						<a href="teacherCdtopicDoDelete.jsp?id=${cdt.getID() }" onclick="return confirm('确定要删除这个课题吗？');"><span class="label label-danger">删除</span></a>
+						<c:if test="${cdt.getStatus()==0||cdt.getStatus()==2 }">
+						<a href="../createTopic/teacherUploadTopic.jsp?id=${cdt.getID() }"><span class="label label-warning">上传开题报告</span></a>
+						</c:if>
+						<c:if test="${cdt.getStatus()==2 }">
+						<a href="teacherCDTopicApplyAudit.jsp?id=${cdt.getID() }"><span class="label label-success">申请审核</span></a>
+						</c:if>
+					</td>
+					<td>${cdt.getNum() }</td>
+					<td>${cdt.getName() }</td>
+					<td>${cdt.getKeyword() }</td>
+					<td>${cdt.getTechnology() }</td>
+					<%-- <td>${cdt.getHeadcount() }</td>
+					<td>${cdt.getTeacherName() }</td> --%>
+					<td>${cdt.getActiveStr() }</td>
+					<td>${cdt.getStatusStr() }</td>
+					<%-- <td>${cdt.getCreated() }</td>
+					<td>${cdt.getUpdated() }</td> --%>
+					</tr>
+				</c:forEach>
 				</tbody>
 			</table>
 		</div>

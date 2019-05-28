@@ -24,6 +24,7 @@
 		var cdtopic_keyword = checkCDTopic_keyword();
 		var cdtopic_technology = checkCDTopic_technology();
 		if(cdtopic_number&&cdtopic_name&&cdtopic_keyword&&cdtopic_technology){
+			$("#teacher_id").removeAttr("disabled");
 			return true;
 		}else{  
 			return false;  
@@ -106,7 +107,7 @@
                 <div class="form-group" id="teacher_id_class">
                     <label for="teacher_id" class="col-sm-2 control-label"><a class="text-danger"></a>所属教师</label>
                     <div class="col-sm-8">
-                        <select class="form-control" id="teacher_id" name="teacher_id">
+                        <select class="form-control" id="teacher_id" name="teacher_id" disabled="disabled">
 	                        <option value = 0>--请选择所属教师--</option>
 	                        <%
 	                        	Teacher tea = new Teacher();

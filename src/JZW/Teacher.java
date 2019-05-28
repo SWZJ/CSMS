@@ -25,6 +25,14 @@ public class Teacher {
  
     public Teacher() {}
  
+    public int getUserID() {
+    	List<User> userList = new User().getUserInfo();
+    	for(User user:userList) {
+    		if(user.getTeacherID()==this.teacher_id)	return user.getID();
+    	}
+    	return 1;
+    }
+    
     public int getID() {
     	return teacher_id;
     }
@@ -399,6 +407,55 @@ public class Teacher {
 			logger.error("刷新所有教师拥有的课题总数后数据库关闭失败！");
 			return false;
 		}
+    }
+    
+    //刷新单个教师评分
+    public boolean refreshGradeByID(int teacher_id) {
+    	List<Grade> graList = new Grade().queryGradeByTeacherID(teacher_id);
+    	double teacher_grade = 0;
+    	int count = 0;
+    	for(Grade grade:graList) {
+    		if(grade.getValue()!=0) {
+    			count++;
+    			teacher_grade += grade.getValue();
+    		}
+    	}
+    	teacher_grade = teacher_grade/(count==0?1:count);
+    	if(teacher_grade > 0) {
+    		Connection conn = conn();
+        	String updateSql = "update teacher set teacher_grade='"+teacher_grade+"' where teacher_id=" + teacher_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                conn.close();
+                return true;
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+                logger.error("数据库语句检查或执行出错！刷新教师 "+teacher_id+ "的评分失败！");
+                return false;
+            } 
+    	}else{
+    		logger.warn("教师ID必须为正整数！");
+    		return false;
+    	}
+    }
+    
+    //刷新所有教师的评分
+    public boolean refreshGradeOfAll() {
+    	Connection conn = conn();
+    	List<Teacher> teaList = getTeacherInfo();
+		for(Teacher teacher:teaList) {
+			teacher.refreshGradeByID(teacher.getID());
+		}
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			logger.error("刷新所有教师的评分后数据库关闭出错！");
+		}
+		logger.info("刷新所有教师的评分成功！");
+		return true;
     }
     
     //判断编号是否存在

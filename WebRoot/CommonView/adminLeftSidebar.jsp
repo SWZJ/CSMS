@@ -5,26 +5,26 @@
         <nav>
             <ul class="nav">
             
-                <li><a href="/CSMS/index.jsp" id="admin" class=""><i class="lnr lnr-home"></i><span>主页</span></a></li>
+                <li><a href="/CSMS/index.jsp" id="admin" class=""><i class="lnr lnr-home"></i> <span>主页</span></a></li>
                 
                 <li>
-                    <a href="#subPages" data-toggle="collapse" id="#subPages" class="collapsed">
-                    <i class="lnr lnr-code"></i><span>节奏葳</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
-                    <div id="subPages" class="collapse">
+                    <a href="#audit" data-toggle="collapse" id="#audit" class="collapsed">
+                    <i class="fa fa-clipboard"></i> <span>课题审核</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <div id="audit" class="collapse">
                         <ul class="nav">
-                            <li><a href="/CSMS/SWZJ/admin/subPages/test1.jsp" class="">测试页面1</a></li>
-                            <li><a href="/CSMS/SWZJ/admin/subPages/test2.jsp" class="">测试页面2</a></li>
-                            <li><a href="/CSMS/SWZJ/admin/subPages/test3.jsp" class="">测试页面3</a></li>
-                            <li><a href="/CSMS/SWZJ/admin/subPages/test4.jsp" class="">测试页面4</a></li>
-                            <li><a href="/CSMS/SWZJ/admin/subPages/test5.jsp" class="">测试页面5</a></li>
-                            <li><a href="/CSMS/login.jsp" class="">Login</a></li>
+                        	<li><a href="/CSMS/SWZJ/admin/audit/waitAuditTopic.jsp" id="waitAuditTopic" class="">待审核课题</a></li>
+                            <li><a href="/CSMS/SWZJ/admin/audit/approvedTopic.jsp" id="approvedTopic" class="">审核通过课题</a></li>
+                            <li><a href="/CSMS/SWZJ/admin/audit/unapprovedTopic.jsp" id="unapprovedTopic" class="">审核未通过课题</a></li>
+                            <c:if test="${currentURL.indexOf('audit/topicDetail.jsp')!=-1 }">
+			                	<li><a href="javascript:void;" id="topicDetail" class="active">课题详情</a></li>
+							</c:if>
                         </ul>
                     </div>
                 </li>
-                
+
                 <li>
                     <a href="#manageInfo" data-toggle="collapse" id="#manageInfo" class="collapsed">
-                    <i class="lnr lnr-file-empty"></i><span>信息管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <i class="lnr lnr-database"></i> <span>信息管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
                     <div id="manageInfo" class="collapse">
                         <ul class="nav">
                         	<li><a href="/CSMS/SWZJ/admin/manageInfo/Student/studentInfo.jsp" id="Student" class="">学生信息管理</a></li>
@@ -51,12 +51,21 @@
 		document.getElementById("admin").className = "active";
 	}
 	
-	//管理员子页面菜单
-	if(pathname.indexOf("subPages") != -1){
-		document.getElementById("#subPages").className = "active";
-		document.getElementById("subPages").className = "collapse in";
-
+	//管理员课题审核菜单
+	if(pathname.indexOf("audit") != -1){
+		document.getElementById("#audit").className = "active";
+		document.getElementById("audit").className = "collapse in";
+		if(pathname.indexOf("waitAuditTopic") != -1){
+			document.getElementById("waitAuditTopic").className = "active";
+		}else if(pathname.indexOf("unapprovedTopic") != -1){
+			document.getElementById("unapprovedTopic").className = "active";
+		}else if(pathname.indexOf("approvedTopic") != -1){
+			document.getElementById("approvedTopic").className = "active";
+		}
 	}
+	
+	
+	
 	//管理员信息管理菜单
 	if(pathname.indexOf("manageInfo") != -1){
 		document.getElementById("#manageInfo").className = "active";

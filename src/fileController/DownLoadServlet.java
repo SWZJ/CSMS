@@ -46,9 +46,17 @@ public class DownLoadServlet extends HttpServlet {
         	logger.warn("文件 "+realname+" 下载失败，资源未找到或已被删除。");
         	session.setAttribute("message", "文件 "+realname+" 下载失败，您要下载的文件资源未找到或已被删除！！");
             if(location.equals("teacherReportOfStudent")==true) {
-            	response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/teacher/createTopic/teacherReportOfStudent.jsp\";</script>");
+            	response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/teacher/studentTopic/teacherReportOfStudent.jsp\";</script>");
             }else if(location.equals("studentMyReport")==true) {
             	response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
+            }else if(location.equals("teacherCDTopicDetail")==true) {
+            	response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/teacher/myTopic/teacherCDTopicDetail.jsp?id="+id+"\";</script>");
+            }else if(location.equals("topicDetail")==true) {
+            	response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/admin/audit/topicDetail.jsp?id="+id+"\";</script>");
+            }else if(location.equals("cdtopicDetail")==true) {
+            	response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/admin/manageInfo/CDTopic/cdtopicDetail.jsp?id="+id+"\";</script>");
+            }else if(location.equals("studentCDTopicDetail")==true) {
+            	response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/chooseTopic/studentCDTopicDetail.jsp?id="+id+"\";</script>");
             }
             return;
         }

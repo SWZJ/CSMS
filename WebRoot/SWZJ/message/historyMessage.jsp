@@ -66,7 +66,7 @@
 					<div class="panel-heading">
 			        	<h3 class="panel-title">Summary:${mes.getSummary() }</h3>
 						<div class="text-center">
-			                <h3 style="margin-top:-20px;" class="panel-title">Receiver:${mes.getReceiver() }</h3>
+			                <h3 style="margin-top:-20px;" class="panel-title">Sender:${mes.getSender() }</h3>
 			            </div>
 						<div class="right">
 							<a href="deleteMessageDo.jsp?id=${mes.getID() }" onclick="return confirm('Are you sure you want to delete this message?');">

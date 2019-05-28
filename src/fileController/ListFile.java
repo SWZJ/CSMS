@@ -18,7 +18,7 @@ public class ListFile extends HttpServlet {
 
 	private static final long serialVersionUID = -1331776217653061493L;
 	
-	public int getFileMap(HttpServletRequest request, HttpServletResponse response,String branch,int id,String queryStr){
+	public Map<String,String> getFileMap(HttpServletRequest request, HttpServletResponse response,String branch,int id,String queryStr){
         //获取上传文件的目录
 		String path = request.getSession().getServletContext().getRealPath("/");
 		String uploadFilePath = path+"/WEB-INF/upload/"+branch;
@@ -35,8 +35,7 @@ public class ListFile extends HttpServlet {
         //递归遍历filepath目录下的所有文件和目录，将文件的文件名存储到map集合中
         listfile(new File(uploadFilePath),fileNameMap,queryStr);//File既可以代表一个文件也可以代表一个目录
         //将Map集合发送到listfile.jsp页面进行显示
-        request.setAttribute("fileNameMap", fileNameMap);
-        return fileNameMap.size();
+        return fileNameMap;
 	}
 
     public void listfile(File file,Map<String,String> map,String queryStr){

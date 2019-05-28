@@ -11,7 +11,8 @@
 	User user = new User();
 	user = user.validateAccountPassword(account, password);
 	if(user!=null){
-		if(user.getPassword().equals("123456")){%>
+		/* 学生第一次登录修改初始密码 */
+		/* if(user.getPassword().equals("123456")){
 		<script>
 			while(true){
 				var password1 = prompt("你是第一次登录或未修改过初始密码！\n请设置你的登录密码（不能为\"123456\"）\n6~18位字符,必须包含数字、字母或特殊字符其中两项及以上","");
@@ -34,7 +35,7 @@
 				}
 			}
 		</script>
-		<%}
+		} */
 		if(remember!=null)	user.setRemember(true);
 		session.setAttribute("user",user);
 		out.print("<script>window.location.href = \"/CSMS/index.jsp\";</script>");

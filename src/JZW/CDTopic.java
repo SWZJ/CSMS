@@ -25,6 +25,8 @@ public class CDTopic {
 	private String cdtopic_technology;	//实现技术
 	private int cdtopic_headcount;		//选题人数
 	private double cdtopic_grade;		//课题评分
+	private int cdtopic_status;			//课题审核状态
+	private String cdtopic_opinion;		//课题审核意见
 	private boolean cdtopic_active;		//课题是否生效
 	private boolean cdtopic_deleted;	//课题是否删除
 	private int teacher_id;				//教师外键
@@ -102,11 +104,36 @@ public class CDTopic {
     	this.cdtopic_grade = cdtopic_grade;
     }
     
+    public String getStatusStr() {
+    	switch(cdtopic_status) {
+	    	case 0:	return "<span><i class='fa fa-spinner fa-spin'></i>等待审核</span>";
+	    	case 1:	return "<span style='color: green'><i class='fa fa-check-circle'></i>审核通过</span>";
+	    	case 2:	return "<span style='color: red'><i class='fa fa-warning'></i>审核未通过</span>";
+	    	default:	return "未知";
+    	}
+    }
+    
+    public int getStatus() {
+    	return cdtopic_status;
+    }
+    
+    public void setStatus(int cdtopic_status) {
+    	this.cdtopic_status = cdtopic_status;
+    }
+    
+    public String getOpinion() {
+    	return cdtopic_opinion==null?"":cdtopic_opinion;
+    }
+    
+    public void setOpinion(String cdtopic_opinion) {
+    	this.cdtopic_opinion = cdtopic_opinion;
+    }
+    
     public String getActiveStr() {
     	if(cdtopic_active == true) {
-    		return "已生效";
+    		return "<span style='color: green'><i class='fa fa-check-circle'></i>已生效</span>";
     	}else {
-    		return "未生效";
+    		return "<span style='color: red'><i class='fa fa-times-circle'></i>未生效</span>";
     	}
     }
     
@@ -276,6 +303,8 @@ public class CDTopic {
             	cdt.cdtopic_technology = queryRS.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = queryRS.getInt("cdtopic_headcount");
             	cdt.cdtopic_grade = queryRS.getDouble("cdtopic_grade");
+            	cdt.cdtopic_status = queryRS.getInt("cdtopic_status");
+            	cdt.cdtopic_opinion = queryRS.getString("cdtopic_opinion");
             	cdt.cdtopic_active = queryRS.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = queryRS.getBoolean("cdtopic_deleted");
             	cdt.teacher_id = queryRS.getInt("teacher_id");
@@ -346,6 +375,8 @@ public class CDTopic {
                 	cdt.cdtopic_technology = queryRS.getString("cdtopic_technology");
                 	cdt.cdtopic_headcount = queryRS.getInt("cdtopic_headcount");
                 	cdt.cdtopic_grade = queryRS.getDouble("cdtopic_grade");
+                	cdt.cdtopic_status = queryRS.getInt("cdtopic_status");
+                	cdt.cdtopic_opinion = queryRS.getString("cdtopic_opinion");
                 	cdt.cdtopic_active = queryRS.getBoolean("cdtopic_active");
                 	cdt.cdtopic_deleted = queryRS.getBoolean("cdtopic_deleted");
                 	cdt.teacher_id = queryRS.getInt("teacher_id");
@@ -391,7 +422,6 @@ public class CDTopic {
     
     //修改课题信息
     public boolean updateCDTopic(CDTopic cdt,String cdtopic_number,String cdtopic_name,String cdtopic_keyword,String cdtopic_technology,int teacher_id,Date updated_at) {
- 
     	String updateStr = "";
     	int count = 0;//记录是否有修改
         Connection conn = conn();
@@ -510,6 +540,87 @@ public class CDTopic {
         return true;
     }
     
+    //修改课题生效状态和审核状态以及审核意见
+    public boolean updateCDTopic(CDTopic cdt,boolean cdtopic_active,int cdtopic_status,String cdtopic_opinion) {
+    	String updateStr = "";
+    	int count = 0;//记录是否有修改
+        Connection conn = conn();
+        //信息有改动才提交
+        if(cdtopic_active != cdt.cdtopic_active) {
+        	count++;
+        	String updateSql = null;
+        	updateSql = "update cdtopic set cdtopic_active='"+(cdtopic_active==true?1:0)+"' where cdtopic_id=" + cdt.cdtopic_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 生效状态:"+cdt.cdtopic_active+"->"+cdtopic_active;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 生效状态"+cdt.cdtopic_active+"为"+cdtopic_active+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        
+        if(cdtopic_status != cdt.cdtopic_status) {
+        	count++;
+        	String updateSql = null;
+        	updateSql = "update cdtopic set cdtopic_status='"+cdtopic_status+"' where cdtopic_id=" + cdt.cdtopic_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 审核状态:"+cdt.cdtopic_status+"->"+cdtopic_status;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 审核状态"+cdt.cdtopic_status+"为"+cdtopic_status+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        
+        if(!(cdtopic_opinion.equals("")&&cdt.cdtopic_opinion == null)&&cdtopic_opinion.equals(cdt.cdtopic_opinion) == false) {
+        	count++;
+            String updateSql = "update cdtopic set cdtopic_opinion='"+cdtopic_opinion+"' where cdtopic_id=" + cdt.cdtopic_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 审核信息:"+cdt.cdtopic_opinion+"->"+cdtopic_opinion;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 审核信息"+cdt.cdtopic_opinion+"为"+cdtopic_opinion+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        
+        Date updated_at=new Date();
+        if(updated_at != cdt.updated_at&&count != 0) {
+        	String updateSql = "update cdtopic set updated_at = ? where cdtopic_id="+ cdt.cdtopic_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.setTimestamp(1, new Timestamp(updated_at.getTime()));
+                ps.executeUpdate();
+                ps.close();
+                updateStr += " 修改时间:"+cdt.updated_at+"->"+updated_at;
+            } catch (SQLException e1) {
+            	logger.error("数据库语句检查或执行出错！修改课题 "+cdt.cdtopic_id+" 修改时间"+cdt.updated_at+"为"+updated_at+"失败。");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        
+        try {
+            conn.close();
+        } catch (SQLException e1) {
+            e1.printStackTrace();
+            logger.error("修改课题 "+cdt.cdtopic_id+" 信息"+updateStr+"后数据库关闭失败！");
+        }
+        if(count != 0 ) {
+        	logger.info("修改课题 "+cdt.cdtopic_id+" 信息成功！"+updateStr);
+        }
+        return true;
+    }
+    
     //删除教师信息时，先将课题表中对应的教师信息置空
     public boolean emptyTeacherByTeacherID(int teacher_id) {
     	 Connection conn = conn();
@@ -577,7 +688,7 @@ public class CDTopic {
             }
     	}
 
-    //刷新课题信息人员数为实际选题人数
+    //刷新课题信息选题人数为实际选题人数
     public boolean refreshHeadcountByID(int cdtopic_id) {
     	if(cdtopic_id > 0) {
     		Connection conn = conn();
@@ -591,7 +702,7 @@ public class CDTopic {
                 return true;
             } catch (SQLException e1) {
                 e1.printStackTrace();
-                logger.error("数据库语句检查或执行出错！刷新课题 "+cdtopic_id+ "的人员数为实际选题人数失败！");
+                logger.error("数据库语句检查或执行出错！刷新课题 "+cdtopic_id+ "的选题人数为实际选题人数失败！");
                 return false;
             } 
     	}else{
@@ -600,7 +711,7 @@ public class CDTopic {
     	}
     }
     
-    //刷新所有课题信息人员数为实际选题人数
+    //刷新所有课题信息选题人数为实际选题人数
     public boolean refreshHeadcountOfAll() {
     	Connection conn = conn();
     	List<CDTopic> cdtList = getCDTopicInfo();
@@ -611,9 +722,58 @@ public class CDTopic {
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			logger.error("刷新所有课题的人员数为实际选题人数后数据库关闭出错！");
+			logger.error("刷新所有课题的选题人数为实际选题人数后数据库关闭出错！");
 		}
-		logger.info("刷新所有课题的人员数为实际选题人数成功！");
+		/*logger.info("刷新所有课题的选题人数为实际选题人数成功！");*/
+		return true;
+    }
+    
+    //刷新单个课题评分
+    public boolean refreshGradeByID(int cdtopic_id) {
+    	List<Grade> graList = new Grade().queryGradeByCDTopicID(cdtopic_id);
+    	double cdtopic_grade = 0;
+    	int count = 0;
+    	for(Grade grade:graList) {
+    		if(grade.getValue()!=0) {
+    			count++;
+    			cdtopic_grade += grade.getValue();
+    		}
+    	}
+    	cdtopic_grade = cdtopic_grade/(count==0?1:count);
+    	if(cdtopic_id > 0) {
+    		Connection conn = conn();
+        	String updateSql = "update cdtopic set cdtopic_grade='"+cdtopic_grade+"' where cdtopic_id=" + cdtopic_id;
+            try {
+                PreparedStatement ps = conn.prepareStatement(updateSql);
+                ps.executeUpdate();
+                ps.close();
+                conn.close();
+                return true;
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+                logger.error("数据库语句检查或执行出错！刷新课题 "+cdtopic_id+ "的评分失败！");
+                return false;
+            } 
+    	}else{
+    		logger.warn("课题ID必须为正整数！");
+    		return false;
+    	}
+    }
+    
+    //刷新所有课题信息选题人数为实际选题人数
+    public boolean refreshGradeOfAll() {
+    	Connection conn = conn();
+    	List<CDTopic> cdtList = getCDTopicInfo();
+		for(CDTopic cdtopic:cdtList) {
+			cdtopic.refreshHeadcountByID(cdtopic.getID());
+		}
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			logger.error("刷新所有课题的评分后数据库关闭出错！");
+		}
+		/*logger.info("刷新所有课题的评分成功！");*/
 		return true;
     }
     
@@ -671,6 +831,8 @@ public class CDTopic {
             	cdt.cdtopic_technology = rs.getString("cdtopic_technology")==null?"":rs.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = rs.getInt("cdtopic_headcount");
             	cdt.cdtopic_grade = rs.getDouble("cdtopic_grade");
+            	cdt.cdtopic_status = rs.getInt("cdtopic_status");
+            	cdt.cdtopic_opinion = rs.getString("cdtopic_opinion");
             	cdt.cdtopic_active = rs.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = rs.getBoolean("cdtopic_deleted");
             	cdt.teacher_id = rs.getInt("teacher_id");
@@ -703,14 +865,31 @@ public class CDTopic {
         return cdtList;
     }
     
-    //按条件获取课题数据（是否删除+是否有效+所属教师ID+搜索字段）（boolean型的2表示不考虑该条件）
-    public List<CDTopic> queryByCondition(int cdtopic_deleted,int cdtopic_active,int teacher_id,String queryStr) {
-    	if(cdtopic_deleted==2&&cdtopic_active==2&&teacher_id==0&&queryStr.length()==0) {
+    //按条件获取课题数据（是否删除+是否有效+审核状态+所属教师ID+排序字段+排序规则+搜索字段）（boolean型的2表示不考虑该条件）
+    public List<CDTopic> queryByCondition(int cdtopic_deleted,int cdtopic_active,int cdtopic_status,int teacher_id,String sortStr,String sortOrder,String queryStr) {
+    	if(cdtopic_deleted==2&&cdtopic_active==2&&cdtopic_status==-1&&teacher_id==0&&queryStr.length()==0) {
     		return queryByConditionByString("select * from cdtopic",queryStr);
     	}else {
     		String querySql = "select * from cdtopic where";
     		if(cdtopic_deleted!=2)	querySql += " cdtopic_deleted = "+cdtopic_deleted+" and";
     		if(cdtopic_active!=2)	querySql += " cdtopic_active = "+cdtopic_active+" and";
+    		if(cdtopic_status!=-1)	querySql += " cdtopic_status = "+cdtopic_status+" and";
+    		if(teacher_id!=0)		querySql += " teacher_id = "+teacher_id+" and";
+    		querySql = querySql.substring(0, querySql.length()-3);
+    		querySql += " order by "+sortStr+" "+sortOrder;
+    		return queryByConditionByString(querySql,queryStr);
+    	}
+    }
+    
+    //按条件获取课题数据（是否删除+是否有效+审核状态+所属教师ID+搜索字段）（boolean型的2表示不考虑该条件）（默认排序）
+    public List<CDTopic> queryByCondition(int cdtopic_deleted,int cdtopic_active,int cdtopic_status,int teacher_id,String queryStr) {
+    	if(cdtopic_deleted==2&&cdtopic_active==2&&cdtopic_status==-1&&teacher_id==0&&queryStr.length()==0) {
+    		return queryByConditionByString("select * from cdtopic",queryStr);
+    	}else {
+    		String querySql = "select * from cdtopic where";
+    		if(cdtopic_deleted!=2)	querySql += " cdtopic_deleted = "+cdtopic_deleted+" and";
+    		if(cdtopic_active!=2)	querySql += " cdtopic_active = "+cdtopic_active+" and";
+    		if(cdtopic_status!=-1)	querySql += " cdtopic_status = "+cdtopic_status+" and";
     		if(teacher_id!=0)		querySql += " teacher_id = "+teacher_id+" and";
     		querySql = querySql.substring(0, querySql.length()-3);
     		return queryByConditionByString(querySql,queryStr);
@@ -744,6 +923,8 @@ public class CDTopic {
             	cdt.cdtopic_technology = rs.getString("cdtopic_technology")==null?"":rs.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = rs.getInt("cdtopic_headcount");
             	cdt.cdtopic_grade = rs.getDouble("cdtopic_grade");
+            	cdt.cdtopic_status = rs.getInt("cdtopic_status");
+            	cdt.cdtopic_opinion = rs.getString("cdtopic_opinion");
             	cdt.cdtopic_active = rs.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = rs.getBoolean("cdtopic_deleted");
             	cdt.teacher_id = rs.getInt("teacher_id");
@@ -789,14 +970,15 @@ public class CDTopic {
         }
     }
     
-    //返回分页数据（是否删除+是否有效+所属教师ID+搜索字段）（boolean型的2表示不考虑该条件）
-    public List<CDTopic> cutPageData(int page,int pageSize,int cdtopic_deleted,int cdtopic_active,int teacher_id,String sortStr,String sortOrder,String queryStr){
-    	if(cdtopic_deleted==2&&cdtopic_active==2&&teacher_id==0&&queryStr.length()==0) {
+    //返回分页数据（是否删除+是否有效+审核状态+所属教师ID+排序字段+排序规则+搜索字段）（boolean型的2表示不考虑该条件）
+    public List<CDTopic> cutPageData(int page,int pageSize,int cdtopic_deleted,int cdtopic_active,int cdtopic_status,int teacher_id,String sortStr,String sortOrder,String queryStr){
+    	if(cdtopic_deleted==2&&cdtopic_active==2&&cdtopic_status==-1&&teacher_id==0&&queryStr.length()==0) {
     		return cutPageDataByString(page,pageSize,"select * from cdtopic limit ?,?",queryStr);
     	}else {
     		String querySql = "select * from cdtopic where";
     		if(cdtopic_deleted!=2)	querySql += " cdtopic_deleted = "+cdtopic_deleted+" and";
     		if(cdtopic_active!=2)	querySql += " cdtopic_active = "+cdtopic_active+" and";
+    		if(cdtopic_status!=-1)	querySql += " cdtopic_status = "+cdtopic_status+" and";
     		if(teacher_id!=0)		querySql += " teacher_id = "+teacher_id+" and";
     		querySql = querySql.substring(0, querySql.length()-3);
     		querySql += " order by "+sortStr+" "+sortOrder;
@@ -826,6 +1008,8 @@ public class CDTopic {
             	cdt.cdtopic_technology = queryRS.getString("cdtopic_technology");
             	cdt.cdtopic_headcount = queryRS.getInt("cdtopic_headcount");
             	cdt.cdtopic_grade = queryRS.getDouble("cdtopic_grade");
+            	cdt.cdtopic_status = queryRS.getInt("cdtopic_status");
+            	cdt.cdtopic_opinion = queryRS.getString("cdtopic_opinion");
             	cdt.cdtopic_active = queryRS.getBoolean("cdtopic_active");
             	cdt.cdtopic_deleted = queryRS.getBoolean("cdtopic_deleted");
             	cdt.teacher_id = queryRS.getInt("teacher_id");

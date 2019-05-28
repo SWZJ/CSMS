@@ -7,10 +7,10 @@
 	Integer message_id = Integer.valueOf(request.getParameter("id"));
 	Message mes = new Message().queryMessageByID(message_id);
 	
-    if(mes.softDeleteGradeByID(message_id)){
-    	session.setAttribute("message", "Marks the message as read success!");
+    if(mes.deleteMessageByID(message_id)){
+    	session.setAttribute("message", "Delete message successful!");
 	}else
-		session.setAttribute("message", "Unknown error encountered! The server may be under maintenance or for some unknown reason! Failed to mark the message as read!");
+		session.setAttribute("message", "Unknown error encountered! The server may be under maintenance or for some unknown reason! Delete message failed!");
 	out.print("<script>self.location=document.referrer;</script>");
 
 %>

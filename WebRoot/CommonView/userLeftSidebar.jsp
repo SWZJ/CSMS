@@ -6,11 +6,11 @@
         <nav>
             <ul class="nav">
             
-                <li><a href="/CSMS/SWZJ/user/userCenter.jsp" id="user" class=""><i class="lnr lnr-user"></i><span>个人中心</span></a></li>
+                <li><a href="/CSMS/SWZJ/user/userCenter.jsp" id="user" class=""><i class="lnr lnr-user"></i> <span>个人中心</span></a></li>
                 
                 <li>
                     <a href="#userManageInfo" data-toggle="collapse" id="#userManageInfo" class="collapsed">
-                    <i class="lnr lnr-license"></i><span>用户信息管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <i class="lnr lnr-license"></i> <span>用户信息管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
                     <div id="userManageInfo" class="collapse">
                         <ul class="nav">
                         	<li><a href="/CSMS/SWZJ/user/userManageInfo/userInfo.jsp" id="userInfo" class="">用户信息</a></li>
@@ -22,7 +22,7 @@
                 
                 <li>
                     <a href="#phone" data-toggle="collapse" id="#phone" class="collapsed">
-                    <i class="lnr lnr-tablet"></i><span>手机号管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <i class="lnr lnr-tablet"></i> <span>手机号管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
                     <div id="phone" class="collapse">
                         <ul class="nav">
                             <li><a href="/CSMS/SWZJ/user/phone/bindPhone.jsp" id="bindPhone" class="">手机号绑定</a></li>
@@ -34,7 +34,7 @@
                 
                 <li>
                     <a href="#email" data-toggle="collapse" id="#email" class="collapsed">
-                    <i class="lnr lnr-envelope"></i><span>邮箱管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <i class="lnr lnr-envelope"></i> <span>邮箱管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
                     <div id="email" class="collapse">
                         <ul class="nav">
                             <li><a href="/CSMS/SWZJ/user/email/bindEmail.jsp" id="bindEmail" class="">邮箱绑定</a></li>
@@ -46,7 +46,7 @@
                 
                 <li>
                     <a href="#question" data-toggle="collapse" id="#question" class="collapsed">
-                    <i class="lnr lnr-question-circle"></i><span>密保问题管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
+                    <i class="lnr lnr-question-circle"></i> <span>密保问题管理</span><i class="icon-submenu lnr lnr-chevron-left"></i></a>
                     <div id="question" class="collapse">
                         <ul class="nav">
                             <li><a href="/CSMS/SWZJ/user/question/setQuestion.jsp" id="setQuestion" class="">密保问题设置</a></li>

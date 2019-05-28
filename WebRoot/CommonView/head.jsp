@@ -16,7 +16,7 @@ request.setAttribute("currentURL", request.getRequestURL());
 <meta name="keywords" content="节奏葳,神葳总局,JZW,SWJZ,CSMS,课程设计选题管理系统,选题">
 <meta name="description" content="CSMS-课程设计选题管理系统">
 <meta name="author" content="节奏葳,神葳总局">
-<meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=0.3, maximum-scale=1.0, minimum-scale=0.3">
+<meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=0.3, maximum-scale=0.5, minimum-scale=0.3">
 <!-- VENDOR CSS -->
 <link rel="stylesheet" href="/CSMS/public/assets/vendor/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="/CSMS/public/assets/vendor/font-awesome/css/font-awesome.min.css">

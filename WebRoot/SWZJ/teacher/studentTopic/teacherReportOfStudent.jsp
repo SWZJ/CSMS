@@ -67,8 +67,23 @@
 				</thead>
 				<tbody>
 				<!-- 遍历Map集合 -->
-				<%ListFile list = new ListFile();list.getFileMap(request, response, "student", user.getTeacherID(), queryStr); %>
-				<c:forEach var="me" items="${fileNameMap}">
+				<%ListFile list = new ListFile();Map<String,String> fileNameMap = list.getFileMap(request, response, "student", user.getTeacherID(), queryStr); %>
+				<%
+					int recordCount = fileNameMap.size();   	//记录总数
+					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
+					int start=1;           					//显示开始页
+					int end=10;            					//显示结束页
+					int pageCount = recordCount%pageSize==0 ? (recordCount/pageSize==0?1:recordCount/pageSize) : recordCount/pageSize+1;	//计算总页数
+					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
+					
+					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
+					Page = Page<1 ? 1 : Page;						//页码小于1的情况
+					
+					int head = Page*pageSize-pageSize;
+					int foot = head+pageSize-1;
+					request.setAttribute("fileNameMap", fileNameMap);
+			     %>
+				<c:forEach var="me" items="${fileNameMap}" begin="<%=head %>" end="<%=foot %>">
 				<c:url value="/servlet/DownLoadServlet" var="downurl">
 					<c:param name="filename" value="${me.key}"></c:param>
 				</c:url>
@@ -90,7 +105,7 @@
 	<!-- 选择页码 -->
 	<%@include file="/CommonView/selectPages.jsp" %>
 	<!-- 分页 -->
-	<%-- <%@include file="/CommonView/pagination.jsp" %> --%>
+	<%@include file="/CommonView/pagination.jsp" %>
 
 	</div>
 	

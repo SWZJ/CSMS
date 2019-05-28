@@ -350,12 +350,12 @@ public class User {
         return queryUser(querySql);
     }
     
-    //账号密码查找用户
+    //账号密码查找用户（手机号、邮箱也可登录）
     public User queryUserByAccountPassword(String account,String password) {
-    	String querySql = "select * from user where user_account="+"'"+account+"'"+" and user_password="+"'"+password+"'";
+    	String querySql = "select * from user where (user_account="+"'"+account+"'"+" or user_phone="+"'"+account+"'"+" or user_email="+"'"+account+"'"+" ) and user_password="+"'"+password+"'";
     	if(queryUser(querySql).size()!=0) {
     		User user = queryUser(querySql).get(0);
-    		if(user.getAccount().equals(account)&&user.getPassword().equals(password))
+    		if(user.getPassword().equals(password))
     			return user;
     		else
     			return new User();
@@ -626,7 +626,7 @@ public class User {
         return true;
     }
     
-    //验证账号密码是否正确
+    //验证账号密码是否正确（手机号邮箱也可登录）
 	public User validateAccountPassword(String account,String password) {
     	User user = queryUserByAccountPassword(account, password);
     	Student stu = new Student();
@@ -635,12 +635,14 @@ public class User {
 			return user;
 		}
 		//判断是否为新学生登录
-		if(user.queryUserByAccount(account).getID() == 0 && stu.queryStudentByNumber(account).size() != 0 && password.equals("123456")) {	
-			stu = stu.queryStudentByNumber(account).get(0);
-			Date created_at = new Date();
-			user.creatUser(account, password, stu.getName(), 0, "学生", stu.getID() , 0 , created_at);
-			logger.info("学生 "+stu.getName()+" 成功注册。"); 
-			return user.queryUserByAccount(account);
+		if(account.length()==11) {
+			if(user.queryUserByAccount(account).getID() == 0 && stu.queryStudentByNumber(account).size() != 0 
+				&& password.equals(stu.queryStudentByNumber(account).get(0).getNum().substring(stu.queryStudentByNumber(account).get(0).getNum().length()-6))) {	
+				stu = stu.queryStudentByNumber(account).get(0);
+				user.creatUser(account, password, stu.getName(), 0, "学生", stu.getID() , 0 , new Date());
+				logger.info("学生 "+stu.getName()+" 成功注册。"); 
+				return user.queryUserByAccount(account);
+			}
 		}
 		return null;
     }

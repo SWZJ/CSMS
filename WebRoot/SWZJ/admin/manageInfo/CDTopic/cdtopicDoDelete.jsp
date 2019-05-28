@@ -8,7 +8,7 @@
 	Integer cdtopic_id = Integer.valueOf(request.getParameter("id"));
 	String cdtopic_name = cdt.queryCDTopicByID(cdtopic_id).getName();
 	
-    if(new Student().emptyCDTopicByCDTopicID(cdtopic_id)&&cdt.deleteCDTopic(cdtopic_id)){//删除课题信息时，先将学生表中对应的课题信息置空
+    if(new Student().emptyCDTopicByCDTopicID(cdtopic_id)&&new Grade().deleteGradeByCDTopicID(cdtopic_id)&&cdt.deleteCDTopic(cdtopic_id)){//删除课题信息时，先将学生表中对应的课题信息置空+所有课题评分数据
     	new Teacher().refreshCDTopicCountOfAll();//刷新教师拥有的课题总数
     	session.setAttribute("message", cdtopic_name+" 的信息删除成功！");
 	}else

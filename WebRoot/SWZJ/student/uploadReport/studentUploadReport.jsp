@@ -27,13 +27,12 @@
 <!-- END INFO TIP -->
      
      <%Student student = new Student().queryStudentByID(user.getStudentID()); %>
-     <%ListFile list = new ListFile();int reportCount = list.getFileMap(request, response, "student", 0, user.getName()); %>
+     <%ListFile list = new ListFile();int reportCount = list.getFileMap(request, response, "student", 0, user.getName()).size(); %>
      <div style="padding: 80px 0px;text-align: center">
         <h2>上传我的课题报告</h2><hr>
         <h4><span style="color:red">上传要求：</span>文件名中必须含课题名称、班级、姓名和学号。（例：神葳计划 计科17-3BJ 李浩葳 14172401437）</h4>
         <p><span  style="color:#E308E4">最多上传10篇报告</span>&ensp;&ensp;&ensp;已上传报告数：<%=reportCount %></p>
         <form method="post" action="/CSMS/servlet/UploadHandleServlet?branch=student&id=${user.getTeacherID()}" onsubmit="return checkFile()?checkID():false" target="_self" enctype="multipart/form-data">
-        	<input type="hidden" name="username" value="${user.getName()}">
             <button type="button" class="btn btn-default" onclick="transferclick()" style="margin: 40px">
                 <span class="glyphicon glyphicon-inbox" style="font-size: 100px" title="选择课题报告文件"></span>
             </button>

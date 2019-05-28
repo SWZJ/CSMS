@@ -97,7 +97,7 @@
 					<th>名称</th>
 					<th>关键字</th>
 					<!-- <th>实现技术</th> -->
-					<th>人员数</th>
+					<th>选题人数</th>
 					<th>所属教师</th>
 					<th>生效状态</th>
 					<th>评分</th>
@@ -108,18 +108,18 @@
 				<tbody>
 				<%
 					CDTopic cdt=new CDTopic();
-					/* cdt.refreshHeadcountOfAll();//刷新所有课题的人员数 */
-					int recordCount = cdt.queryByCondition(0,2,teacher_id,queryStr).size();   	//记录总数
+					/* cdt.refreshHeadcountOfAll();//刷新所有课题的选题人数 */
+					int recordCount = cdt.queryByCondition(0,2,-1,teacher_id,queryStr).size();   	//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
 					int pageCount = recordCount%pageSize==0 ? (recordCount/pageSize==0?1:recordCount/pageSize) : recordCount/pageSize+1;	//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
-					
+
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,teacher_id,"cdtopic_grade","DESC",queryStr);
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,-1,teacher_id,"cdtopic_id","ASC",queryStr);
 					for(CDTopic cdtopic:cutList) {
 						out.print("<tr>");
 						out.print("<td>");

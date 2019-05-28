@@ -28,6 +28,14 @@ public class Student {
  
     public Student() {}
  
+    public int getUserID() {
+    	List<User> userList = new User().getUserInfo();
+    	for(User user:userList) {
+    		if(user.getStudentID()==this.student_id)	return user.getID();
+    	}
+    	return 1;
+    }
+    
     public int getID() {
     	return student_id;
     }
@@ -97,7 +105,7 @@ public class Student {
     }
     
     public String getClassName() {
-		return "计科17-3BJ";
+    	return new CLass().queryClassByID(class_id).getName();
     }
  
     public int getMajorID() {
@@ -109,7 +117,7 @@ public class Student {
     }
     
     public String getMajorName() {
-		return "计算机科学与技术";
+		return new Major().queryMajorByID(major_id).getName();
     }
     
     public int getCollegeID() {
@@ -121,7 +129,7 @@ public class Student {
     }
     
     public String getCollegeName() {
-		return "信息学院";
+		return new College().queryCollegeByID(college_id).getName();
     }
     
     public int getCdtopicID() {

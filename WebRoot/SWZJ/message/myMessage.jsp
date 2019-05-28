@@ -69,7 +69,7 @@
 				        	<h3 class="panel-title">Summary:${mes.getSummary() }</h3>
 				        	<span style="margin-top:-2cm;" class="badge bg-danger">${mes.getReaded()==false?"<span>new message</span>":"" }</span>
 							<div class="text-center">
-				                <h3 style="margin-top:-41px;" class="panel-title">Receiver:${mes.getReceiver() }</h3>
+				                <h3 style="margin-top:-41px;" class="panel-title">Sender:${mes.getSender() }</h3>
 				            </div>
 							<div class="right">
 								<a href="deleteMessageDo.jsp?id=${mes.getID() }" onclick="return confirm('Are you sure you want to delete this message?');">
@@ -98,7 +98,7 @@
 						<div class="panel-heading">
 				        	<h3 class="panel-title">Summary:${mes.getSummary() }</h3>
 							<div class="text-center">
-				                <h3 style="margin-top:-20px;" class="panel-title">Receiver:${mes.getReceiver() }</h3>
+				                <h3 style="margin-top:-20px;" class="panel-title">Sender:${mes.getSender() }</h3>
 				            </div>
 							<div class="right">
 								<a href="deleteMessageDo.jsp?id=${mes.getID() }" onclick="return confirm('<%="sd"%>Are you sure you want to delete this message?');">

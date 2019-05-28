@@ -1,28 +1,57 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-%>
+<%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
+<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML>
 <html>
-  <head>
-    <base href="<%=basePath%>">
-    
-    <title>My JSP 'userSet.jsp' starting page</title>
-    
-	<meta http-equiv="pragma" content="no-cache">
-	<meta http-equiv="cache-control" content="no-cache">
-	<meta http-equiv="expires" content="0">    
-	<meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-	<meta http-equiv="description" content="This is my page">
-	<!--
-	<link rel="stylesheet" type="text/css" href="styles.css">
-	-->
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="robots" content="none" />
+		<title>404 Not Found</title>
+		<style>
+			* {
+				font-family: "Microsoft Yahei";
+				margin: 0;
+				font-weight: lighter;
+				text-decoration: none;
+				text-align: center;
+				line-height: 2.2em;
+			}
 
-  </head>
-  
-  <body>
-    用户设置页面<br>
-  </body>
+			html,
+			body {
+				height: 100%;
+			}
+
+			h1 {
+				font-size: 100px;
+				line-height: 1em;
+			}
+
+			table {
+				width: 100%;
+				height: 100%;
+				border: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<table cellspacing="0" cellpadding="0">
+			<tr>
+				<td>
+					<table cellspacing="0" cellpadding="0">
+						<tr>
+							<td>
+								<h1>施工中</h1>
+								<h3>设置页面维护中...</h3>
+								<p>去访问其他的页面吧！！！<br />
+									<a href="/CSMS/index.jsp">回到主页 ></a>
+								</p>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</body>
 </html>

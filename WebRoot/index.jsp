@@ -1,10 +1,10 @@
 <%@ page language="java" import="java.util.*,JZW.*,java.text.DateFormat,java.text.SimpleDateFormat" pageEncoding="utf-8"%>
 <% 
 	User user = (User)session.getAttribute("user");
-	String password = request.getParameter("password")==null?"":request.getParameter("password");
+	/* String password = request.getParameter("password")==null?"":request.getParameter("password");
 	if(password.length()!=0){
 		user.updateUserPassword(user, password);
-	}
+	} */
 	if(user == null){
 		response.sendRedirect("/CSMS/login.jsp");
 	}else{

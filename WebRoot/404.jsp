@@ -47,7 +47,7 @@ a:hover{text-decoration:underline}
                 <div>
                     <h4>可以尝试：</h4>
                     <ol>
-                        <li><a href="/CSMS/login.jsp">返回首页</a></li>
+                        <li><a href="/CSMS/index.jsp">返回首页</a></li>
                         <li><a href="#">留言反馈</a></li>
                         <li><a href="mailto:lhw981121@foxmail.com">联系神葳总局</a></li>
                     </ol>

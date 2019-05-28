@@ -6,6 +6,8 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -69,7 +71,7 @@ public class Grade {
     }
     
     public String getUser() {
-    	if(grade_user==0)	return "匿名用户";
+    	if(grade_user<=0)	return "匿名用户";
     	else 	return new User().queryUserByID(grade_user).getName();
     }
     
@@ -178,9 +180,27 @@ public class Grade {
     public void setDeleted(Date deleted_at) {
     	this.deleted_at = deleted_at;
     }
- 
+    
+    public static String getRandomIden() {
+		String[] chars = new String[] { "a", "b", "c", "d", "e", "f",  
+                "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",  
+                "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5",  
+                "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I",  
+                "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",  
+                "W", "X", "Y", "Z" };  
+        Random r = new Random();
+        StringBuffer shortBuffer = new StringBuffer();  
+        String uuid = UUID.randomUUID().toString().replace("-", "");  
+        for (int i = 0; i < 8; i++) {  
+            String str = uuid.substring(i * 4, i * 4 + 4);  
+            int x = Integer.parseInt(str, 16);  
+            shortBuffer.append(chars[x % 0x3E]);  
+        }
+        return shortBuffer.toString()+(r.nextInt(899)+100);  
+	}
+    
     //添加评分信息
-	public boolean CreateGrade(String grade_identifier,double grade_value,String grade_content,int grade_user,int grade_type,int foreign_id) {
+	public boolean CreateGrade(double grade_value,String grade_content,int grade_user,int grade_type,int foreign_id) {
 		String insertSql = 
         		"insert into grade("
         			+ "grade_identifier,"
@@ -188,16 +208,24 @@ public class Grade {
         			+ "grade_content,"
         			+ "grade_user,"
         			+ "grade_type,"
-	        		+ ""+(grade_user==0?"cdtopic_id":"teacher_id")+","
+	        		+ ""+(grade_type==0?"cdtopic_id":"teacher_id")+","
 	        		+ "created_at) "
         		+ "values(?,?,?,?,?,?,?)";
         Connection conn = conn();
         PreparedStatement ps = null;
+        String grade_identifier = getRandomIden();
+        while(true) {
+    		if(isExist_identifier(grade_identifier)) {
+    			grade_identifier = getRandomIden();
+    		}else {
+    			break;
+    		}
+    	}
         try {
         	ps = conn.prepareStatement(insertSql);
         	ps.setString(1, grade_identifier);
         	ps.setDouble(2, grade_value);
-        	if(!grade_content.equals(""))	ps.setString(3, grade_content);
+        	if(grade_content.length()==0)	ps.setNull(3, Types.VARCHAR);	else	ps.setString(3, grade_content);
         	ps.setInt(4, grade_user);
         	ps.setInt(5, grade_type);
         	ps.setInt(6, foreign_id);
@@ -269,6 +297,22 @@ public class Grade {
         logger.info("删除评分 "+grade_id+" 成功。");
         return true;
     }
+    
+    //删除课题信息时，先将评分表中对应的评分信息删除
+    public boolean deleteGradeByCDTopicID(int cdtopic_id) {
+    	List<Grade> graList = this.queryGradeByCDTopicID(cdtopic_id);
+    	boolean ok = false;
+    	for(Grade gra:graList) {
+    		ok = this.deleteGradeByID(gra.getID());
+    	}
+    	if(ok==true){
+    		logger.info("删除课题 "+cdtopic_id+" 的所有评分信息成功。");
+    		return true;
+    	}else {
+    		logger.error("删除课题 "+cdtopic_id+" 的所有评分信息失败。");
+    		return false;
+    	}
+	}
  
     //查询评分信息
     public List<Grade> queryGrade(String querySql) {
@@ -338,7 +382,7 @@ public class Grade {
     }
     
     //查询评分信息（按评分人查找）
-    public List<Grade> queryGradeUserByType(int grade_user) {
+    public List<Grade> queryGradeByUserID(int grade_user) {
     	String querySql = "select * from grade where grade_user="+"'"+grade_user+"'";
         return queryGrade(querySql);
     }

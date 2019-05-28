@@ -14,6 +14,14 @@ request.setAttribute("newMesList", newMesList);request.setAttribute("newMessageC
         <div class="navbar-btn">
             <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
         </div>
+        <%-- <c:if test="${currentURL.indexOf(\"/message/\")!=-1 }">
+        <form class="navbar-form navbar-left">
+			<div class="button-group" style="margin-left:2cm">
+				<a class="btn btn-primary" id="english" href="javascript:English;">English</a>&emsp;
+				<a class="btn btn-primary" id="chinese" href="javascript:简体中文;">简体中文</a>
+			</div>
+		</form>
+		</c:if> --%>
         <div id="navbar-menu">
         <ul class="nav navbar-nav navbar-right">
 	        <li class="dropdown">
@@ -35,7 +43,8 @@ request.setAttribute("newMesList", newMesList);request.setAttribute("newMessageC
 	    	</li>
 	        <li class="dropdown">
 	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/userAvatar/${user.getID()}.jpg?temp=<%=Math.random()%>" class="img-circle" alt="Avatar" onerror="this.src='/CSMS/public/userAvatar/<%=user.getRoot()==0?new Student().queryStudentByID(user.getStudentID()).getSex():"未知"%>.jpg';this.onerror=null"/> 
+	                <img src="/CSMS/public/userAvatar/${user.getID()}.jpg?temp=<%=Math.random()%>" class="img-circle" alt="Avatar"
+	                onerror="this.src='/CSMS/public/userAvatar/<%=user.getRoot()==0?new Student().queryStudentByID(user.getStudentID()).getSex():"未知"%>.jpg';this.onerror=null"/> 
 	                <span id="user_昵称">${user.getName()}</span>
 	                <i class="icon-submenu lnr lnr-chevron-down"></i>
 	            </a>

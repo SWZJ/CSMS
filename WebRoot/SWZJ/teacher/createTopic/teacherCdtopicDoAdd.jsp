@@ -13,9 +13,21 @@
 	    String cdtopic_keyword = request.getParameter("cdtopic_keyword");
 	    String cdtopic_technology = request.getParameter("cdtopic_technology");
 	    Integer teacher_id = Integer.valueOf(request.getParameter("teacher_id"));
-	    Date created_at = new Date();
+	    Teacher tea = new Teacher().queryTeacherByID(teacher_id);
+
+	    Message mes = new Message();
+	    //消息概述
+		String message_summary = "课题 "+cdtopic_name+" 新增,等待审核";
+		//消息内容
+		String message_content = "教师 "+tea.getName()+" 新增了课题 "+cdtopic_name+"，等待管理员审核。";
+		//消息发送者用户ID
+		int sender_id = 1;//系统消息
+		//消息接收者用户ID
+		int receiver_id = 2;//管理员
+		//发送消息
+		boolean m = mes.sendSingleMessage(4, message_summary, message_content, sender_id, receiver_id);
 		
-		if(cdt.createCDTopic(cdtopic_number, cdtopic_name, cdtopic_keyword, cdtopic_technology, teacher_id, created_at)){
+		if(cdt.createCDTopic(cdtopic_number, cdtopic_name, cdtopic_keyword, cdtopic_technology, teacher_id, new Date())){
 			new Teacher().refreshCDTopicCountByID(teacher_id);//刷新教师拥有的课题总数
 			session.setAttribute("message", "新增课题 "+cdtopic_name+" 成功！");
 		}else{

@@ -27,7 +27,7 @@
 	
 	<div class="wrapper">
 	    <div class="container">
-	    	<h1>课 程 设 计 选 题 管 理 系 统</h1><hr><br>
+	    	<h1>课&emsp;程&emsp;设&emsp;计&emsp;选&emsp;题&emsp;系&emsp;统</h1><hr><br>
 	        <h1>Welcome</h1>
 	        <form class="form" id="userForm" name="userForm" action="loginDo.jsp" onsubmit="return validateUserForm()" method="POST">
 	            <input type="text" name="account" placeholder="User account" value="${account}">
