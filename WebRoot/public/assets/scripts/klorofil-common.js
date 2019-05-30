@@ -7,10 +7,12 @@ $(document).ready(function() {
 	$('.btn-toggle-fullwidth').on('click', function() {
 		if(!$('body').hasClass('layout-fullwidth')) {
 			$('body').addClass('layout-fullwidth');
+			$.session.set('fullwidth', '1');
 
 		} else {
 			$('body').removeClass('layout-fullwidth');
 			$('body').removeClass('layout-default'); // also remove default behaviour if set
+			$.session.set('fullwidth', '0');
 		}
 
 		$(this).find('.lnr').toggleClass('lnr-arrow-left-circle lnr-arrow-right-circle');
@@ -24,6 +26,18 @@ $(document).ready(function() {
 		}
 	});
 
+	var fullwidth = $.session.get('fullwidth');
+	if(fullwidth==1) {
+			$('body').addClass('layout-fullwidth');
+			$.session.set('fullwidth', '1');
+			$('.btn-toggle-fullwidth').find('.lnr').attr('class','lnr lnr-arrow-right-circle');
+		} else {
+			$('body').removeClass('layout-fullwidth');
+			$('body').removeClass('layout-default'); // also remove default behaviour if set
+			$.session.set('fullwidth', '0');
+			$('.btn-toggle-fullwidth').find('.lnr').attr('class','lnr lnr-arrow-left-circle');
+		}
+	
 	$(window).on('load', function() {
 		if($(window).innerWidth() < 1025) {
 			$('.btn-toggle-fullwidth').find('.icon-arrows')

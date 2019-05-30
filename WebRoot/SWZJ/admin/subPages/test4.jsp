@@ -1,1 +1,0 @@
-<%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>

@@ -24,7 +24,7 @@ function checkCDTopic_technology(){
 	    }else{
 			//符合规则
 	        spanNode.innerHTML = "";  
-	        document.getElementById("cdtopic_technology_class").className = "form-group";    
+	        document.getElementById("cdtopic_technology_class").className = "form-group has-success";    
 	        return true;  
 		}
 	}

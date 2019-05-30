@@ -5,93 +5,149 @@
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
+<!-- Receiver验证 -->
+<script>
+function checkReceiverEmpty(){
+	var receiver = $("#receiver").val();
+	if(receiver.length==0){
+		$("#receiver_span").html("<label class=\"control-label text-danger\" for=\"receiver\">The receiver cannot be empty!</label>");
+		$("#receiver_class").attr("class","form-group has-error");
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>
+<!-- Summary验证 -->
+<script>
+function checkSummary(){
+	var field = $("#summary").val();
+    var spanNode = $("#summary_span");
+	if(field.length == 0){
+		//不符合规则
+        spanNode.html("<label class=\"control-label text-danger\" for=\"summary\">The Summary cannot be empty!</label>");
+        $("#summary_class").attr("class","form-group has-error");
+        return false;
+	}else{
+		spanNode.html();
+		$("#summary_class").attr("class","form-group");
+        return true;  
+	}
+}
+</script>
+<!-- Content验证 -->
+<script>
+function checkContent(){
+	var field = $("#content").val();
+    var spanNode = $("#content_span");
+	if(field.length == 0){
+		//不符合规则
+        spanNode.html("<label class=\"control-label text-danger\" for=\"content\">The Content cannot be empty!</label>");
+        $("#content_class").attr("class","form-group has-error");
+        return false;
+	}else{
+		spanNode.html();
+		$("#content_class").attr("class","form-group");
+        return true;  
+	}
+}
+</script>
+<!-- 表单验证 -->
+<script>
+function checkAll(){
+	var receiver = checkReceiverEmpty()&&$("#receiver_id").val()!=null;
+	var summary = checkSummary();
+	var content = checkContent();
+	if(receiver&&summary&&content){
+		return true;
+	}else{  
+		return false;  
+	}
+} 
+</script>
 
 </head>
 
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = (User)session.getAttribute("user");	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="#"><i class="lnr lnr-user"></i> <span>我的信息</span></a></li>
-	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
-	                <li><a href="#"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%if(user.getRoot() == 1){%>
-<%@include file="/HTML/adminLeftSidebar.html" %>
-<%}else if(user.getRoot() == 0){%>
-<%@include file="/HTML/studentLeftSidebar.html" %>
-<%}else if(user.getRoot() == 9){%>
-<%@include file="/HTML/teacherLeftSidebar.html" %>
-<%}%>
-
-<%if(user.getRoot() == 999){%>
-<%@include file="/HTML/adminLeftSidebar.html" %>
-<%}%>
+<%@include file="/CommonView/messageLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
 <!-- MAIN CONTENT -->
 <div class="main-content">
 
-<!-- ERROR TIP -->
-<!-- END ERROR TIP -->
-        
-     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1">
-                <div class="panel panel-default">
-                    <div class="panel-heading">欢迎  <%= user.getName() %> 登录</div>
-                    <div class="panel-body">
-                    	你是 <%= user.getRootName() %> ！<hr>
-                    	这里你可以发送消息！
-                    </div>
-                </div>
+<!-- INFO TIP -->
+<%@include file="/CommonView/infoTip.jsp" %>
+<!-- END INFO TIP -->
+
+	<div class="panel">
+    
+        <div class="panel-heading" >
+            <h3 class="panel-title">Send Message</h3>
+            <div class="right">
+                <a href="/CSMS/SWZJ/message/myMessage.jsp"><span class="label label-primary"><i class="fa fa-comment"></i>&nbsp;My Message</span></a>
             </div>
         </div>
-    </div>
+        
+		<div class="panel-body" style="text-align:center; vertical-align:middel;">
+			<form class="form-horizontal" role="form" method="post" action="sendMessageDo.jsp" onsubmit="return checkAll()">
+				<input type="hidden" name="sender_id" value="<%=user.getID()%>">
+				
+				<div class="form-group" id="receiver_class">
+                    <label for="receiver" class="col-sm-2 control-label"><a class="text-danger"></a>Receiver</label>
+                    <div class="col-sm-8">
+                    	<div class="input-group">
+	                        <input type="text" class="form-control" id="receiver" name="receiver" onkeypress="if(event.keyCode==13) {testBtn.click();return false;}"
+	                        placeholder="Please enter the receiver's account number, mobile phone number or email address" value="" onchange="testBtn.click()"
+	                        oninput="Inputing(document.getElementById('receiver_span'),document.getElementById('receiver_class'));$('#receiver_id_class').hide(500);$('#receiver_id').empty();">
+	                        <span class="input-group-btn"><button class="btn btn-primary" type="button" id="testBtn">Testing Receiver</button></span>
+                        </div>
+                        <span id="receiver_span"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="receiver_id_class" style="display:none">
+                    <label for="receiver_id" class="col-sm-2 control-label"><a class="text-danger"></a>Select Receiver</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="receiver_id" name="receiver_id">
+                        </select>
+                        <span id="receiver_id_span"></span>
+					</div>
+                </div>
+
+                <div class="form-group" id="summary_class">
+                    <label for="summary" class="col-sm-2 control-label"><a class="text-danger"></a>Summary</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="summary" name="summary" maxlength="30"
+                        placeholder="Please enter the message summary(No more than 30 words)" value="" onchange="checkSummary()"
+                        oninput="Inputing(document.getElementById('summary_span'),document.getElementById('summary_class'))">
+                        <span id="summary_span"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="content_class">
+                    <label for="content" class="col-sm-2 control-label"><a class="text-danger"></a>Content</label>
+                    <div class="col-sm-8">
+                    	<textarea class="form-control" placeholder="Please enter the message content(No more than 500 words)" maxlength="500" 
+                    	style="height:150px;resize: none;" id="content" name="content" onchange="checkContent()"
+                        oninput="Inputing(document.getElementById('content_span'),document.getElementById('content_class'))"></textarea>
+                        <span id="content_span"></span>
+                    </div>
+                </div>
+                
+				<div class="form-group">
+                	<button type="submit" class="btn btn-primary" id="SendBtn">Send Message Now</button>
+                </div>
+				
+			</form>
+		</div>
+
+	</div>
 
 </div>
 <!-- END MAIN CONTENT -->
@@ -99,10 +155,44 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
+<%@include file="/CommonView/javaScript.jsp" %>
+<script>
+$("#testBtn").click(function(){
+	//判断接收者是否存在
+	if(checkReceiverEmpty()==false)	return;
+	$.ajax({
+		type:"post",
+		url:"/CSMS/manageInfo/UserIsExist",
+		datatype: "json",
+		async:false,
+		data:{
+			"ID":$("#receiver").val(),
+		},
+		success:function(result) {
+			var r = JSON.parse(result);
+			if(r.isExist==true){//用户存在
+				var userList = r.userList;
+				var receiver = $("#receiver_id");
+				receiver.empty();
+				for(var i in userList){
+					receiver.append("<option value='"+userList[i].user_id+"'>"+userList[i].user_name+"</option>");
+				}
+				$("#receiver_id_class").show(500);
+			}else{//用户不存在
+				$("#receiver_span").html("<label class=\"control-label text-danger\" for=\"receiver\">"+r.errorMes+"</label>");
+				$("#receiver_class").attr("class","form-group has-error");
+				return;
+			}
+		},
+		error:function(){
+			alert("回调出错！");
+		}
+	});	
+})
+</script>
 
 </body>
 </html>

@@ -23,9 +23,13 @@ function checkStudent_number(){
 	        return false;  
 	    }else{
 			//符合规则
-	        spanNode.innerHTML = "";  
-	        document.getElementById("student_number_class").className = "form-group";   
-	        return true;  
+			if(spanNode.innerHTML.indexOf("success")!=-1)	return true;
+			else if(spanNode.innerHTML.indexOf("danger")!=-1)	return false;
+			else{
+				spanNode.innerHTML = "";
+		        document.getElementById("student_number_class").className = "form-group has-success";
+		        return true;  
+			}
 		}
 	}
 }

@@ -1,86 +1,29 @@
 <%if(session.getAttribute("user") == null){response.sendRedirect("/CSMS/login.jsp");return;}%>
-<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="utf-8"%>
+<%@ page language="java" import="java.util.*,JZW.*,java.net.URLDecoder" pageEncoding="utf-8"%>
 
 <!DOCTYPE html>
 <html>
 <head>
 <!-- 头部 -->
-<%@include file="/HTML/head.html" %>
+<%@include file="/CommonView/head.jsp" %>
 
 </head>
 
 <body>
 <div id="wrapper"><!-- WRAPPER -->
 <!-- 导航栏 -->
-<% User user = (User)session.getAttribute("user");	List<Message> mesList = new Message().queryMessageOfNew(user.getID(),false);	int messageCount = mesList.size(); %>
-<nav class="navbar navbar-default navbar-fixed-top">
-    <div class="brand">
-    	<a href="/CSMS/index.jsp"><img src="/CSMS/public/assets/img/logo-dark.png" alt="Klorofil Logo" class="img-responsive logo"></a>
-    </div>
-    <div class="container-fluid">
-        <div class="navbar-btn">
-            <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
-        </div>
-        <div id="navbar-menu">
-        <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
-		        <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-		            <i class="lnr lnr-alarm"></i>
-		            <span class="badge bg-danger" id="alarm_count"><%= messageCount==0?"":messageCount %></span>
-		        </a>
-		        <ul class="dropdown-menu notifications" id="message_menu">
-<%
-	for(int i =0;i < messageCount;i++){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp?id="+mesList.get(i).getID()+"\" class=\"notification-item\"><span class=\"dot "+mesList.get(i).getType()+"\"></span>"+mesList.get(i).getSummary()+"</a></li>");
-	}
-	if(messageCount != 0){
-		out.print("<li><a href=\"/CSMS/SWZJ/message/myMessage.jsp\" class=\"more\">查看所有通知</a></li>");
-	}else{
-		out.print("<li><a href=\"#\" class=\"more\">未收到通知</a></li>");
-	}
-%>
-		        </ul>
-	    	</li>
-	        <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	                <img src="/CSMS/public/assets/img/jzw.jpg" class="img-circle" alt="Avatar">
-	                <span id="user_昵称">${user.getName()}</span>
-	                <i class="icon-submenu lnr lnr-chevron-down"></i>
-	            </a>
-	            <ul class="dropdown-menu">
-	                <li><a href="#"><i class="lnr lnr-user"></i> <span>我的信息</span></a></li>
-	                <li><a href="/CSMS/SWZJ/message/myMessage.jsp"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
-	                <li><a href="#"><i class="lnr lnr-cog"></i> <span>设置</span></a></li>
-	                <li><a href="/CSMS/logout.jsp"><i class="lnr lnr-exit"></i> <span>注销</span></a></li>
-	            </ul>
-	        </li>
-        </ul>
-    	</div>
-    </div>
-</nav>
+<%@include file="/CommonView/navbar.jsp" %>
 <!-- 左侧边栏 -->
-<%@include file="/HTML/adminLeftSidebar.html" %>
+<%@include file="/CommonView/adminLeftSidebar.jsp" %>
 
 <!-- 内容区域 -->
 <div class="main">
 <!-- MAIN CONTENT -->
 <div class="main-content">
 
-<!-- ERROR TIP -->
-<% String message = (String)session.getAttribute("message"); %>
-<%if(message != null){
-	if(message.indexOf("成功") != -1){
-		out.print("<div class=\"alert alert-success alert-dismissible\" role=\"alert\">");
-		out.print("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>");
-		out.print("<i class=\"fa fa-check-circle\"></i>"+message+"</div>");
-	}else{
-		out.print("<div class=\"alert alert-danger alert-dismissible\" role=\"alert\">");
-		out.print("<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>");
-		out.print("<i class=\"fa fa-close\"></i>"+message+"</div>");
-	}
-}%>
-<% session.removeAttribute("message"); %>
-<!-- END ERROR TIP -->
+<!-- INFO TIP -->
+<%@include file="/CommonView/infoTip.jsp" %>
+<!-- END INFO TIP -->
         
     <div class="panel">
         <div class="panel-heading" >
@@ -89,7 +32,62 @@
                 <a href="/CSMS/SWZJ/admin/manageInfo/CDTopic/cdtopicAdd.jsp"><span class="label label-primary"><i class="fa fa-plus-square"></i>&nbsp;新增课题</span></a>
             </div>
         </div>
-        
+        <div class="panel-heading">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-2 col-sm-2 col-lg-2">
+						<h3 class="panel-title">信息查询</h3>
+					</div>
+					<% int teacher_id = request.getParameter("teacher_id")== null ? 0 : Integer.parseInt(request.getParameter("teacher_id")); //教师ID %>
+					<div class="col-md-5 col-sm-5 col-lg-5">
+				        <form class="form-inline" id="searchForm" role="form" method="get" action="">
+				            <div class="form-group right">
+				            	<span>教师查询:</span>
+				                <select title="选择教师" id="teacher_id" name="teacher_id" class="form-control field">
+				                	<option value = 0>不限教师</option>
+			                       	<%
+			                        	Teacher tea = new Teacher();
+			                        	List<Teacher> teaList = tea.getTeacherInfo();
+			                        	for(Teacher teacher:teaList){
+			                        		out.print("<option value=\""+teacher.getID()+"\">"+teacher.getName()+"</option>");
+			                        	}
+			                         %>
+				                </select>
+				                <span class="form-group-btn"><a onclick="searchTeacher()" class="btn btn-primary">查询</a></span>
+				            </div>
+				            <script type="text/javascript">
+								function searchTeacher() {
+									document.getElementById("searchForm").submit();
+								}
+							</script>
+				        </form>
+				    </div>
+				    <% String queryStr = request.getParameter("queryStr")== null ? "" : request.getParameter("queryStr"); //搜索字段 %>
+				    <% if(new Teacher().queryTeacherByName(queryStr).size()!=0){teacher_id = new Teacher().queryTeacherByName(queryStr).get(0).getID();queryStr="";} %>
+			        <div class="col-md-5 col-sm-5 col-lg-5">
+						<form role="form" class="form-horizontal" method="get" id="searchCDTopic" action="">
+							<div class="input-group">
+								<input class="form-control" name="queryStr" type="text" id="queryStr" value="<%=queryStr%>" placeholder="课题编号、名称、关键字、实现技术或教师姓名">
+								<input type="hidden" name="teacher_id" value="<%=request.getParameter("teacher_id")== null ? 0 : Integer.parseInt(request.getParameter("teacher_id"))%>">
+								<input type="hidden" name="selectPages" value="<%=request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages"))%>">
+								<span class="input-group-btn"><a onclick="return searchCDTopic()" class="btn btn-primary">搜索</a></span>
+							</div>
+							<script type="text/javascript">
+								function searchCDTopic() {
+									if(document.getElementById("queryStr").value.length != 0){
+										document.getElementById("searchCDTopic").submit();
+										return true;
+									}else{
+										return false;
+									}
+								}
+							</script>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="panel-body">
 			<table class="table table-hover">
 				<thead>
@@ -98,10 +96,11 @@
 					<th>编号</th>
 					<th>名称</th>
 					<th>关键字</th>
-					<th>实现技术</th>
-					<th>人员数</th>
+					<!-- <th>实现技术</th> -->
+					<th>选题人数</th>
 					<th>所属教师</th>
 					<th>生效状态</th>
+					<th>评分</th>
 					<!-- <th>添加时间</th>
 					<th>修改时间</th> -->
 					</tr>
@@ -109,18 +108,18 @@
 				<tbody>
 				<%
 					CDTopic cdt=new CDTopic();
-					/* cdt.refreshHeadcountOfAll();//刷新所有课题的人员数 */
-					int recordCount = cdt.Count(0,2,0);   	//记录总数
+					/* cdt.refreshHeadcountOfAll();//刷新所有课题的选题人数 */
+					int recordCount = cdt.queryByCondition(0,2,-1,teacher_id,queryStr).size();   	//记录总数
 					int pageSize = request.getParameter("selectPages")==null ? 10 : Integer.parseInt(request.getParameter("selectPages")); //每页记录数
 					int start=1;           					//显示开始页
 					int end=10;            					//显示结束页
-					int pageCount = recordCount%pageSize==0 ? recordCount/pageSize : recordCount/pageSize+1; 				//计算总页数
+					int pageCount = recordCount%pageSize==0 ? (recordCount/pageSize==0?1:recordCount/pageSize) : recordCount/pageSize+1;	//计算总页数
 					int Page = request.getParameter("page")==null ? 1 : Integer.parseInt(request.getParameter("page"));		//获取当前页面的页码
-					
+
 					Page = Page>pageCount ? pageCount : Page;		//页码大于最大页码的情况
 					Page = Page<1 ? 1 : Page;						//页码小于1的情况
 
-					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,0);
+					List<CDTopic> cutList = cdt.cutPageData(Page,pageSize,0,2,-1,teacher_id,"cdtopic_id","ASC",queryStr);
 					for(CDTopic cdtopic:cutList) {
 						out.print("<tr>");
 						out.print("<td>");
@@ -131,10 +130,11 @@
 						out.print("<td>"+cdtopic.getNum()+"</td>");
 						out.print("<td>"+cdtopic.getName()+"</td>");
 						out.print("<td>"+cdtopic.getKeyword()+"</td>");
-						out.print("<td>"+cdtopic.getTechnology()+"</td>");
+						/* out.print("<td>"+cdtopic.getTechnology()+"</td>"); */
 						out.print("<td>"+cdtopic.getHeadcount()+"</td>");
 						out.print("<td>"+cdtopic.getTeacherName()+"</td>");
 						out.print("<td>"+cdtopic.getActiveStr()+"</td>");
+						out.print("<td>"+cdtopic.getGradeStr()+"</td>");
 						/* out.print("<td>"+cdtopic.getCreated()+"</td>");
 						out.print("<td>"+cdtopic.getUpdated()+"</td>"); */
 					}
@@ -143,86 +143,11 @@
 			</table>
 		</div>
 		
-		<!-- 选择页码 -->
-		<%@include file="/HTML/selectPages.html" %>
+	<!-- 选择页码 -->
+	<%@include file="/CommonView/selectPages.jsp" %>
+	<!-- 分页 -->
+	<%@include file="/CommonView/pagination.jsp" %>
 
-	</div>
-	
-	<div>
-		<div class="pull-left">
-			<ul class="pagination">
-				<% 
-					if(pageCount<=end){
-						if(Page == 1){
-							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
-						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">首页</a></li>",pageSize,1));
-						}
-						
-						end = pageCount;
-						
-						if(Page>1){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&laquo;</a></li>",pageSize,Page-1));
-						}
-						
-						for(int i=start;i<=end;i++){
-						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\"?selectPages=%d&page=%d\">%d</a></li>",pageSize,i,i);
-						  if(i==Page){
-						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
-						  }
-						  out.print(pageinfo);
-						}
-						
-						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&raquo;</a></li>",pageSize,Page+1));
-						}
-						
-						if(Page == pageCount){
-							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
-						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">尾页</a></li>",pageSize,pageCount));
-						}
-						
-					}else{
-						if(Page == 1){
-							out.print(String.format("<li class=\"disabled\"><a>首页</a></li>"));
-						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">首页</a></li>",pageSize,1));
-						}
-						if(Page>=7){
-						  start=Page-5;
-						  end=Page+4;
-						}
-						if(start>(pageCount-10)){
-						  start=pageCount-9;
-						}
-						if(Page>1){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&laquo;</a></li>",pageSize,Page-1));
-						}
-						
-						for(int i=start;i<=end;i++){
-						  if(i>pageCount) break;
-						  String pageinfo=String.format("<li><a href=\"?selectPages=%d&page=%d\">%d</a></li>",pageSize,i,i);
-						  if(i==Page){
-						    pageinfo=String.format("<li class=\"active\"><span>%d</span></li>",i);
-						  }
-						  out.print(pageinfo);
-						}
-						
-						if(Page<pageCount){
-						  out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">&raquo;</a></li>",pageSize,Page+1));
-						}
-						
-						if(Page == pageCount){
-							out.print(String.format("<li class=\"disabled\"><a>尾页</a></li>"));
-						}else{
-							out.print(String.format("<li><a href=\"?selectPages=%d&page=%d\">尾页</a></li>",pageSize,pageCount));
-						}
-					}
-			     %>
-			</ul>
-		</div>
 	</div>
 
 </div>
@@ -231,30 +156,19 @@
 <!-- END 内容区域 -->
 
 <!-- 页尾 -->
-<%@include file="/HTML/foot.html" %>
+<%@include file="/CommonView/foot.jsp" %>
 </div><!-- END WRAPPER -->
 <!-- Javascript -->
-<%@include file="/HTML/javaScript.html" %>
-<!-- SELECT  -->
+<%@include file="/CommonView/javaScript.jsp" %>
+<!-- 选中教师 -->
 <script>
-   $(document).ready(function(){
-       //页面行数改变，刷新页面
-       $("#selectPages").change(function(){
-           $("#pageNumForm").submit();
-       });
-   });
-</script>
-<!-- END SELECT  -->
-<!-- GET SELECT PAGES FROM INPUT -->
-<script>
-	$("#selectPages option").each(function() {
-        if($(this).val()=='<%= pageSize %>'){
+	$("#teacher_id option").each(function() {
+        if($(this).val()=='<%= teacher_id %>'){
         	$(this).prop('selected',true);
        	}
     });
 </script>
-<!-- END GET SELECT PAGES FROM INPUT -->
-
+<!-- END 选中教师 -->
 
 </body>
 </html>
