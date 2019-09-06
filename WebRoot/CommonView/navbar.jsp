@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*,JZW.*" pageEncoding="UTF-8"%>
+<%@ page language="java" import="java.util.*,JZW.*,java.net.URLDecoder" pageEncoding="UTF-8"%>
 
 <%	
 List<Message> newMesList = new Message().queryMessageOfNew(user.getID(),false);
@@ -14,14 +14,22 @@ request.setAttribute("newMesList", newMesList);request.setAttribute("newMessageC
         <div class="navbar-btn">
             <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
         </div>
-        <%-- <c:if test="${currentURL.indexOf(\"/message/\")!=-1 }">
+        <c:if test="${currentURL.indexOf(\"/message/\")!=-1 }">
         <form class="navbar-form navbar-left">
 			<div class="button-group" style="margin-left:2cm">
-				<a class="btn btn-primary" id="english" href="javascript:English;">English</a>&emsp;
-				<a class="btn btn-primary" id="chinese" href="javascript:简体中文;">简体中文</a>
+				<%String urllan = request.getRequestURI() + "?";
+				if(request.getQueryString()!=null){
+					urllan = request.getRequestURI() + "?" + URLDecoder.decode(request.getQueryString(),"utf-8") +"&";
+				}if(urllan.indexOf("language")!=-1){
+					String language = request.getParameter("language");
+					session.setAttribute("language", language);%>
+					<script>self.location=document.referrer;</script>
+				<%return;}%>
+				<a class="btn btn-primary" href="<%=urllan%>language=en">English</a>&emsp;
+				<a class="btn btn-primary" href="<%=urllan%>language=ch">简体中文</a>
 			</div>
 		</form>
-		</c:if> --%>
+		</c:if>
         <div id="navbar-menu">
         <ul class="nav navbar-nav navbar-right">
 	        <li class="dropdown">

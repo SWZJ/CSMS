@@ -48,13 +48,13 @@
 			<div class="col-md-12">
 				<div class="panel">
 			        <div class="panel-heading" >
-			            <h3 class="panel-title">History Message</h3>
+			            <h3 class="panel-title">${lan.equals("en")?"History Message":"已读消息"}</h3>
 			            <div class="right">
-			                <a href="sendMessage.jsp"><span class="label label-primary"><i class="fa fa-comments"></i>&nbsp;Send Message</span></a>
+			                <a href="sendMessage.jsp"><span class="label label-primary"><i class="fa fa-comments"></i>&nbsp;${lan.equals("en")?"Send Message":"发送消息"}</span></a>
 			            </div>
 			        </div>
 					<div class="panel-body" style="text-align:center;font-size:24px">
-						Here are all the messages you've read
+						${lan.equals("en")?"Here are all the messages you've read":"这里是你所有的已读消息"}
 					</div>
 				</div>
 			</div>
@@ -64,13 +64,13 @@
 			<div class="col-md-12">
 				<div class="panel">
 					<div class="panel-heading">
-			        	<h3 class="panel-title">Summary:${mes.getSummary() }</h3>
+			        	<h3 class="panel-title">${lan.equals("en")?"Summary":"概述"}:${mes.getSummary() }</h3>
 						<div class="text-center">
-			                <h3 style="margin-top:-20px;" class="panel-title">Sender:${mes.getSender() }</h3>
+			                <h3 style="margin-top:-20px;" class="panel-title">${lan.equals("en")?"Sender":"发送者"}:${mes.getSender() }</h3>
 			            </div>
 						<div class="right">
-							<a href="deleteMessageDo.jsp?id=${mes.getID() }" onclick="return confirm('Are you sure you want to delete this message?');">
-							<span class="label label-danger"><i class="fa fa-window-close"></i>&nbsp;Delete Message</span></a>
+							<a href="deleteMessageDo.jsp?id=${mes.getID() }" onclick="return confirm('${lan.equals('en')?'Are you sure you want to delete this message?':'确定要删除这条消息吗？'}');">
+							<span class="label label-danger"><i class="fa fa-window-close"></i>&nbsp;${lan.equals("en")?"Delete Message":"删除消息"}</span></a>
 							<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
 							<button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
 						</div>
@@ -80,12 +80,12 @@
 					</div>
 					<div class="panel-footer">
 						<span>#${floor.count+startFloor}</span>
-						<span style="margin-left:50px;">Identifier:${mes.getIden() }</span>
+						<span style="margin-left:50px;">${lan.equals("en")?"Identifier":"编号"}:${mes.getIden() }</span>
 						<div class="text-center" style="margin-top:-27px;">
-							<a type="button" href="markUnreadMessageDo.jsp?id=${mes.getID() }" class="btn btn-info">Mark as Unread</a>
+							<a type="button" href="markUnreadMessageDo.jsp?id=${mes.getID() }" class="btn btn-info">${lan.equals("en")?"Mark as Unread":"标为未读"}</a>
 			            </div>
 						<div class="text-right" style="margin-top:-27px;">
-			            	<span>Sending time:${mes.getCreated() }</span>
+			            	<span>${lan.equals("en")?"Sending time":"发送时间"}:${mes.getCreated() }</span>
 			            </div>
 					</div>
 				</div>
@@ -101,7 +101,7 @@
 							</div>
 						</div>
 						<div class="panel-body">
-							<p style="text-align:center;font-size:20px">You have no message that you have read!!!</p>
+							<p style="text-align:center;font-size:20px">${lan.equals("en")?"You have no message that you have read!!!":"你没有已读消息！！！"}</p>
 						</div>
 					</div>
 				</div>

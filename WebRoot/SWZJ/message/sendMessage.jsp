@@ -11,7 +11,7 @@
 function checkReceiverEmpty(){
 	var receiver = $("#receiver").val();
 	if(receiver.length==0){
-		$("#receiver_span").html("<label class=\"control-label text-danger\" for=\"receiver\">The receiver cannot be empty!</label>");
+		$("#receiver_span").html("<label class=\"control-label text-danger\" for=\"receiver\"><%=session.getAttribute("lan").equals("en")?"The receiver cannot be empty!":"接收者账号不能为空！" %></label>");
 		$("#receiver_class").attr("class","form-group has-error");
 		return false;
 	}else{
@@ -26,7 +26,7 @@ function checkSummary(){
     var spanNode = $("#summary_span");
 	if(field.length == 0){
 		//不符合规则
-        spanNode.html("<label class=\"control-label text-danger\" for=\"summary\">The Summary cannot be empty!</label>");
+        spanNode.html("<label class=\"control-label text-danger\" for=\"summary\"><%=session.getAttribute("lan").equals("en")?"The Summary cannot be empty!":"主题不能为空！" %></label>");
         $("#summary_class").attr("class","form-group has-error");
         return false;
 	}else{
@@ -43,7 +43,7 @@ function checkContent(){
     var spanNode = $("#content_span");
 	if(field.length == 0){
 		//不符合规则
-        spanNode.html("<label class=\"control-label text-danger\" for=\"content\">The Content cannot be empty!</label>");
+        spanNode.html("<label class=\"control-label text-danger\" for=\"content\"><%=session.getAttribute("lan").equals("en")?"The Content cannot be empty!":"内容不能为空！" %></label>");
         $("#content_class").attr("class","form-group has-error");
         return false;
 	}else{
@@ -88,9 +88,9 @@ function checkAll(){
 	<div class="panel">
     
         <div class="panel-heading" >
-            <h3 class="panel-title">Send Message</h3>
+            <h3 class="panel-title">${lan.equals("en")?"Send Message":"发送消息"}</h3>
             <div class="right">
-                <a href="/CSMS/SWZJ/message/myMessage.jsp"><span class="label label-primary"><i class="fa fa-comment"></i>&nbsp;My Message</span></a>
+                <a href="/CSMS/SWZJ/message/myMessage.jsp"><span class="label label-primary"><i class="fa fa-comment"></i>&nbsp;${lan.equals("en")?"My Message":"所有消息"}</span></a>
             </div>
         </div>
         
@@ -99,20 +99,20 @@ function checkAll(){
 				<input type="hidden" name="sender_id" value="<%=user.getID()%>">
 				
 				<div class="form-group" id="receiver_class">
-                    <label for="receiver" class="col-sm-2 control-label"><a class="text-danger"></a>Receiver</label>
+                    <label for="receiver" class="col-sm-2 control-label"><a class="text-danger"></a>${lan.equals("en")?"Receiver":"接收者"}</label>
                     <div class="col-sm-8">
                     	<div class="input-group">
 	                        <input type="text" class="form-control" id="receiver" name="receiver" onkeypress="if(event.keyCode==13) {testBtn.click();return false;}"
-	                        placeholder="Please enter the receiver's account number, mobile phone number or email address" value="" onchange="testBtn.click()"
+	                        placeholder="<%=session.getAttribute("lan").equals("en")?"Please enter the receiver's account number, mobile phone number or email address":"请输入接收用户的帐号、手机号码或电邮地址" %>" value="" onchange="testBtn.click()"
 	                        oninput="Inputing(document.getElementById('receiver_span'),document.getElementById('receiver_class'));$('#receiver_id_class').hide(500);$('#receiver_id').empty();">
-	                        <span class="input-group-btn"><button class="btn btn-primary" type="button" id="testBtn">Testing Receiver</button></span>
+	                        <span class="input-group-btn"><button class="btn btn-primary" type="button" id="testBtn">${lan.equals("en")?"Testing Receive":"检测用户"}</button></span>
                         </div>
                         <span id="receiver_span"></span>
                     </div>
                 </div>
                 
                 <div class="form-group" id="receiver_id_class" style="display:none">
-                    <label for="receiver_id" class="col-sm-2 control-label"><a class="text-danger"></a>Select Receiver</label>
+                    <label for="receiver_id" class="col-sm-2 control-label"><a class="text-danger"></a>${lan.equals("en")?"Select Receiver":"选择接收者"}</label>
                     <div class="col-sm-8">
                         <select class="form-control" id="receiver_id" name="receiver_id">
                         </select>
@@ -121,19 +121,19 @@ function checkAll(){
                 </div>
 
                 <div class="form-group" id="summary_class">
-                    <label for="summary" class="col-sm-2 control-label"><a class="text-danger"></a>Summary</label>
+                    <label for="summary" class="col-sm-2 control-label"><a class="text-danger"></a>${lan.equals("en")?"Summary":"主题"}</label>
                     <div class="col-sm-8">
                         <input type="text" class="form-control" id="summary" name="summary" maxlength="30"
-                        placeholder="Please enter the message summary(No more than 30 words)" value="" onchange="checkSummary()"
+                        placeholder="<%=session.getAttribute("lan").equals("en")?"Please enter the message summary(No more than 30 words)":"请输入消息主题（不超过30字）" %>" value="" onchange="checkSummary()"
                         oninput="Inputing(document.getElementById('summary_span'),document.getElementById('summary_class'))">
                         <span id="summary_span"></span>
                     </div>
                 </div>
                 
                 <div class="form-group" id="content_class">
-                    <label for="content" class="col-sm-2 control-label"><a class="text-danger"></a>Content</label>
+                    <label for="content" class="col-sm-2 control-label"><a class="text-danger"></a>${lan.equals("en")?"Content":"内容"}</label>
                     <div class="col-sm-8">
-                    	<textarea class="form-control" placeholder="Please enter the message content(No more than 500 words)" maxlength="500" 
+                    	<textarea class="form-control" placeholder="<%=session.getAttribute("lan").equals("en")?"Please enter the message content(No more than 500 words)":"请输入消息内容（不超过500字）" %>" maxlength="500" 
                     	style="height:150px;resize: none;" id="content" name="content" onchange="checkContent()"
                         oninput="Inputing(document.getElementById('content_span'),document.getElementById('content_class'))"></textarea>
                         <span id="content_span"></span>
@@ -141,7 +141,7 @@ function checkAll(){
                 </div>
                 
 				<div class="form-group">
-                	<button type="submit" class="btn btn-primary" id="SendBtn">Send Message Now</button>
+                	<button type="submit" class="btn btn-primary" id="SendBtn">${lan.equals("en")?"Send Message Now":"发送消息"}</button>
                 </div>
 				
 			</form>
