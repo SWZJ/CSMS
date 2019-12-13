@@ -1,7 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <!-- 修改头像模态框 -->
 <link href="https://cdn.bootcss.com/cropper/3.1.3/cropper.min.css" rel="stylesheet">
-<div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="changeModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
 <div class="modal-dialog">
     <div class="modal-content" style="text-align:center">
         <div class="modal-header">
@@ -32,15 +32,19 @@
             var $image = img;
             var $inputImage = input;
             var $modal = modal;
-            var options = {
-                aspectRatio: 1, // 纵横比
-                viewMode: 1,
-				scalable: false,//是否允许缩放图像
-				zoomable: false,//是否允许放大图像
-				movable: false,//是否允许可以移动后面的图片
-				rotatable: false,//是否允许旋转图像
-				
-            };
+				var options = {
+						aspectRatio : 1, 			//纵横比
+						viewMode : 1,				//显示模式
+						dragMode : 'move',		//定义cropper的拖拽模式：‘crop’: 可以产生一个新的裁剪框3 ‘move’: 只可以移动3 ‘none’: 什么也不处理
+						center : true,				//裁剪区域正中央是否显示+号
+						scalable : false, 		//是否允许缩放图像
+						zoomable : true,			//是否允许放大图像
+						movable : true,			//是否允许可以移动后面的图片
+						rotatable : false, 		//是否允许旋转图像
+						minCropBoxWidth : 150,	//剪切框宽度最小值
+						minCropBoxHeight : 150, //剪切框高度最小值
+						autoCropArea : 1,			//自动显示的裁剪框的大小
+					};
             // 模态框隐藏后需要保存的数据对象
             var saveData = {};
             var URL = window.URL || window.webkitURL;

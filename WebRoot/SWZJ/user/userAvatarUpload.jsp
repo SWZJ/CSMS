@@ -5,7 +5,6 @@
 User user = new User();
 //获取上一个页面传递过来的数据
 request.setCharacterEncoding("UTF-8");
-request.setCharacterEncoding("UTF-8");
 String user_id = request.getParameter("id")==null?"":request.getParameter("id");
 String dataURL = request.getParameter("dataURL")==null?"":request.getParameter("dataURL");
 

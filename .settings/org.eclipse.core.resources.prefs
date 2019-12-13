@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//WebRoot/CommonView/head.jsp=UTF-8
 encoding//WebRoot/CommonView/navbar.jsp=UTF-8
+encoding//src/log4j.properties=UTF-8
 encoding//src/phoneController/Config.java=UTF-8
 encoding//src/phoneController/HttpUtil.java=UTF-8
 encoding/<project>=UTF-8

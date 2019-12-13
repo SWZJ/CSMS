@@ -93,7 +93,7 @@
 				<div class="panel">
 					<div class="panel-heading">
 			        	<h3 class="panel-title">${lan.equals("en")?"Summary":"概述"}:${mes.getSummary() }</h3>
-			        	<span style="margin-top:-2cm;" class="badge bg-danger">${mes.getReaded()==false?"<span>new message</span>":"" }</span>
+			        	<span style="margin-top:-2cm;" class="badge bg-danger">${mes.getReaded()==false?lan.equals("en")?"new message":"新消息":"" }</span>
 						<div class="text-center">
 			                <h3 style="margin-top:-41px;" class="panel-title">${lan.equals("en")?"Sender":"发送者"}:${mes.getSender() }</h3>
 			            </div>

@@ -102,7 +102,7 @@ function checkUser_passwords(){
 		                        <option value = "0" id="default_mode">--请选择验证方式--</option>
 		                        <option value = "1" id="user_question_mode" style="display:none">密保问题验证</option>
 	                          	<option value = "2" id="user_email_mode" style="display:none"></option>
-								<option value = "3" id="user_phone_mode" style="display:none"></option>
+										<option value = "3" id="user_phone_mode" style="display:none"></option>
 	                        </select>
 	                        <span id="selectMode_span"></span>
 						</div>
@@ -178,7 +178,7 @@ function checkUser_passwords(){
 				</form>
 				<!-- 填写新密码 -->
 				<form id="passwordForm" class="form-horizontal" style="display: none;">
-					<h4>第三步：填写新密码</h4><hr>
+					<h4>第四步：填写新密码</h4><hr>
 
 					<div class="form-group" id="user_password_class">
 						<label for="user_password" class="col-sm-2 control-label"><a class="text-danger">*</a>新密码</label>

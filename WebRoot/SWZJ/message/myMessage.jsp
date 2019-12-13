@@ -112,7 +112,7 @@
 						</div>
 						<div class="panel-footer">
 							<span>#${floor.count+startFloor}</span>
-							<span style="margin-left:50px;">${lan.equals("en")?"Identifier":"编号"}:${mes.getIden() }:${mes.getIden() }</span>
+							<span style="margin-left:50px;">${lan.equals("en")?"Identifier":"编号"}:${mes.getIden() }</span>
 							<div class="text-center" style="margin-top:-27px;">
 								<a type="button" href="markUnreadMessageDo.jsp?id=${mes.getID() }" class="btn btn-info">${lan.equals("en")?"Mark as Unread":"标为未读"}</a>
 				            </div>
