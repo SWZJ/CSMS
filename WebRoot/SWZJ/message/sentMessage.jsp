@@ -48,13 +48,13 @@
 			<div class="col-md-12">
 				<div class="panel">
 			        <div class="panel-heading" >
-			            <h3 class="panel-title">Sent Message</h3>
+			            <h3 class="panel-title">${lan.equals("en")?"Sent Message":"已发消息"}</h3>
 			            <div class="right">
-			                <a href="sendMessage.jsp"><span class="label label-primary"><i class="fa fa-comments"></i>&nbsp;Send Message</span></a>
+			                <a href="sendMessage.jsp"><span class="label label-primary"><i class="fa fa-comments"></i>&nbsp;${lan.equals("en")?"Send Message":"发送消息"}</span></a>
 			            </div>
 			        </div>
 					<div class="panel-body" style="text-align:center;font-size:24px">
-						Here is a record of all the messages you sent
+						${lan.equals("en")?"Here is a record of all the messages you sent":"这里是你所有发送过的消息"}
 					</div>
 				</div>
 			</div>
@@ -64,9 +64,9 @@
 			<div class="col-md-12">
 				<div class="panel">
 					<div class="panel-heading">
-			        	<h3 class="panel-title">Summary:${mes.getSummary() }</h3>
+			        	<h3 class="panel-title">${lan.equals("en")?"Summary":"概述"}:${mes.getSummary() }</h3>
 						<div class="text-center">
-			                <h3 style="margin-top:-20px;" class="panel-title">Receiver:${mes.getReceiver() }</h3>
+			                <h3 style="margin-top:-20px;" class="panel-title">${lan.equals("en")?"Receiver":"接收者"}:${mes.getReceiver() }</h3>
 			            </div>
 						<div class="right">
 							<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
@@ -78,9 +78,9 @@
 					</div>
 					<div class="panel-footer">
 						<span>#${floor.count+startFloor}</span>
-						<span style="margin-left:50px;">Identifier:${mes.getIden() }</span>
+						<span style="margin-left:50px;">${lan.equals("en")?"Identifier":"编号"}:${mes.getIden() }</span>
 						<div class="text-right" style="margin-top:-20px;">
-			            	<span>Sending time:${mes.getCreated() }</span>
+			            	<span>${lan.equals("en")?"Sending time":"发送时间"}:${mes.getCreated() }</span>
 			            </div>
 					</div>
 				</div>
@@ -91,7 +91,7 @@
 					<div class="panel">
 						<div class="panel-heading">
 				        	<div class="text-center">
-						 		<a href="sendMessage.jsp"><span class="label label-primary"><i class="fa fa-comments"></i>&nbsp;Send Message</span></a>
+						 		<a href="sendMessage.jsp"><span class="label label-primary"><i class="fa fa-comments"></i>&nbsp;${lan.equals("en")?"Send Message":"发送消息"}</span></a>
 						 	</div>
 							<div class="right">
 								<button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i></button>
@@ -99,7 +99,7 @@
 							</div>
 						</div>
 						<div class="panel-body">
-							<p style="text-align:center;font-size:20px">You have not sent a message, go to send it!!!</p>
+							<p style="text-align:center;font-size:20px">${lan.equals("en")?"You have not sent a message, go to send it!!!":"你还未发送过消息，快去发送吧！！！"}</p>
 						</div>
 					</div>
 				</div>

@@ -244,7 +244,7 @@ public class Grade {
                 logger.error("添加评分"+grade_identifier+" "+grade_value+" "+grade_content+" "+grade_user+" "+grade_type+" "+foreign_id+"后数据库关闭出错！");
             }
         }
-        logger.error("添加评分成功："+grade_identifier+" "+grade_value+" "+grade_content+" "+grade_user+" "+grade_type+" "+foreign_id);
+        logger.info("添加评分成功："+grade_identifier+" "+grade_value+" "+grade_content+" "+grade_user+" "+grade_type+" "+foreign_id);
         return true;
     }
  

@@ -264,6 +264,7 @@ $("#accountbtn").click(function() {
 					$("#default_mode").html("您没有可用的验证方式！请联系管理员。");
 				}else{
 					if(user.user_question!=null&&user.user_question.length!=0){
+						$("#user_question").html(user.user_question);
 						$("#answer").val(user.user_answer);
 						$("#user_question_mode").show();
 					}

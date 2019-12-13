@@ -8,6 +8,7 @@ if(session.getAttribute("user") != null){
 }
 request.setAttribute("currentURL", request.getRequestURL());
 %>
+<%String lan = session.getAttribute("language")==null?"en":(String)session.getAttribute("language");session.setAttribute("lan", lan); %>
 <title>节奏葳</title>
 <meta content="IE=edge,chrome=1">
 <!-- <meta http-equiv="pragma" content="no-cache">
