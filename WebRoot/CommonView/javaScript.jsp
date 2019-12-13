@@ -11,3 +11,17 @@
 <script src="/CSMS/public/assets/scripts/common.js"></script>
 <script src="https://cdn.bootcss.com/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
 
+<script>
+//消息页面语言切换
+$("#english").click(function(){
+	alert($.session.get("language"));
+	$.session.set('language', 'english');
+	alert($.session.get("language"));
+});
+$("#chinese").click(function(){
+	alert($.session.get("language"));
+	$.session.set('language', 'chinese');
+	alert($.session.get("language"));
+});
+</script>
+
