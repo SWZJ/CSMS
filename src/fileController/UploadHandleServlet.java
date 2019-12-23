@@ -44,7 +44,7 @@ public class UploadHandleServlet extends HttpServlet {
 		int id = request.getParameter("id")==null?0:Integer.parseInt(request.getParameter("id"));
         //得到上传文件的保存目录，将上传的文件存放于WEB-INF目录下，不允许外界直接访问，保证上传文件的安全
         String savePath = this.getServletContext().getRealPath("/WEB-INF/upload/"+branch+"/"+id);
-        String savePathcopy = "E://CSMS-public/upload/"+branch+"/"+id;
+        String savePathcopy = "C://CSMS-public/upload/"+branch+"/"+id;
         /*if(id != 0)	savePath+="/"+id;*/
         //如果是老师上传开题报告则先删除原有文件夹
         if(branch.equals("teacher")==true) {

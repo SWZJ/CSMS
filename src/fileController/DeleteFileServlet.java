@@ -31,7 +31,7 @@ public class DeleteFileServlet extends HttpServlet {
         String fileName = request.getParameter("filename");
         //上传的文件都是保存在/WEB-INF/upload目录下的子目录当中
         String fileSaveRootPath=this.getServletContext().getRealPath("/WEB-INF/upload/"+branch+"/"+id);
-        String fileSaveRootPathcopy = "E://CSMS-public/upload/"+branch+"/"+id;
+        String fileSaveRootPathcopy = "C://CSMS-public/upload/"+branch+"/"+id;
         //通过文件名找出文件的所在目录
         String path = findFileSavePathByFileName(fileName,fileSaveRootPath);
         String pathcopy = findFileSavePathByFileName(fileName,fileSaveRootPathcopy);
