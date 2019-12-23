@@ -975,8 +975,12 @@ public class User {
     public void decodeBase64DataURLToImage(String dataURL, String path, String imgName) throws IOException {
         // 将dataURL开头的非base64字符删除
         String base64 = dataURL.substring(dataURL.indexOf(",") + 1);
+        //目录不存在先创建目录
+        File file = new File(path);if(!file.exists()){file.mkdirs();}
         FileOutputStream write = new FileOutputStream(new File(path  + "\\" + imgName));
-        FileOutputStream write1 = new FileOutputStream(new File("C:\\Users\\LHW98\\Documents\\GitHub\\CSMS\\WebRoot\\public\\userAvatar\\" + imgName));
+        //目录不存在先创建目录(复制一份到本地硬盘)
+        File newFile = new File("C:/CSMS-public/upload/userAvatar");if(!newFile.exists()){newFile.mkdirs();}
+        FileOutputStream write1 = new FileOutputStream(new File(newFile + "/" + imgName));
         byte[] decoderBytes = Base64.getDecoder().decode(base64);
         write.write(decoderBytes);
         write.close();

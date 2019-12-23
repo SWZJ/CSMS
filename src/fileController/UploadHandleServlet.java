@@ -142,7 +142,7 @@ public class UploadHandleServlet extends HttpServlet {
             }
         }catch (FileUploadBase.FileSizeLimitExceededException e) {
             e.printStackTrace();
-            if(branch.equals("sutdent")) {
+            if(branch.equals("student")) {
             	session.setAttribute("message", "课题报告报告 "+filename+" 上传失败：单个文件大小超出最大值！！！");
                 logger.warn("课题报告报告 "+filename+" 上传失败：单个文件大小超出最大值！");
                 response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
@@ -154,7 +154,7 @@ public class UploadHandleServlet extends HttpServlet {
             return;
         }catch (FileUploadBase.SizeLimitExceededException e) {
             e.printStackTrace();
-            if(branch.equals("sutdent")) {
+            if(branch.equals("student")) {
             	session.setAttribute("message", "课题报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！！！");
                 logger.warn("课题报告 "+filename+" 上传失败：上传文件的总的大小超出限制的最大值！");
                 response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
@@ -166,7 +166,7 @@ public class UploadHandleServlet extends HttpServlet {
             return;
         }catch (Exception e) {
             e.printStackTrace();
-            if(branch.equals("sutdent")) {
+            if(branch.equals("student")) {
             	session.setAttribute("message","课题报告 "+filename+" 上传失败：遇到未知错误！！！");
                 logger.error("课题报告 "+filename+" 上传失败：遇到未知错误！");
                 response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
@@ -177,7 +177,7 @@ public class UploadHandleServlet extends HttpServlet {
             }
             return;
         }
-        if(branch.equals("sutdent")) {
+        if(branch.equals("student")) {
         	logger.info("课题报告 "+filename+" 上传成功！");
             session.setAttribute("message","课题报告 "+filename+" 上传成功！！！");
             response.getWriter().println("<script>window.location.href = \"/CSMS/SWZJ/student/designStep/studentMyReport.jsp\";</script>");
