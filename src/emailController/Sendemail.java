@@ -30,14 +30,24 @@ public class Sendemail {
     
     @SuppressWarnings("static-access")
 	public boolean send(String to,String title,String content) throws Exception{
-    	if(!checkEmail(to))	return false;
+    	//if(!checkEmail(to))	return false;
     	this.to=to;
     	this.title=title;
     	this.content=content;
     	Properties prop = new Properties();
+        /*prop.setProperty("mail.host", "smtp.qq.com");
+        prop.setProperty("mail.transport.protocol", "smtp");
+        prop.setProperty("mail.smtp.auth", "true");*/
+        //使用465端口发送邮件
         prop.setProperty("mail.host", "smtp.qq.com");
         prop.setProperty("mail.transport.protocol", "smtp");
-        prop.setProperty("mail.smtp.auth", "true");
+        prop.setProperty("mail.smtp.auth", "true");//开启认证
+        //prop.setProperty("mail.debug", "true");//启用调试
+        prop.setProperty("mail.smtp.timeout", "10000");//设置链接超时
+        prop.setProperty("mail.smtp.port", "465");//设置端口
+        prop.setProperty("mail.smtp.socketFactory.port", "465");//设置ssl端口
+        prop.setProperty("mail.smtp.socketFactory.fallback", "false");
+        prop.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         //使用JavaMail发送邮件的5个步骤
         //1、创建session
         Session session = Session.getInstance(prop);
