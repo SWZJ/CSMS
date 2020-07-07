@@ -4,7 +4,7 @@ function checkUser_authCode(){
     var field = document.getElementById("user_authCode").value;  
     var spanNode = document.getElementById("user_authCode_span");  
 	//授权码的规则：选填，
-	var authCode = "x24q1%44322R16Z";
+	var authCode = "x24q1%44322R16Z节奏葳";
     if(field.length!=0&&field!=authCode){
         //输入授权码但不正确
         spanNode.innerHTML = "<label class=\"control-label text-danger\" for=\"user_authCode\">授权码有误！请仔细核对神葳总局给予的授权码！</label>";  

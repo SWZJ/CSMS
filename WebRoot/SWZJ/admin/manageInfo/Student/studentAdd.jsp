@@ -103,55 +103,6 @@
                     </div>
                 </div>
                 
-                <div class="form-group" id="student_class_class">
-                    <label for="student_class" class="col-sm-2 control-label"><a class="text-danger">*</a>班级</label>
-                    <div class="col-sm-8">
-                        <select class="form-control" id="student_class" name="student_class" onchange="checkStudent_class()">
-	                        <option value = 0>--请选择所属班级--</option>
-	                        <option value = 1>计科17-3BJ</option>
-                        </select>
-                        <span id="student_class_span"></span>
-                    </div>
-                </div>
-                
-                <div class="form-group" id="student_major_class">
-                    <label for="student_major" class="col-sm-2 control-label"><a class="text-danger">*</a>专业</label>
-                    <div class="col-sm-8">
-                        <select class="form-control" id="student_major" name="student_major" onchange="checkStudent_major()">
-	                        <option value = 0>--请选择所属专业--</option>
-	                        <option value = 1>计算机科学与技术</option>
-                        </select>
-                        <span id="student_major_span"></span>
-                    </div>
-                </div>
-
-				<div class="form-group" id="student_college_class">
-                    <label for="student_college" class="col-sm-2 control-label"><a class="text-danger">*</a>学院</label>
-                    <div class="col-sm-8">
-                        <select class="form-control" id="student_college" name="student_college" onchange="checkStudent_college()">
-	                        <option value = 0>--请选择所属学院--</option>
-	                        <option value = 1>信息学院</option>
-                        </select>
-                        <span id="student_college_span"></span>
-                    </div>
-                </div>
-
-                <div class="form-group" id="cdtopic_id_class">
-                    <label for="cdtopic_id" class="col-sm-2 control-label"><a class="text-danger"></a>选择课题</label>
-                    <div class="col-sm-8">
-                        <select class="form-control" id="cdtopic_id" name="cdtopic_id">
-	                        <option value = 0>--请选择课题名称--</option>
-	                        <%
-	                        	CDTopic cdt = new CDTopic();
-	                        	List<CDTopic> cdtList = cdt.getCDTopicInfo();
-	                        	for(CDTopic cdtopic:cdtList){
-	                        		out.print("<option value=\""+cdtopic.getID()+"\">"+cdtopic.getName()+"</option>");
-	                        	}
-	                         %>
-                        </select>
-                        <span id="cdtopic_id_span"></span>
-					</div>
-                </div>
 
                 <div class="form-group">
                     <div class="col-sm-offset-5 col-sm-6">
